@@ -1,0 +1,157 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================================
+   Vellora design tokens — see docs/roadmap.md §2.
+   The canonical palette below is the single source of truth. Re-theming
+   (Phase 5: Modern → Wooden → Glassy → Ice) = swapping these values only.
+   The @theme inline block maps shadcn/ui's component token names onto this
+   palette so every shadcn component renders on-brand.
+   ============================================================================ */
+
+:root {
+  /* ---- Canonical palette (default theme: minimalist, mostly-white) ---- */
+  --background: #ffffff; /* app background */
+  --surface: #ffffff; /* cards, panels */
+  --surface-subtle: #f4f4f5; /* subtle neutral fills, hovers */
+  --border: #e7e7e9; /* dividers, inputs */
+  --foreground: #0a0a0b; /* primary text */
+  --muted: #6b7280; /* secondary text */
+  --accent: #4f46e5; /* indigo — the single brand accent */
+  --accent-foreground: #ffffff; /* text/icons on the accent */
+  --success: #10b981; /* emerald */
+  --warning: #f59e0b; /* amber */
+  --danger: #f43f5e; /* rose */
+
+  --radius: 0.625rem;
+
+  /* ---- shadcn/ui compatibility layer (maps onto the palette above) ---- */
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-foreground);
+  --secondary: var(--surface-subtle);
+  --secondary-foreground: var(--foreground);
+  --muted-surface: var(--surface-subtle);
+  --muted-foreground: var(--muted);
+  --subtle: var(--surface-subtle);
+  --subtle-foreground: var(--foreground);
+  --destructive: var(--danger);
+  --input: var(--border);
+  --ring: var(--accent);
+}
+
+.dark {
+  --background: #0a0a0b;
+  --surface: #141416;
+  --surface-subtle: #1c1c1f;
+  --border: #26262a;
+  --foreground: #fafafa;
+  --muted: #9ca3af;
+  --accent: #6366f1;
+  --accent-foreground: #ffffff;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #fb7185;
+
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-foreground);
+  --secondary: var(--surface-subtle);
+  --secondary-foreground: var(--foreground);
+  --muted-surface: var(--surface-subtle);
+  --muted-foreground: var(--muted);
+  --subtle: var(--surface-subtle);
+  --subtle-foreground: var(--foreground);
+  --destructive: var(--danger);
+  --input: var(--border);
+  --ring: var(--accent);
+}
+
+@theme inline {
+  /* ---- Colors: Tailwind utilities → canonical palette ---- */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  /* shadcn `muted` = subtle neutral background; secondary text = muted-foreground */
+  --color-muted: var(--muted-surface);
+  --color-muted-foreground: var(--muted-foreground);
+  /* shadcn `accent` = neutral hover/active background (not the brand accent) */
+  --color-accent: var(--subtle);
+  --color-accent-foreground: var(--subtle-foreground);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* ---- Fonts: exposed as font-sans / font-display / font-mono ---- */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sora), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  /* ---- Radii ---- */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+  }
+  html {
+    @apply font-sans antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer components {
+  /* Gentle hover lift used by marketing cards. */
+  .hover-lift {
+    @apply transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-1 hover:shadow-lg hover:shadow-foreground/5;
+  }
+}
+
+/* Respect users who prefer reduced motion — neutralize transitions/animations. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,17 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+.next
+out
+dist
+build
+
+# Turbo
+.turbo
+
+# Misc
+pnpm-lock.yaml
+*.log
+.DS_Store

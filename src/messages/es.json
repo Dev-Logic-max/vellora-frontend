@@ -1,0 +1,321 @@
+{
+  "Nav": {
+    "features": "Funciones",
+    "pricing": "Precios",
+    "resources": "Recursos",
+    "company": "Empresa",
+    "signIn": "Iniciar sesión",
+    "getStarted": "Empezar",
+    "openMenu": "Abrir menú",
+    "promo": {
+      "eyebrow": "Nuevo",
+      "title": "Una plataforma para cada tienda",
+      "description": "Descubre cómo Vellora sustituye cinco herramientas por un solo espacio de trabajo.",
+      "cta": "Ver todas las funciones"
+    },
+    "features_links": {
+      "scheduling": { "title": "Horarios", "description": "Cuadrantes y plantillas de turnos" },
+      "attendance": { "title": "Asistencia", "description": "Fichaje por QR y hojas de horas" },
+      "leave": { "title": "Ausencias", "description": "Solicitudes, saldos y aprobaciones" },
+      "recruiting": { "title": "Selección", "description": "ATS y página de empleo" },
+      "documents": { "title": "Documentos", "description": "Biblioteca, firma y caducidad" },
+      "onboarding": {
+        "title": "Incorporación",
+        "description": "Plantillas y seguimiento de tareas"
+      }
+    },
+    "resources_links": {
+      "blog": { "title": "Blog", "description": "Ideas de producto y operaciones" },
+      "pricing": { "title": "Precios", "description": "Planes para cada tamaño" },
+      "help": { "title": "Centro de ayuda", "description": "Guías y documentación" }
+    },
+    "company_links": {
+      "about": { "title": "Sobre nosotros", "description": "Nuestra historia y misión" },
+      "contact": { "title": "Contacto", "description": "Habla con nuestro equipo" },
+      "careers": { "title": "Empleo", "description": "Únete a nosotros" }
+    }
+  },
+  "Hero": {
+    "badge": "Gestión de personal para equipos con varias tiendas",
+    "title": "Gestiona tu personal, no tus hojas de cálculo",
+    "subtitle": "Vellora unifica horarios, asistencia, ausencias y contratación en un solo lugar, para que los responsables de operaciones y RR. HH. gestionen cada tienda y turno desde una plataforma moderna.",
+    "ctaPrimary": "Empezar gratis",
+    "ctaSecondary": "Solicitar demo",
+    "trust": "Prueba gratuita de 14 días · Sin tarjeta · Cancela cuando quieras"
+  },
+  "LogoCloud": {
+    "title": "Creado para equipos como el tuyo"
+  },
+  "Highlights": {
+    "eyebrow": "Todo en un solo lugar",
+    "title": "Lo esencial para que funcionen tus tiendas",
+    "subtitle": "Sustituye la mezcla de hojas de cálculo, chats de grupo y partes de fichaje en papel por una sola plataforma pensada para equipos con varias ubicaciones.",
+    "items": [
+      {
+        "title": "Horarios inteligentes",
+        "description": "Crea cuadrantes para todas tus tiendas en minutos con plantillas, reglas de cobertura y traslados de turno en un clic."
+      },
+      {
+        "title": "Asistencia por QR",
+        "description": "El personal ficha entrada y salida con el código QR de la tienda. Las hojas de horas se generan solas: precisas, fiables y en tiempo real."
+      },
+      {
+        "title": "Cumplimiento sin esfuerzo",
+        "description": "Las políticas de ausencias, las aprobaciones y los registros de auditoría se mantienen coherentes entre tiendas y países, automáticamente."
+      }
+    ]
+  },
+  "DeepDives": {
+    "items": [
+      {
+        "eyebrow": "Horarios",
+        "title": "Planifica cada turno, en todas las ubicaciones",
+        "description": "Cuadrantes con arrastrar y soltar, plantillas reutilizables y cobertura según la demanda mantienen cada tienda con personal sin idas y venidas.",
+        "points": [
+          "Plantillas semanales reutilizables",
+          "Límites de cobertura y coste",
+          "Traslados de turno con un toque"
+        ]
+      },
+      {
+        "eyebrow": "Asistencia",
+        "title": "Fichaje por QR que crea las hojas de horas por ti",
+        "description": "El personal escanea el QR de la tienda para fichar. Horas, descansos y extras se registran con precisión y listos para nómina.",
+        "points": [
+          "Fichaje por QR vinculado a la tienda",
+          "Hojas de horas automáticas",
+          "Avisos y correcciones de anomalías"
+        ]
+      },
+      {
+        "eyebrow": "Ausencias y aprobaciones",
+        "title": "Las ausencias que se gestionan solas",
+        "description": "Políticas configurables, saldos y cadenas de aprobación hacen que las solicitudes lleguen al responsable correcto y nunca se pierdan.",
+        "points": [
+          "Acumulaciones y traspasos",
+          "Aprobaciones de varios pasos",
+          "Calendarios de festivos"
+        ]
+      },
+      {
+        "eyebrow": "Selección (ATS)",
+        "title": "Contrata para tus tiendas, más rápido",
+        "description": "Publica ofertas, evalúa candidatos y agenda entrevistas desde un único flujo, con una página de empleo pública incluida.",
+        "points": [
+          "Página de empleo con tu marca",
+          "Flujo de candidatos",
+          "Programación de entrevistas"
+        ]
+      }
+    ]
+  },
+  "HowItWorks": {
+    "eyebrow": "Cómo funciona",
+    "title": "En marcha en tres pasos",
+    "stepLabel": "Paso {number}",
+    "steps": [
+      {
+        "title": "Configura tiendas y equipo",
+        "description": "Añade tus ubicaciones, horarios de apertura y personas. Invita a responsables y personal en minutos."
+      },
+      {
+        "title": "Planifica y controla",
+        "description": "Publica turnos, deja que el personal fiche por QR y gestiona ausencias, todo sincronizado entre tiendas."
+      },
+      {
+        "title": "Obtén información",
+        "description": "Consulta horas, asistencia y coste laboral de un vistazo y actúa antes de que los problemas crezcan."
+      }
+    ]
+  },
+  "Stats": {
+    "items": [
+      { "value": "+6 h", "label": "Ahorradas por responsable cada semana" },
+      { "value": "99,9 %", "label": "Disponibilidad objetivo de la plataforma" },
+      { "value": "+30", "label": "Tiendas gestionadas por cuenta" },
+      { "value": "Multipaís", "label": "Listo desde el primer día" }
+    ]
+  },
+  "Pricing": {
+    "eyebrow": "Precios",
+    "title": "Planes que crecen con tus tiendas",
+    "subtitle": "Empieza gratis y elige el plan que encaje. Los precios mostrados son provisionales para esta vista previa.",
+    "monthly": "mensual",
+    "annual": "anual",
+    "save": "−20 %",
+    "perMonth": "/mes",
+    "billedAnnually": "facturado anualmente",
+    "mostPopular": "Más popular",
+    "tailored": "¿Necesitas algo a medida?",
+    "talk": "Habla con nuestro equipo",
+    "plans": [
+      {
+        "name": "Starter",
+        "description": "Hasta 25 empleados · hasta 3 tiendas",
+        "cta": "Empezar gratis",
+        "features": [
+          "Empleados y perfiles",
+          "Horarios y cuadrantes",
+          "Asistencia por QR",
+          "Ausencias y aprobaciones",
+          "Documentos e incorporación"
+        ]
+      },
+      {
+        "name": "Growth",
+        "description": "Hasta 100 empleados · hasta 10 tiendas",
+        "cta": "Empezar gratis",
+        "features": [
+          "Todo lo de Starter",
+          "Selección (ATS)",
+          "Informes y analíticas",
+          "Mensajería y notificaciones",
+          "Análisis de CV con IA"
+        ]
+      },
+      {
+        "name": "Business",
+        "description": "Hasta 500 empleados · tiendas ilimitadas",
+        "cta": "Empezar gratis",
+        "features": [
+          "Todo lo de Growth",
+          "Automatizaciones",
+          "Analíticas avanzadas",
+          "Temas personalizados",
+          "Soporte prioritario"
+        ]
+      },
+      {
+        "name": "Enterprise",
+        "description": "Empleados y tiendas ilimitados",
+        "cta": "Contactar con ventas",
+        "features": [
+          "Todo lo de Business",
+          "SSO y SCIM",
+          "Registro de auditoría y API",
+          "Soporte dedicado y SLA",
+          "Revisión de seguridad"
+        ]
+      }
+    ]
+  },
+  "Testimonials": {
+    "eyebrow": "Lo prefieren los operadores",
+    "title": "Hecho para quienes están en la tienda",
+    "items": [
+      {
+        "quote": "Planificar cinco ubicaciones me ocupaba los lunes enteros. Ahora los cuadrantes se publican solos y mis responsables confían en los números.",
+        "name": "A. Rivera",
+        "role": "Responsable de operaciones, retail con varias tiendas"
+      },
+      {
+        "quote": "El fichaje por QR acabó con las dudas en las hojas de horas. Preparar la nómina pasó de un día a una hora.",
+        "name": "J. Chen",
+        "role": "Responsable de RR. HH., grupo hostelero"
+      },
+      {
+        "quote": "Incorporar nuevas tiendas por fin es repetible. Todo lo que el equipo necesita está en un solo lugar.",
+        "name": "M. Okafor",
+        "role": "Propietario de franquicia"
+      }
+    ]
+  },
+  "Faq": {
+    "eyebrow": "Preguntas frecuentes",
+    "title": "Respuestas a tus dudas",
+    "items": [
+      {
+        "question": "¿Cómo se mantienen seguros y aislados nuestros datos de otras empresas?",
+        "answer": "Cada empresa es un inquilino independiente. Los datos se aíslan a nivel de base de datos con seguridad por filas y delimitación de consultas, de modo que una empresa nunca ve los registros de otra. Los documentos sensibles se guardan en privado y el acceso depende del rol."
+      },
+      {
+        "question": "¿Funciona Vellora para equipos en varios países?",
+        "answer": "Sí. Vellora está preparada para varios países desde el primer día: las horas se guardan en UTC y se muestran en la zona horaria de cada usuario, y puedes configurar horarios por tienda y calendarios de festivos."
+      },
+      {
+        "question": "¿Cómo funcionan los precios?",
+        "answer": "Los planes crecen según tu número de empleados y tiendas, con facturación mensual o anual. Puedes empezar con una prueba gratuita sin tarjeta y ampliar a medida que creces. Los precios aquí mostrados son provisionales para esta vista previa."
+      },
+      {
+        "question": "¿Podemos migrar desde hojas de cálculo u otra herramienta de RR. HH.?",
+        "answer": "Sí. Puedes importar empleados y tiendas para empezar rápido, y nuestro equipo puede ayudarte a mapear tus datos para que arranques sin volver a introducir todo a mano."
+      },
+      {
+        "question": "¿Qué soporte ofrecéis?",
+        "answer": "Todos los planes incluyen soporte por correo y documentación. Los planes Business añaden soporte prioritario y Enterprise incluye un contacto dedicado con SLA."
+      },
+      {
+        "question": "¿Cuánto tarda la configuración?",
+        "answer": "La mayoría de los equipos añaden sus tiendas, invitan a su gente y publican un primer horario el mismo día. No hay nada que instalar: Vellora funciona en el navegador."
+      }
+    ]
+  },
+  "FinalCta": {
+    "title": "¿Listo para optimizar tu personal?",
+    "subtitle": "Reúne horarios, asistencia, ausencias y contratación, y dale a cada tienda el mismo método moderno.",
+    "ctaPrimary": "Empezar gratis",
+    "ctaSecondary": "Solicitar demo"
+  },
+  "Newsletter": {
+    "title": "Recibe novedades del producto",
+    "subtitle": "Nuevas funciones, guías de operaciones y algún caso de éxito. Sin spam.",
+    "placeholder": "tu@empresa.com",
+    "button": "Suscribirse",
+    "success": "¡Gracias! Ya estás en la lista."
+  },
+  "Footer": {
+    "description": "Gestión moderna de RR. HH. y personal para equipos con varias tiendas y ubicaciones.",
+    "rights": "© {year} Vellora. Todos los derechos reservados.",
+    "operational": "Todos los sistemas operativos",
+    "columns": {
+      "product": {
+        "heading": "Producto",
+        "links": {
+          "features": "Funciones",
+          "pricing": "Precios",
+          "security": "Seguridad",
+          "roadmap": "Hoja de ruta"
+        }
+      },
+      "solutions": {
+        "heading": "Soluciones",
+        "links": {
+          "retail": "Retail",
+          "hospitality": "Hostelería",
+          "franchises": "Franquicias",
+          "enterprise": "Empresas"
+        }
+      },
+      "company": {
+        "heading": "Empresa",
+        "links": {
+          "about": "Sobre nosotros",
+          "careers": "Empleo",
+          "contact": "Contacto",
+          "blog": "Blog"
+        }
+      },
+      "resources": {
+        "heading": "Recursos",
+        "links": {
+          "help": "Centro de ayuda",
+          "guides": "Guías",
+          "changelog": "Novedades",
+          "status": "Estado"
+        }
+      },
+      "legal": {
+        "heading": "Legal",
+        "links": {
+          "privacy": "Privacidad",
+          "terms": "Términos",
+          "cookies": "Cookies",
+          "dpa": "DPA"
+        }
+      }
+    }
+  },
+  "LanguageSwitcher": {
+    "label": "Idioma"
+  }
+}

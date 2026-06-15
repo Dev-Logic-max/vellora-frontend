@@ -1,0 +1,306 @@
+{
+  "Nav": {
+    "features": "Features",
+    "pricing": "Pricing",
+    "resources": "Resources",
+    "company": "Company",
+    "signIn": "Sign in",
+    "getStarted": "Get started",
+    "openMenu": "Open menu",
+    "promo": {
+      "eyebrow": "New",
+      "title": "One platform for every store",
+      "description": "See how Vellora replaces five tools with one workspace.",
+      "cta": "See all features"
+    },
+    "features_links": {
+      "scheduling": { "title": "Scheduling", "description": "Rosters & shift templates" },
+      "attendance": { "title": "Attendance", "description": "QR clock-in & timesheets" },
+      "leave": { "title": "Leave", "description": "Requests, balances, approvals" },
+      "recruiting": { "title": "Recruiting", "description": "ATS & careers site" },
+      "documents": { "title": "Documents", "description": "Library, e-sign & expiry" },
+      "onboarding": { "title": "Onboarding", "description": "Templates & task tracking" }
+    },
+    "resources_links": {
+      "blog": { "title": "Blog", "description": "Product & ops insights" },
+      "pricing": { "title": "Pricing", "description": "Plans for every size" },
+      "help": { "title": "Help center", "description": "Guides & docs" }
+    },
+    "company_links": {
+      "about": { "title": "About", "description": "Our story & mission" },
+      "contact": { "title": "Contact", "description": "Talk to our team" },
+      "careers": { "title": "Careers", "description": "Join us" }
+    }
+  },
+  "Hero": {
+    "badge": "Workforce management for multi-store teams",
+    "title": "Run your workforce, not your spreadsheets",
+    "subtitle": "Vellora unifies scheduling, attendance, leave, and hiring in one place — so operations and HR leaders can run every store and shift from a single, modern platform.",
+    "ctaPrimary": "Start free",
+    "ctaSecondary": "Book a demo",
+    "trust": "Free 14-day trial · No credit card required · Cancel anytime"
+  },
+  "LogoCloud": {
+    "title": "Built for teams like yours"
+  },
+  "Highlights": {
+    "eyebrow": "Everything in one place",
+    "title": "The essentials your stores run on",
+    "subtitle": "Replace the patchwork of spreadsheets, group chats, and paper sign-in sheets with one platform built for multi-location teams.",
+    "items": [
+      {
+        "title": "Smart scheduling",
+        "description": "Build rosters across every store in minutes with templates, coverage rules, and one-click shift transfers."
+      },
+      {
+        "title": "QR attendance",
+        "description": "Staff clock in and out from a store QR code. Timesheets build themselves — accurate, tamper-resistant, real-time."
+      },
+      {
+        "title": "Effortless compliance",
+        "description": "Leave policies, approvals, and audit trails stay consistent across locations and countries, automatically."
+      }
+    ]
+  },
+  "DeepDives": {
+    "items": [
+      {
+        "eyebrow": "Scheduling",
+        "title": "Plan every shift, across every location",
+        "description": "Drag-and-drop rosters, reusable templates, and demand-aware coverage keep each store staffed without the back-and-forth.",
+        "points": [
+          "Reusable weekly templates",
+          "Coverage & cost guardrails",
+          "One-tap shift transfers"
+        ]
+      },
+      {
+        "eyebrow": "Attendance",
+        "title": "QR clock-in that builds timesheets for you",
+        "description": "Employees scan a store QR to clock in and out. Hours, breaks, and overtime are captured accurately and ready for payroll.",
+        "points": ["Store-bound QR check-in", "Automatic timesheets", "Anomaly flags & corrections"]
+      },
+      {
+        "eyebrow": "Leave & approvals",
+        "title": "Time-off that runs itself",
+        "description": "Configurable policies, balances, and approval chains mean requests route to the right manager and never get lost.",
+        "points": ["Accruals & carryover", "Multi-step approvals", "Public-holiday calendars"]
+      },
+      {
+        "eyebrow": "Recruiting (ATS)",
+        "title": "Hire for your stores, faster",
+        "description": "Post jobs, screen candidates, and schedule interviews from one pipeline — with a public careers site built in.",
+        "points": ["Branded careers site", "Candidate pipeline", "Interview scheduling"]
+      }
+    ]
+  },
+  "HowItWorks": {
+    "eyebrow": "How it works",
+    "title": "Up and running in three steps",
+    "stepLabel": "Step {number}",
+    "steps": [
+      {
+        "title": "Set up stores & team",
+        "description": "Add your locations, operating hours, and people. Invite managers and staff in minutes."
+      },
+      {
+        "title": "Schedule & track",
+        "description": "Publish shifts, let staff clock in by QR, and manage leave — all kept in sync across stores."
+      },
+      {
+        "title": "Get insights",
+        "description": "See hours, attendance, and labor cost at a glance, then act before small issues become big ones."
+      }
+    ]
+  },
+  "Stats": {
+    "items": [
+      { "value": "6+ hrs", "label": "Saved per manager each week" },
+      { "value": "99.9%", "label": "Platform uptime target" },
+      { "value": "30+", "label": "Stores managed per account" },
+      { "value": "Multi-country", "label": "Ready from day one" }
+    ]
+  },
+  "Pricing": {
+    "eyebrow": "Pricing",
+    "title": "Plans that scale with your stores",
+    "subtitle": "Start free, then pick the plan that fits. Prices shown are placeholders for this preview.",
+    "monthly": "monthly",
+    "annual": "annual",
+    "save": "−20%",
+    "perMonth": "/mo",
+    "billedAnnually": "billed annually",
+    "mostPopular": "Most popular",
+    "tailored": "Need something tailored?",
+    "talk": "Talk to our team",
+    "plans": [
+      {
+        "name": "Starter",
+        "description": "Up to 25 employees · up to 3 stores",
+        "cta": "Start free",
+        "features": [
+          "Employees & profiles",
+          "Scheduling & rosters",
+          "QR attendance",
+          "Leave & approvals",
+          "Documents & onboarding"
+        ]
+      },
+      {
+        "name": "Growth",
+        "description": "Up to 100 employees · up to 10 stores",
+        "cta": "Start free",
+        "features": [
+          "Everything in Starter",
+          "Recruiting (ATS)",
+          "Reports & analytics",
+          "Messaging & notifications",
+          "AI resume parsing"
+        ]
+      },
+      {
+        "name": "Business",
+        "description": "Up to 500 employees · unlimited stores",
+        "cta": "Start free",
+        "features": [
+          "Everything in Growth",
+          "Automations",
+          "Advanced analytics",
+          "Custom themes",
+          "Priority support"
+        ]
+      },
+      {
+        "name": "Enterprise",
+        "description": "Unlimited employees & stores",
+        "cta": "Contact sales",
+        "features": [
+          "Everything in Business",
+          "SSO & SCIM",
+          "Audit log & API access",
+          "Dedicated support & SLA",
+          "Security review"
+        ]
+      }
+    ]
+  },
+  "Testimonials": {
+    "eyebrow": "Loved by operators",
+    "title": "Built for the people who run the floor",
+    "items": [
+      {
+        "quote": "Scheduling five locations used to eat my Mondays. Now the rosters publish themselves and my managers actually trust the numbers.",
+        "name": "A. Rivera",
+        "role": "Operations Lead, multi-store retail"
+      },
+      {
+        "quote": "QR clock-in ended the timesheet guesswork. Payroll prep that took a day now takes an hour.",
+        "name": "J. Chen",
+        "role": "HR Manager, hospitality group"
+      },
+      {
+        "quote": "Onboarding new stores is finally repeatable. Everything our teams need lives in one place.",
+        "name": "M. Okafor",
+        "role": "Franchise Owner"
+      }
+    ]
+  },
+  "Faq": {
+    "eyebrow": "FAQ",
+    "title": "Questions, answered",
+    "items": [
+      {
+        "question": "How is our data kept secure and isolated from other companies?",
+        "answer": "Every company is a separate tenant. Data is isolated at the database level with row-level security plus query scoping, so one company can never see another's records. Sensitive documents are stored privately and access is role-based."
+      },
+      {
+        "question": "Does Vellora work for teams across multiple countries?",
+        "answer": "Yes. Vellora is multi-country ready from day one — times are stored in UTC and shown in each user's local timezone, and you can configure per-store operating hours and public-holiday calendars."
+      },
+      {
+        "question": "How does pricing work?",
+        "answer": "Plans scale with your number of employees and stores, billed monthly or annually. You can start on a free trial with no credit card, then upgrade as you grow. The prices shown here are placeholders for this preview."
+      },
+      {
+        "question": "Can we migrate from spreadsheets or another HR tool?",
+        "answer": "Yes. You can import employees and stores to get started quickly, and our team can help map your existing data so you're up and running without re-entering everything by hand."
+      },
+      {
+        "question": "What support do you offer?",
+        "answer": "All plans include email support and documentation. Business plans add priority support, and Enterprise includes a dedicated contact with an SLA."
+      },
+      {
+        "question": "How long does setup take?",
+        "answer": "Most teams add their stores, invite their people, and publish a first schedule the same day. There's nothing to install — Vellora runs in the browser."
+      }
+    ]
+  },
+  "FinalCta": {
+    "title": "Ready to streamline your workforce?",
+    "subtitle": "Bring scheduling, attendance, leave, and hiring together — and give every store the same modern playbook.",
+    "ctaPrimary": "Start free",
+    "ctaSecondary": "Book a demo"
+  },
+  "Newsletter": {
+    "title": "Get product updates",
+    "subtitle": "New features, ops playbooks, and the occasional case study. No spam.",
+    "placeholder": "you@company.com",
+    "button": "Subscribe",
+    "success": "Thanks — you're on the list."
+  },
+  "Footer": {
+    "description": "Modern HR and workforce management for multi-store and multi-location teams.",
+    "rights": "© {year} Vellora. All rights reserved.",
+    "operational": "All systems operational",
+    "columns": {
+      "product": {
+        "heading": "Product",
+        "links": {
+          "features": "Features",
+          "pricing": "Pricing",
+          "security": "Security",
+          "roadmap": "Roadmap"
+        }
+      },
+      "solutions": {
+        "heading": "Solutions",
+        "links": {
+          "retail": "Retail",
+          "hospitality": "Hospitality",
+          "franchises": "Franchises",
+          "enterprise": "Enterprise"
+        }
+      },
+      "company": {
+        "heading": "Company",
+        "links": {
+          "about": "About",
+          "careers": "Careers",
+          "contact": "Contact",
+          "blog": "Blog"
+        }
+      },
+      "resources": {
+        "heading": "Resources",
+        "links": {
+          "help": "Help center",
+          "guides": "Guides",
+          "changelog": "Changelog",
+          "status": "Status"
+        }
+      },
+      "legal": {
+        "heading": "Legal",
+        "links": {
+          "privacy": "Privacy",
+          "terms": "Terms",
+          "cookies": "Cookies",
+          "dpa": "DPA"
+        }
+      }
+    }
+  },
+  "LanguageSwitcher": {
+    "label": "Language"
+  }
+}

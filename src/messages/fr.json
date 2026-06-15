@@ -1,0 +1,321 @@
+{
+  "Nav": {
+    "features": "Fonctionnalités",
+    "pricing": "Tarifs",
+    "resources": "Ressources",
+    "company": "Entreprise",
+    "signIn": "Se connecter",
+    "getStarted": "Commencer",
+    "openMenu": "Ouvrir le menu",
+    "promo": {
+      "eyebrow": "Nouveau",
+      "title": "Une plateforme pour chaque magasin",
+      "description": "Découvrez comment Vellora remplace cinq outils par un seul espace de travail.",
+      "cta": "Voir toutes les fonctionnalités"
+    },
+    "features_links": {
+      "scheduling": { "title": "Planning", "description": "Plannings et modèles de shifts" },
+      "attendance": { "title": "Présence", "description": "Pointage par QR et feuilles d'heures" },
+      "leave": { "title": "Congés", "description": "Demandes, soldes et validations" },
+      "recruiting": { "title": "Recrutement", "description": "ATS et site carrières" },
+      "documents": {
+        "title": "Documents",
+        "description": "Bibliothèque, e-signature et expiration"
+      },
+      "onboarding": { "title": "Intégration", "description": "Modèles et suivi des tâches" }
+    },
+    "resources_links": {
+      "blog": { "title": "Blog", "description": "Conseils produit et opérations" },
+      "pricing": { "title": "Tarifs", "description": "Des forfaits pour chaque taille" },
+      "help": { "title": "Centre d'aide", "description": "Guides et documentation" }
+    },
+    "company_links": {
+      "about": { "title": "À propos", "description": "Notre histoire et notre mission" },
+      "contact": { "title": "Contact", "description": "Parlez à notre équipe" },
+      "careers": { "title": "Carrières", "description": "Rejoignez-nous" }
+    }
+  },
+  "Hero": {
+    "badge": "Gestion du personnel pour les équipes multi-magasins",
+    "title": "Pilotez vos équipes, pas vos tableurs",
+    "subtitle": "Vellora réunit planning, présence, congés et recrutement au même endroit, pour que les responsables des opérations et des RH gèrent chaque magasin et chaque shift depuis une plateforme moderne.",
+    "ctaPrimary": "Commencer gratuitement",
+    "ctaSecondary": "Demander une démo",
+    "trust": "Essai gratuit de 14 jours · Sans carte bancaire · Résiliable à tout moment"
+  },
+  "LogoCloud": {
+    "title": "Conçu pour des équipes comme la vôtre"
+  },
+  "Highlights": {
+    "eyebrow": "Tout au même endroit",
+    "title": "L'essentiel pour faire tourner vos magasins",
+    "subtitle": "Remplacez le patchwork de tableurs, de messageries de groupe et de feuilles de pointage papier par une seule plateforme pensée pour les équipes multi-sites.",
+    "items": [
+      {
+        "title": "Planning intelligent",
+        "description": "Créez des plannings pour tous vos magasins en quelques minutes grâce aux modèles, aux règles de couverture et aux transferts de shift en un clic."
+      },
+      {
+        "title": "Présence par QR",
+        "description": "Le personnel pointe l'entrée et la sortie via le QR code du magasin. Les feuilles d'heures se créent toutes seules : précises, fiables et en temps réel."
+      },
+      {
+        "title": "Conformité sans effort",
+        "description": "Politiques de congés, validations et pistes d'audit restent cohérentes entre les magasins et les pays, automatiquement."
+      }
+    ]
+  },
+  "DeepDives": {
+    "items": [
+      {
+        "eyebrow": "Planning",
+        "title": "Planifiez chaque shift, sur tous les sites",
+        "description": "Plannings en glisser-déposer, modèles réutilisables et couverture selon la demande gardent chaque magasin doté en personnel, sans allers-retours.",
+        "points": [
+          "Modèles hebdomadaires réutilisables",
+          "Garde-fous de couverture et de coût",
+          "Transferts de shift en un geste"
+        ]
+      },
+      {
+        "eyebrow": "Présence",
+        "title": "Le pointage par QR qui crée vos feuilles d'heures",
+        "description": "Les employés scannent le QR du magasin pour pointer. Heures, pauses et heures supplémentaires sont enregistrées avec précision, prêtes pour la paie.",
+        "points": [
+          "Pointage QR lié au magasin",
+          "Feuilles d'heures automatiques",
+          "Alertes et corrections d'anomalies"
+        ]
+      },
+      {
+        "eyebrow": "Congés et validations",
+        "title": "Des congés qui se gèrent tout seuls",
+        "description": "Politiques configurables, soldes et circuits de validation acheminent chaque demande au bon manager, sans jamais la perdre.",
+        "points": [
+          "Acquisition et report",
+          "Validations à plusieurs niveaux",
+          "Calendriers de jours fériés"
+        ]
+      },
+      {
+        "eyebrow": "Recrutement (ATS)",
+        "title": "Recrutez pour vos magasins, plus vite",
+        "description": "Publiez des offres, évaluez les candidats et planifiez les entretiens depuis un seul pipeline, avec un site carrières public intégré.",
+        "points": [
+          "Site carrières à votre marque",
+          "Pipeline de candidats",
+          "Planification des entretiens"
+        ]
+      }
+    ]
+  },
+  "HowItWorks": {
+    "eyebrow": "Comment ça marche",
+    "title": "Opérationnel en trois étapes",
+    "stepLabel": "Étape {number}",
+    "steps": [
+      {
+        "title": "Configurez magasins et équipe",
+        "description": "Ajoutez vos sites, vos horaires d'ouverture et vos collaborateurs. Invitez managers et personnel en quelques minutes."
+      },
+      {
+        "title": "Planifiez et suivez",
+        "description": "Publiez les shifts, laissez le personnel pointer par QR et gérez les congés, le tout synchronisé entre magasins."
+      },
+      {
+        "title": "Obtenez des analyses",
+        "description": "Visualisez heures, présence et coût de main-d'œuvre en un coup d'œil, puis agissez avant que les soucis ne grandissent."
+      }
+    ]
+  },
+  "Stats": {
+    "items": [
+      { "value": "+6 h", "label": "Gagnées par manager chaque semaine" },
+      { "value": "99,9 %", "label": "Disponibilité visée de la plateforme" },
+      { "value": "+30", "label": "Magasins gérés par compte" },
+      { "value": "Multi-pays", "label": "Prêt dès le premier jour" }
+    ]
+  },
+  "Pricing": {
+    "eyebrow": "Tarifs",
+    "title": "Des forfaits qui évoluent avec vos magasins",
+    "subtitle": "Commencez gratuitement, puis choisissez le forfait adapté. Les prix affichés sont provisoires pour cet aperçu.",
+    "monthly": "mensuel",
+    "annual": "annuel",
+    "save": "−20 %",
+    "perMonth": "/mois",
+    "billedAnnually": "facturé annuellement",
+    "mostPopular": "Le plus populaire",
+    "tailored": "Besoin d'une offre sur mesure ?",
+    "talk": "Parlez à notre équipe",
+    "plans": [
+      {
+        "name": "Starter",
+        "description": "Jusqu'à 25 employés · jusqu'à 3 magasins",
+        "cta": "Commencer gratuitement",
+        "features": [
+          "Employés et profils",
+          "Planning et plannings",
+          "Présence par QR",
+          "Congés et validations",
+          "Documents et intégration"
+        ]
+      },
+      {
+        "name": "Growth",
+        "description": "Jusqu'à 100 employés · jusqu'à 10 magasins",
+        "cta": "Commencer gratuitement",
+        "features": [
+          "Tout Starter",
+          "Recrutement (ATS)",
+          "Rapports et analyses",
+          "Messagerie et notifications",
+          "Analyse de CV par IA"
+        ]
+      },
+      {
+        "name": "Business",
+        "description": "Jusqu'à 500 employés · magasins illimités",
+        "cta": "Commencer gratuitement",
+        "features": [
+          "Tout Growth",
+          "Automatisations",
+          "Analyses avancées",
+          "Thèmes personnalisés",
+          "Support prioritaire"
+        ]
+      },
+      {
+        "name": "Enterprise",
+        "description": "Employés et magasins illimités",
+        "cta": "Contacter le service commercial",
+        "features": [
+          "Tout Business",
+          "SSO et SCIM",
+          "Journal d'audit et accès API",
+          "Support dédié et SLA",
+          "Revue de sécurité"
+        ]
+      }
+    ]
+  },
+  "Testimonials": {
+    "eyebrow": "Plébiscité par les opérationnels",
+    "title": "Pensé pour ceux qui tiennent la boutique",
+    "items": [
+      {
+        "quote": "Planifier cinq sites me mangeait tous mes lundis. Maintenant les plannings se publient seuls et mes managers font confiance aux chiffres.",
+        "name": "A. Rivera",
+        "role": "Responsable des opérations, retail multi-magasins"
+      },
+      {
+        "quote": "Le pointage par QR a mis fin aux approximations des feuilles d'heures. La préparation de la paie est passée d'une journée à une heure.",
+        "name": "J. Chen",
+        "role": "Responsable RH, groupe hôtelier"
+      },
+      {
+        "quote": "Ouvrir de nouveaux magasins est enfin reproductible. Tout ce dont les équipes ont besoin se trouve au même endroit.",
+        "name": "M. Okafor",
+        "role": "Franchisé"
+      }
+    ]
+  },
+  "Faq": {
+    "eyebrow": "FAQ",
+    "title": "Vos questions, nos réponses",
+    "items": [
+      {
+        "question": "Comment nos données sont-elles sécurisées et isolées des autres entreprises ?",
+        "answer": "Chaque entreprise est un locataire distinct. Les données sont isolées au niveau de la base avec une sécurité par ligne et un cloisonnement des requêtes : une entreprise ne voit jamais les données d'une autre. Les documents sensibles sont stockés en privé et l'accès dépend du rôle."
+      },
+      {
+        "question": "Vellora fonctionne-t-il pour des équipes dans plusieurs pays ?",
+        "answer": "Oui. Vellora est prêt pour le multi-pays dès le premier jour : les heures sont stockées en UTC et affichées dans le fuseau de chaque utilisateur, et vous pouvez configurer les horaires par magasin et les calendriers de jours fériés."
+      },
+      {
+        "question": "Comment fonctionnent les tarifs ?",
+        "answer": "Les forfaits évoluent selon votre nombre d'employés et de magasins, facturés mensuellement ou annuellement. Vous pouvez commencer par un essai gratuit sans carte, puis évoluer en grandissant. Les prix affichés ici sont provisoires pour cet aperçu."
+      },
+      {
+        "question": "Peut-on migrer depuis des tableurs ou un autre outil RH ?",
+        "answer": "Oui. Vous pouvez importer employés et magasins pour démarrer vite, et notre équipe peut vous aider à mapper vos données existantes afin d'être opérationnel sans tout ressaisir à la main."
+      },
+      {
+        "question": "Quel support proposez-vous ?",
+        "answer": "Tous les forfaits incluent le support par e-mail et la documentation. Les forfaits Business ajoutent un support prioritaire et Enterprise inclut un contact dédié avec SLA."
+      },
+      {
+        "question": "Combien de temps prend la configuration ?",
+        "answer": "La plupart des équipes ajoutent leurs magasins, invitent leurs collaborateurs et publient un premier planning le jour même. Rien à installer : Vellora fonctionne dans le navigateur."
+      }
+    ]
+  },
+  "FinalCta": {
+    "title": "Prêt à fluidifier la gestion de vos équipes ?",
+    "subtitle": "Réunissez planning, présence, congés et recrutement, et donnez à chaque magasin la même méthode moderne.",
+    "ctaPrimary": "Commencer gratuitement",
+    "ctaSecondary": "Demander une démo"
+  },
+  "Newsletter": {
+    "title": "Recevez les nouveautés produit",
+    "subtitle": "Nouvelles fonctionnalités, guides opérationnels et quelques études de cas. Pas de spam.",
+    "placeholder": "vous@entreprise.com",
+    "button": "S'abonner",
+    "success": "Merci — vous êtes sur la liste."
+  },
+  "Footer": {
+    "description": "Gestion RH et du personnel moderne pour les équipes multi-magasins et multi-sites.",
+    "rights": "© {year} Vellora. Tous droits réservés.",
+    "operational": "Tous les systèmes sont opérationnels",
+    "columns": {
+      "product": {
+        "heading": "Produit",
+        "links": {
+          "features": "Fonctionnalités",
+          "pricing": "Tarifs",
+          "security": "Sécurité",
+          "roadmap": "Feuille de route"
+        }
+      },
+      "solutions": {
+        "heading": "Solutions",
+        "links": {
+          "retail": "Retail",
+          "hospitality": "Hôtellerie",
+          "franchises": "Franchises",
+          "enterprise": "Grandes entreprises"
+        }
+      },
+      "company": {
+        "heading": "Entreprise",
+        "links": {
+          "about": "À propos",
+          "careers": "Carrières",
+          "contact": "Contact",
+          "blog": "Blog"
+        }
+      },
+      "resources": {
+        "heading": "Ressources",
+        "links": {
+          "help": "Centre d'aide",
+          "guides": "Guides",
+          "changelog": "Nouveautés",
+          "status": "Statut"
+        }
+      },
+      "legal": {
+        "heading": "Légal",
+        "links": {
+          "privacy": "Confidentialité",
+          "terms": "Conditions",
+          "cookies": "Cookies",
+          "dpa": "DPA"
+        }
+      }
+    }
+  },
+  "LanguageSwitcher": {
+    "label": "Langue"
+  }
+}

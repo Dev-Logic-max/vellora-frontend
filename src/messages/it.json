@@ -1,0 +1,318 @@
+{
+  "Nav": {
+    "features": "Funzionalità",
+    "pricing": "Prezzi",
+    "resources": "Risorse",
+    "company": "Azienda",
+    "signIn": "Accedi",
+    "getStarted": "Inizia",
+    "openMenu": "Apri menu",
+    "promo": {
+      "eyebrow": "Novità",
+      "title": "Una piattaforma per ogni punto vendita",
+      "description": "Scopri come Vellora sostituisce cinque strumenti con un unico spazio di lavoro.",
+      "cta": "Vedi tutte le funzionalità"
+    },
+    "features_links": {
+      "scheduling": { "title": "Turni", "description": "Pianificazioni e modelli di turno" },
+      "attendance": { "title": "Presenze", "description": "Timbratura QR e fogli ore" },
+      "leave": { "title": "Assenze", "description": "Richieste, saldi e approvazioni" },
+      "recruiting": { "title": "Selezione", "description": "ATS e pagina lavora con noi" },
+      "documents": { "title": "Documenti", "description": "Archivio, firma e scadenze" },
+      "onboarding": { "title": "Onboarding", "description": "Modelli e monitoraggio attività" }
+    },
+    "resources_links": {
+      "blog": { "title": "Blog", "description": "Spunti su prodotto e operations" },
+      "pricing": { "title": "Prezzi", "description": "Piani per ogni dimensione" },
+      "help": { "title": "Centro assistenza", "description": "Guide e documentazione" }
+    },
+    "company_links": {
+      "about": { "title": "Chi siamo", "description": "La nostra storia e missione" },
+      "contact": { "title": "Contatti", "description": "Parla con il nostro team" },
+      "careers": { "title": "Lavora con noi", "description": "Unisciti a noi" }
+    }
+  },
+  "Hero": {
+    "badge": "Gestione del personale per team con più punti vendita",
+    "title": "Gestisci il personale, non i fogli di calcolo",
+    "subtitle": "Vellora unisce turni, presenze, assenze e selezione in un unico posto, così i responsabili operations e HR gestiscono ogni punto vendita e turno da una piattaforma moderna.",
+    "ctaPrimary": "Inizia gratis",
+    "ctaSecondary": "Prenota una demo",
+    "trust": "Prova gratuita di 14 giorni · Nessuna carta · Disdici quando vuoi"
+  },
+  "LogoCloud": {
+    "title": "Creato per team come il tuo"
+  },
+  "Highlights": {
+    "eyebrow": "Tutto in un unico posto",
+    "title": "L'essenziale per far funzionare i tuoi punti vendita",
+    "subtitle": "Sostituisci l'insieme di fogli di calcolo, chat di gruppo e fogli presenze cartacei con un'unica piattaforma pensata per team multi-sede.",
+    "items": [
+      {
+        "title": "Turni intelligenti",
+        "description": "Crea le pianificazioni per tutti i punti vendita in pochi minuti con modelli, regole di copertura e cambi turno con un clic."
+      },
+      {
+        "title": "Presenze con QR",
+        "description": "Il personale timbra entrata e uscita con il QR del punto vendita. I fogli ore si compilano da soli: precisi, affidabili e in tempo reale."
+      },
+      {
+        "title": "Conformità senza sforzo",
+        "description": "Policy di assenze, approvazioni e tracciati di audit restano coerenti tra punti vendita e Paesi, in automatico."
+      }
+    ]
+  },
+  "DeepDives": {
+    "items": [
+      {
+        "eyebrow": "Turni",
+        "title": "Pianifica ogni turno, in ogni sede",
+        "description": "Pianificazioni drag-and-drop, modelli riutilizzabili e copertura in base alla domanda mantengono ogni punto vendita coperto senza continui scambi.",
+        "points": [
+          "Modelli settimanali riutilizzabili",
+          "Limiti di copertura e costo",
+          "Cambi turno con un tocco"
+        ]
+      },
+      {
+        "eyebrow": "Presenze",
+        "title": "La timbratura QR che crea i fogli ore al posto tuo",
+        "description": "I dipendenti scansionano il QR del punto vendita per timbrare. Ore, pause e straordinari vengono registrati con precisione, pronti per le buste paga.",
+        "points": [
+          "Timbratura QR legata al punto vendita",
+          "Fogli ore automatici",
+          "Avvisi e correzioni delle anomalie"
+        ]
+      },
+      {
+        "eyebrow": "Assenze e approvazioni",
+        "title": "Le assenze che si gestiscono da sole",
+        "description": "Policy configurabili, saldi e catene di approvazione indirizzano ogni richiesta al responsabile giusto, senza mai perderla.",
+        "points": [
+          "Maturazioni e riporti",
+          "Approvazioni a più livelli",
+          "Calendari delle festività"
+        ]
+      },
+      {
+        "eyebrow": "Selezione (ATS)",
+        "title": "Assumi per i tuoi punti vendita, più in fretta",
+        "description": "Pubblica annunci, valuta i candidati e pianifica i colloqui da un unico flusso, con una pagina lavora con noi integrata.",
+        "points": [
+          "Pagina carriere con il tuo brand",
+          "Pipeline dei candidati",
+          "Pianificazione dei colloqui"
+        ]
+      }
+    ]
+  },
+  "HowItWorks": {
+    "eyebrow": "Come funziona",
+    "title": "Operativo in tre passi",
+    "stepLabel": "Passo {number}",
+    "steps": [
+      {
+        "title": "Configura punti vendita e team",
+        "description": "Aggiungi sedi, orari di apertura e persone. Invita responsabili e personale in pochi minuti."
+      },
+      {
+        "title": "Pianifica e monitora",
+        "description": "Pubblica i turni, lascia che il personale timbri con il QR e gestisci le assenze, tutto sincronizzato tra i punti vendita."
+      },
+      {
+        "title": "Ottieni informazioni",
+        "description": "Vedi ore, presenze e costo del lavoro a colpo d'occhio e agisci prima che i piccoli problemi diventino grandi."
+      }
+    ]
+  },
+  "Stats": {
+    "items": [
+      { "value": "6+ ore", "label": "Risparmiate da ogni responsabile a settimana" },
+      { "value": "99,9 %", "label": "Disponibilità target della piattaforma" },
+      { "value": "30+", "label": "Punti vendita gestiti per account" },
+      { "value": "Multi-paese", "label": "Pronta dal primo giorno" }
+    ]
+  },
+  "Pricing": {
+    "eyebrow": "Prezzi",
+    "title": "Piani che crescono con i tuoi punti vendita",
+    "subtitle": "Inizia gratis, poi scegli il piano adatto. I prezzi mostrati sono provvisori per questa anteprima.",
+    "monthly": "mensile",
+    "annual": "annuale",
+    "save": "−20 %",
+    "perMonth": "/mese",
+    "billedAnnually": "fatturato annualmente",
+    "mostPopular": "Più popolare",
+    "tailored": "Ti serve qualcosa su misura?",
+    "talk": "Parla con il nostro team",
+    "plans": [
+      {
+        "name": "Starter",
+        "description": "Fino a 25 dipendenti · fino a 3 punti vendita",
+        "cta": "Inizia gratis",
+        "features": [
+          "Dipendenti e profili",
+          "Turni e pianificazioni",
+          "Presenze con QR",
+          "Assenze e approvazioni",
+          "Documenti e onboarding"
+        ]
+      },
+      {
+        "name": "Growth",
+        "description": "Fino a 100 dipendenti · fino a 10 punti vendita",
+        "cta": "Inizia gratis",
+        "features": [
+          "Tutto di Starter",
+          "Selezione (ATS)",
+          "Report e analisi",
+          "Messaggistica e notifiche",
+          "Analisi CV con IA"
+        ]
+      },
+      {
+        "name": "Business",
+        "description": "Fino a 500 dipendenti · punti vendita illimitati",
+        "cta": "Inizia gratis",
+        "features": [
+          "Tutto di Growth",
+          "Automazioni",
+          "Analisi avanzate",
+          "Temi personalizzati",
+          "Supporto prioritario"
+        ]
+      },
+      {
+        "name": "Enterprise",
+        "description": "Dipendenti e punti vendita illimitati",
+        "cta": "Contatta le vendite",
+        "features": [
+          "Tutto di Business",
+          "SSO e SCIM",
+          "Audit log e accesso API",
+          "Supporto dedicato e SLA",
+          "Revisione di sicurezza"
+        ]
+      }
+    ]
+  },
+  "Testimonials": {
+    "eyebrow": "Amato dagli operatori",
+    "title": "Pensato per chi sta in negozio",
+    "items": [
+      {
+        "quote": "Pianificare cinque sedi mi mangiava ogni lunedì. Ora le pianificazioni si pubblicano da sole e i miei responsabili si fidano dei numeri.",
+        "name": "A. Rivera",
+        "role": "Responsabile operations, retail con più punti vendita"
+      },
+      {
+        "quote": "La timbratura QR ha eliminato i dubbi sui fogli ore. La preparazione delle buste paga è passata da un giorno a un'ora.",
+        "name": "J. Chen",
+        "role": "Responsabile HR, gruppo alberghiero"
+      },
+      {
+        "quote": "Aprire nuovi punti vendita è finalmente ripetibile. Tutto ciò che serve ai team è in un unico posto.",
+        "name": "M. Okafor",
+        "role": "Titolare in franchising"
+      }
+    ]
+  },
+  "Faq": {
+    "eyebrow": "FAQ",
+    "title": "Risposte alle tue domande",
+    "items": [
+      {
+        "question": "Come vengono protetti e isolati i nostri dati da quelli di altre aziende?",
+        "answer": "Ogni azienda è un tenant separato. I dati sono isolati a livello di database con sicurezza a livello di riga e delimitazione delle query, così un'azienda non vede mai i dati di un'altra. I documenti sensibili sono archiviati in privato e l'accesso è basato sui ruoli."
+      },
+      {
+        "question": "Vellora funziona per team in più Paesi?",
+        "answer": "Sì. Vellora è pronta per più Paesi dal primo giorno: gli orari sono salvati in UTC e mostrati nel fuso di ogni utente, e puoi configurare orari per punto vendita e calendari delle festività."
+      },
+      {
+        "question": "Come funzionano i prezzi?",
+        "answer": "I piani crescono in base al numero di dipendenti e punti vendita, con fatturazione mensile o annuale. Puoi iniziare con una prova gratuita senza carta e poi passare a un piano superiore. I prezzi qui mostrati sono provvisori per questa anteprima."
+      },
+      {
+        "question": "Possiamo migrare da fogli di calcolo o da un altro strumento HR?",
+        "answer": "Sì. Puoi importare dipendenti e punti vendita per iniziare subito, e il nostro team può aiutarti a mappare i dati esistenti così da partire senza reinserire tutto a mano."
+      },
+      {
+        "question": "Che supporto offrite?",
+        "answer": "Tutti i piani includono supporto via e-mail e documentazione. I piani Business aggiungono il supporto prioritario, mentre Enterprise include un contatto dedicato con SLA."
+      },
+      {
+        "question": "Quanto dura la configurazione?",
+        "answer": "La maggior parte dei team aggiunge i punti vendita, invita le persone e pubblica un primo turno lo stesso giorno. Non c'è nulla da installare: Vellora funziona nel browser."
+      }
+    ]
+  },
+  "FinalCta": {
+    "title": "Pronto a semplificare la gestione del personale?",
+    "subtitle": "Unisci turni, presenze, assenze e selezione, e dai a ogni punto vendita lo stesso metodo moderno.",
+    "ctaPrimary": "Inizia gratis",
+    "ctaSecondary": "Prenota una demo"
+  },
+  "Newsletter": {
+    "title": "Ricevi gli aggiornamenti sul prodotto",
+    "subtitle": "Nuove funzionalità, guide operative e qualche caso studio. Niente spam.",
+    "placeholder": "tu@azienda.com",
+    "button": "Iscriviti",
+    "success": "Grazie — sei nella lista."
+  },
+  "Footer": {
+    "description": "Gestione HR e del personale moderna per team con più punti vendita e sedi.",
+    "rights": "© {year} Vellora. Tutti i diritti riservati.",
+    "operational": "Tutti i sistemi operativi",
+    "columns": {
+      "product": {
+        "heading": "Prodotto",
+        "links": {
+          "features": "Funzionalità",
+          "pricing": "Prezzi",
+          "security": "Sicurezza",
+          "roadmap": "Roadmap"
+        }
+      },
+      "solutions": {
+        "heading": "Soluzioni",
+        "links": {
+          "retail": "Retail",
+          "hospitality": "Ospitalità",
+          "franchises": "Franchising",
+          "enterprise": "Grandi aziende"
+        }
+      },
+      "company": {
+        "heading": "Azienda",
+        "links": {
+          "about": "Chi siamo",
+          "careers": "Lavora con noi",
+          "contact": "Contatti",
+          "blog": "Blog"
+        }
+      },
+      "resources": {
+        "heading": "Risorse",
+        "links": {
+          "help": "Centro assistenza",
+          "guides": "Guide",
+          "changelog": "Novità",
+          "status": "Stato"
+        }
+      },
+      "legal": {
+        "heading": "Legale",
+        "links": {
+          "privacy": "Privacy",
+          "terms": "Termini",
+          "cookies": "Cookie",
+          "dpa": "DPA"
+        }
+      }
+    }
+  },
+  "LanguageSwitcher": {
+    "label": "Lingua"
+  }
+}

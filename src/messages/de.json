@@ -1,0 +1,310 @@
+{
+  "Nav": {
+    "features": "Funktionen",
+    "pricing": "Preise",
+    "resources": "Ressourcen",
+    "company": "Unternehmen",
+    "signIn": "Anmelden",
+    "getStarted": "Loslegen",
+    "openMenu": "Menü öffnen",
+    "promo": {
+      "eyebrow": "Neu",
+      "title": "Eine Plattform für jede Filiale",
+      "description": "Sehen Sie, wie Vellora fünf Tools durch einen Arbeitsbereich ersetzt.",
+      "cta": "Alle Funktionen ansehen"
+    },
+    "features_links": {
+      "scheduling": { "title": "Dienstplanung", "description": "Dienstpläne & Schichtvorlagen" },
+      "attendance": { "title": "Anwesenheit", "description": "QR-Stempeln & Stundenzettel" },
+      "leave": { "title": "Abwesenheiten", "description": "Anträge, Salden, Genehmigungen" },
+      "recruiting": { "title": "Recruiting", "description": "ATS & Karriereseite" },
+      "documents": { "title": "Dokumente", "description": "Bibliothek, E-Signatur & Ablauf" },
+      "onboarding": { "title": "Onboarding", "description": "Vorlagen & Aufgaben-Tracking" }
+    },
+    "resources_links": {
+      "blog": { "title": "Blog", "description": "Produkt- & Betriebs-Insights" },
+      "pricing": { "title": "Preise", "description": "Tarife für jede Größe" },
+      "help": { "title": "Hilfecenter", "description": "Leitfäden & Doku" }
+    },
+    "company_links": {
+      "about": { "title": "Über uns", "description": "Unsere Geschichte & Mission" },
+      "contact": { "title": "Kontakt", "description": "Sprechen Sie mit uns" },
+      "careers": { "title": "Karriere", "description": "Werden Sie Teil" }
+    }
+  },
+  "Hero": {
+    "badge": "Personalmanagement für Teams mit mehreren Filialen",
+    "title": "Führen Sie Ihr Team, nicht Ihre Tabellen",
+    "subtitle": "Vellora vereint Dienstplanung, Anwesenheit, Abwesenheiten und Recruiting an einem Ort – damit Operations- und HR-Verantwortliche jede Filiale und Schicht über eine moderne Plattform steuern.",
+    "ctaPrimary": "Kostenlos starten",
+    "ctaSecondary": "Demo buchen",
+    "trust": "14 Tage kostenlos testen · Keine Kreditkarte · Jederzeit kündbar"
+  },
+  "LogoCloud": {
+    "title": "Für Teams wie Ihres gemacht"
+  },
+  "Highlights": {
+    "eyebrow": "Alles an einem Ort",
+    "title": "Das Wesentliche für Ihre Filialen",
+    "subtitle": "Ersetzen Sie den Flickenteppich aus Tabellen, Gruppenchats und Papier-Anwesenheitslisten durch eine Plattform für Teams an mehreren Standorten.",
+    "items": [
+      {
+        "title": "Intelligente Dienstplanung",
+        "description": "Erstellen Sie Dienstpläne für alle Filialen in Minuten – mit Vorlagen, Besetzungsregeln und Schichttausch per Klick."
+      },
+      {
+        "title": "QR-Anwesenheit",
+        "description": "Mitarbeitende stempeln über den QR-Code der Filiale ein und aus. Stundenzettel entstehen von selbst – genau, manipulationssicher und in Echtzeit."
+      },
+      {
+        "title": "Mühelose Compliance",
+        "description": "Abwesenheitsregeln, Genehmigungen und Prüfprotokolle bleiben über Filialen und Länder hinweg automatisch konsistent."
+      }
+    ]
+  },
+  "DeepDives": {
+    "items": [
+      {
+        "eyebrow": "Dienstplanung",
+        "title": "Planen Sie jede Schicht, in jeder Filiale",
+        "description": "Dienstpläne per Drag-and-drop, wiederverwendbare Vorlagen und bedarfsgerechte Besetzung halten jede Filiale besetzt – ohne ständiges Hin und Her.",
+        "points": [
+          "Wiederverwendbare Wochenvorlagen",
+          "Besetzungs- & Kostengrenzen",
+          "Schichttausch mit einem Tipp"
+        ]
+      },
+      {
+        "eyebrow": "Anwesenheit",
+        "title": "QR-Stempeln, das Stundenzettel für Sie erstellt",
+        "description": "Mitarbeitende scannen den Filial-QR zum Ein- und Ausstempeln. Stunden, Pausen und Überstunden werden präzise erfasst – bereit für die Lohnabrechnung.",
+        "points": [
+          "Filialgebundenes QR-Stempeln",
+          "Automatische Stundenzettel",
+          "Hinweise & Korrekturen bei Anomalien"
+        ]
+      },
+      {
+        "eyebrow": "Abwesenheiten & Genehmigungen",
+        "title": "Abwesenheiten, die sich selbst regeln",
+        "description": "Konfigurierbare Regeln, Salden und Genehmigungsketten leiten Anträge an die richtige Führungskraft – nichts geht verloren.",
+        "points": ["Ansprüche & Übertrag", "Mehrstufige Genehmigungen", "Feiertagskalender"]
+      },
+      {
+        "eyebrow": "Recruiting (ATS)",
+        "title": "Schneller für Ihre Filialen einstellen",
+        "description": "Stellen ausschreiben, Bewerbende prüfen und Interviews planen – alles in einer Pipeline, inklusive öffentlicher Karriereseite.",
+        "points": ["Karriereseite mit Ihrer Marke", "Bewerber-Pipeline", "Interview-Planung"]
+      }
+    ]
+  },
+  "HowItWorks": {
+    "eyebrow": "So funktioniert es",
+    "title": "In drei Schritten startklar",
+    "stepLabel": "Schritt {number}",
+    "steps": [
+      {
+        "title": "Filialen & Team einrichten",
+        "description": "Fügen Sie Standorte, Öffnungszeiten und Personen hinzu. Laden Sie Führungskräfte und Mitarbeitende in Minuten ein."
+      },
+      {
+        "title": "Planen & verfolgen",
+        "description": "Veröffentlichen Sie Schichten, lassen Sie das Team per QR stempeln und verwalten Sie Abwesenheiten – filialübergreifend synchron."
+      },
+      {
+        "title": "Erkenntnisse gewinnen",
+        "description": "Sehen Sie Stunden, Anwesenheit und Personalkosten auf einen Blick und handeln Sie, bevor kleine Probleme groß werden."
+      }
+    ]
+  },
+  "Stats": {
+    "items": [
+      { "value": "6+ Std.", "label": "Pro Führungskraft und Woche gespart" },
+      { "value": "99,9 %", "label": "Angestrebte Plattform-Verfügbarkeit" },
+      { "value": "30+", "label": "Filialen pro Konto verwaltet" },
+      { "value": "Mehrländerfähig", "label": "Bereit ab Tag eins" }
+    ]
+  },
+  "Pricing": {
+    "eyebrow": "Preise",
+    "title": "Tarife, die mit Ihren Filialen wachsen",
+    "subtitle": "Kostenlos starten und den passenden Tarif wählen. Die gezeigten Preise sind Platzhalter für diese Vorschau.",
+    "monthly": "monatlich",
+    "annual": "jährlich",
+    "save": "−20 %",
+    "perMonth": "/Mon.",
+    "billedAnnually": "jährlich abgerechnet",
+    "mostPopular": "Am beliebtesten",
+    "tailored": "Brauchen Sie etwas Maßgeschneidertes?",
+    "talk": "Sprechen Sie mit uns",
+    "plans": [
+      {
+        "name": "Starter",
+        "description": "Bis zu 25 Mitarbeitende · bis zu 3 Filialen",
+        "cta": "Kostenlos starten",
+        "features": [
+          "Mitarbeitende & Profile",
+          "Dienstplanung & Pläne",
+          "QR-Anwesenheit",
+          "Abwesenheiten & Genehmigungen",
+          "Dokumente & Onboarding"
+        ]
+      },
+      {
+        "name": "Growth",
+        "description": "Bis zu 100 Mitarbeitende · bis zu 10 Filialen",
+        "cta": "Kostenlos starten",
+        "features": [
+          "Alles aus Starter",
+          "Recruiting (ATS)",
+          "Berichte & Analysen",
+          "Messaging & Benachrichtigungen",
+          "KI-Lebenslaufanalyse"
+        ]
+      },
+      {
+        "name": "Business",
+        "description": "Bis zu 500 Mitarbeitende · unbegrenzte Filialen",
+        "cta": "Kostenlos starten",
+        "features": [
+          "Alles aus Growth",
+          "Automatisierungen",
+          "Erweiterte Analysen",
+          "Eigene Themes",
+          "Priorisierter Support"
+        ]
+      },
+      {
+        "name": "Enterprise",
+        "description": "Unbegrenzte Mitarbeitende & Filialen",
+        "cta": "Vertrieb kontaktieren",
+        "features": [
+          "Alles aus Business",
+          "SSO & SCIM",
+          "Audit-Log & API-Zugriff",
+          "Dedizierter Support & SLA",
+          "Sicherheitsprüfung"
+        ]
+      }
+    ]
+  },
+  "Testimonials": {
+    "eyebrow": "Beliebt bei Operations-Teams",
+    "title": "Gemacht für die Menschen auf der Fläche",
+    "items": [
+      {
+        "quote": "Fünf Standorte zu planen kostete mich jeden Montag. Jetzt veröffentlichen sich die Pläne selbst und meine Führungskräfte vertrauen den Zahlen.",
+        "name": "A. Rivera",
+        "role": "Operations-Leitung, Retail mit mehreren Filialen"
+      },
+      {
+        "quote": "QR-Stempeln hat das Rätselraten bei Stundenzetteln beendet. Die Lohnvorbereitung dauert statt eines Tages nur noch eine Stunde.",
+        "name": "J. Chen",
+        "role": "HR-Leitung, Hotelgruppe"
+      },
+      {
+        "quote": "Neue Filialen zu eröffnen ist endlich wiederholbar. Alles, was die Teams brauchen, liegt an einem Ort.",
+        "name": "M. Okafor",
+        "role": "Franchisenehmer"
+      }
+    ]
+  },
+  "Faq": {
+    "eyebrow": "FAQ",
+    "title": "Antworten auf Ihre Fragen",
+    "items": [
+      {
+        "question": "Wie werden unsere Daten sicher und von anderen Unternehmen getrennt gehalten?",
+        "answer": "Jedes Unternehmen ist ein eigener Mandant. Die Daten werden auf Datenbankebene mit Row-Level Security und Query-Scoping isoliert, sodass ein Unternehmen niemals die Daten eines anderen sieht. Sensible Dokumente werden privat gespeichert, der Zugriff ist rollenbasiert."
+      },
+      {
+        "question": "Funktioniert Vellora für Teams in mehreren Ländern?",
+        "answer": "Ja. Vellora ist von Tag eins an mehrländerfähig – Zeiten werden in UTC gespeichert und in der Zeitzone jedes Nutzers angezeigt, und Sie können Öffnungszeiten pro Filiale sowie Feiertagskalender konfigurieren."
+      },
+      {
+        "question": "Wie funktionieren die Preise?",
+        "answer": "Die Tarife wachsen mit Ihrer Zahl an Mitarbeitenden und Filialen, monatlich oder jährlich abgerechnet. Sie starten mit einer kostenlosen Testphase ohne Kreditkarte und können später upgraden. Die hier gezeigten Preise sind Platzhalter für diese Vorschau."
+      },
+      {
+        "question": "Können wir aus Tabellen oder einem anderen HR-Tool migrieren?",
+        "answer": "Ja. Sie können Mitarbeitende und Filialen importieren, um schnell zu starten, und unser Team hilft beim Zuordnen Ihrer Daten, damit Sie ohne manuelles Neueingeben loslegen."
+      },
+      {
+        "question": "Welchen Support bieten Sie?",
+        "answer": "Alle Tarife enthalten E-Mail-Support und Dokumentation. Business-Tarife bieten priorisierten Support, Enterprise umfasst einen dedizierten Ansprechpartner mit SLA."
+      },
+      {
+        "question": "Wie lange dauert die Einrichtung?",
+        "answer": "Die meisten Teams legen ihre Filialen an, laden ihre Leute ein und veröffentlichen am selben Tag einen ersten Plan. Es gibt nichts zu installieren – Vellora läuft im Browser."
+      }
+    ]
+  },
+  "FinalCta": {
+    "title": "Bereit, Ihr Personalmanagement zu verschlanken?",
+    "subtitle": "Bringen Sie Dienstplanung, Anwesenheit, Abwesenheiten und Recruiting zusammen – und geben Sie jeder Filiale denselben modernen Ansatz.",
+    "ctaPrimary": "Kostenlos starten",
+    "ctaSecondary": "Demo buchen"
+  },
+  "Newsletter": {
+    "title": "Produkt-Updates erhalten",
+    "subtitle": "Neue Funktionen, Betriebs-Leitfäden und gelegentlich eine Fallstudie. Kein Spam.",
+    "placeholder": "sie@unternehmen.com",
+    "button": "Abonnieren",
+    "success": "Danke – Sie sind auf der Liste."
+  },
+  "Footer": {
+    "description": "Modernes HR- und Personalmanagement für Teams mit mehreren Filialen und Standorten.",
+    "rights": "© {year} Vellora. Alle Rechte vorbehalten.",
+    "operational": "Alle Systeme betriebsbereit",
+    "columns": {
+      "product": {
+        "heading": "Produkt",
+        "links": {
+          "features": "Funktionen",
+          "pricing": "Preise",
+          "security": "Sicherheit",
+          "roadmap": "Roadmap"
+        }
+      },
+      "solutions": {
+        "heading": "Lösungen",
+        "links": {
+          "retail": "Einzelhandel",
+          "hospitality": "Gastgewerbe",
+          "franchises": "Franchise",
+          "enterprise": "Unternehmen"
+        }
+      },
+      "company": {
+        "heading": "Unternehmen",
+        "links": {
+          "about": "Über uns",
+          "careers": "Karriere",
+          "contact": "Kontakt",
+          "blog": "Blog"
+        }
+      },
+      "resources": {
+        "heading": "Ressourcen",
+        "links": {
+          "help": "Hilfecenter",
+          "guides": "Leitfäden",
+          "changelog": "Änderungen",
+          "status": "Status"
+        }
+      },
+      "legal": {
+        "heading": "Rechtliches",
+        "links": {
+          "privacy": "Datenschutz",
+          "terms": "AGB",
+          "cookies": "Cookies",
+          "dpa": "AVV"
+        }
+      }
+    }
+  },
+  "LanguageSwitcher": {
+    "label": "Sprache"
+  }
+}
