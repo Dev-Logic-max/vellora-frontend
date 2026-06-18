@@ -6,6 +6,7 @@ import { setRequestLocale } from "next-intl/server";
 
 import "../globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
 import { routing } from "@/i18n/routing";
 
 const inter = Inter({
@@ -63,7 +64,7 @@ export default async function LocaleLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <QueryProvider>{children}</QueryProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

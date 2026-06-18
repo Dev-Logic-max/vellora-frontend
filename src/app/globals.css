@@ -14,7 +14,7 @@
 
 :root {
   /* ---- Canonical palette (default theme: minimalist, mostly-white) ---- */
-  --background: #ffffff; /* app background */
+  --background: #fafafb; /* app canvas — soft off-white (never pure white) */
   --surface: #ffffff; /* cards, panels */
   --surface-subtle: #f4f4f5; /* subtle neutral fills, hovers */
   --border: #e7e7e9; /* dividers, inputs */
@@ -22,11 +22,39 @@
   --muted: #6b7280; /* secondary text */
   --accent: #4f46e5; /* indigo — the single brand accent */
   --accent-foreground: #ffffff; /* text/icons on the accent */
-  --success: #10b981; /* emerald */
-  --warning: #f59e0b; /* amber */
-  --danger: #f43f5e; /* rose */
+  --success: #16a34a; /* green */
+  --warning: #d97706; /* amber */
+  --danger: #dc2626; /* red */
+  --info: #0ea5e9; /* sky */
 
-  --radius: 0.625rem;
+  /* indigo brand — soft fills + strong (hover) */
+  --accent-soft: #eef0ff;
+  --accent-strong: #4338ca;
+  --faint: #9ca3af;
+
+  /* soft semantic tints for chips */
+  --success-soft: #e9f7ef;
+  --warning-soft: #fdf3e6;
+  --danger-soft: #fef2f2;
+  --info-soft: #eaf7ff;
+
+  /* supportive palette — charts / category tags / gradients ONLY (never buttons) */
+  --chart-1: #4f46e5; /* indigo */
+  --chart-2: #3b82f6; /* blue   */
+  --chart-3: #8b5cf6; /* purple */
+  --chart-4: #14b8a6; /* teal   */
+  --chart-5: #10b981; /* green  */
+  --chart-6: #f472b6; /* pink   */
+
+  /* dark indigo rail (design-system §2 option A) — constant across themes */
+  --rail-bg: #0e0f1a;
+  --rail-foreground: #e2e4f0;
+  --rail-muted: #9498b2;
+  --rail-active: #4f46e5;
+  --rail-active-foreground: #ffffff;
+  --rail-border: #1c1d2e;
+
+  --radius: 0.75rem;
 
   /* ---- shadcn/ui compatibility layer (maps onto the palette above) ---- */
   --card: var(--surface);
@@ -97,11 +125,39 @@
   --color-accent-foreground: var(--subtle-foreground);
   --color-destructive: var(--destructive);
   --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
   --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
   --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* brand soft/strong + faint text */
+  --color-surface: var(--surface);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-strong: var(--accent-strong);
+  --color-faint: var(--faint);
+
+  /* dark indigo rail */
+  --color-rail: var(--rail-bg);
+  --color-rail-foreground: var(--rail-foreground);
+  --color-rail-muted: var(--rail-muted);
+  --color-rail-active: var(--rail-active);
+  --color-rail-active-foreground: var(--rail-active-foreground);
+  --color-rail-border: var(--rail-border);
+
+  /* supportive chart palette */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
 
   /* ---- Fonts: exposed as font-sans / font-display / font-mono ---- */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
