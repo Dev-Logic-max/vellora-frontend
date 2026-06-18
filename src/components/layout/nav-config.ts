@@ -42,7 +42,6 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/employees",
     icon: Users,
     roles: ["owner", "hr", "area_manager", "store_manager"],
-    soon: true,
   },
   { label: "Scheduling", href: "/scheduling", icon: CalendarDays, roles: ALL_ROLES, soon: true },
   { label: "Attendance", href: "/attendance", icon: Clock, roles: ALL_ROLES, soon: true },

@@ -3,6 +3,8 @@ import { cn } from "@/lib/utils";
 const STATUS_STYLES: Record<string, string> = {
   active: "bg-success-soft text-success",
   pending: "bg-warning-soft text-warning",
+  invited: "bg-accent-soft text-accent-strong",
+  on_leave: "bg-warning-soft text-warning",
   suspended: "bg-warning-soft text-warning",
   inactive: "bg-muted text-muted-foreground",
   archived: "bg-muted text-muted-foreground",
@@ -19,7 +21,7 @@ export function StatusPill({ status, className }: { status: string; className?: 
         className,
       )}
     >
-      {status}
+      {status.replace(/_/g, " ")}
     </span>
   );
 }
