@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { TriangleAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrentUser } from "@/features/session/use-current-user";
 import { AppSidebar } from "./app-sidebar";
+import { CommandPalette } from "./command-palette";
 import { MobileNav } from "./mobile-nav";
 import { TopBar } from "./top-bar";
 import { useSidebarCollapsed } from "./use-sidebar-collapsed";
@@ -15,6 +16,19 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { data: user, isLoading, isError, refetch, isFetching } = useCurrentUser();
   const [collapsed, toggleCollapsed] = useSidebarCollapsed();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // Cmd/Ctrl-K toggles the super-search palette.
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   if (isLoading) return <ShellSkeleton />;
 
@@ -48,10 +62,15 @@ export function AppShell({ children }: { children: ReactNode }) {
         className="hidden lg:flex"
       />
       <div className="flex min-h-screen flex-1 flex-col">
-        <TopBar user={user} onOpenMobileNav={() => setMobileOpen(true)} />
+        <TopBar
+          user={user}
+          onOpenMobileNav={() => setMobileOpen(true)}
+          onOpenSearch={() => setSearchOpen(true)}
+        />
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</main>
       </div>
       <MobileNav role={user.role} open={mobileOpen} onOpenChange={setMobileOpen} />
+      <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
   );
 }

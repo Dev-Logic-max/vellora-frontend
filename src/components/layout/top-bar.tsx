@@ -10,9 +10,10 @@ import { UserMenu } from "./user-menu";
 interface TopBarProps {
   user: CurrentUser;
   onOpenMobileNav: () => void;
+  onOpenSearch: () => void;
 }
 
-export function TopBar({ user, onOpenMobileNav }: TopBarProps) {
+export function TopBar({ user, onOpenMobileNav, onOpenSearch }: TopBarProps) {
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b border-border bg-background/80 px-4 backdrop-blur-sm sm:px-6">
       <Button
@@ -29,11 +30,11 @@ export function TopBar({ user, onOpenMobileNav }: TopBarProps) {
 
       <div className="flex-1" />
 
-      {/* Super-search trigger (cmdk palette wired in Phase 1). */}
+      {/* Super-search trigger (Cmd/Ctrl-K). */}
       <button
         type="button"
-        disabled
-        className="hidden items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted disabled:opacity-70 sm:flex"
+        onClick={onOpenSearch}
+        className="hidden items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted sm:flex"
       >
         <Search className="size-4" />
         <span>Search…</span>
@@ -41,6 +42,9 @@ export function TopBar({ user, onOpenMobileNav }: TopBarProps) {
           ⌘K
         </kbd>
       </button>
+      <Button variant="ghost" size="icon" className="sm:hidden" onClick={onOpenSearch} aria-label="Search">
+        <Search />
+      </Button>
 
       <Button variant="ghost" size="icon" aria-label="Notifications" disabled>
         <Bell />
