@@ -30,13 +30,12 @@ const ALL_ROLES: MembershipRole[] = ["owner", "hr", "area_manager", "store_manag
 
 export const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ALL_ROLES },
-  { label: "Companies", href: "/companies", icon: Building2, roles: ["owner", "hr"], soon: true },
+  { label: "Companies", href: "/companies", icon: Building2, roles: ["owner", "hr"] },
   {
     label: "Stores",
     href: "/stores",
     icon: Store,
     roles: ["owner", "hr", "area_manager", "store_manager"],
-    soon: true,
   },
   {
     label: "Employees",
@@ -57,7 +56,7 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ["owner", "hr", "area_manager", "store_manager"],
     soon: true,
   },
-  { label: "Settings", href: "/settings", icon: Settings, roles: ["owner", "hr"], soon: true },
+  { label: "Settings", href: "/settings", icon: Settings, roles: ["owner", "hr"] },
 ];
 
 /** Nav filtered to a role. With no membership yet, only the dashboard shows. */

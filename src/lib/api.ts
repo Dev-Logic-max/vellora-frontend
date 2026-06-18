@@ -67,6 +67,8 @@ export const api = {
   get: <T>(path: string, companyId?: string) => apiFetch<T>(path, { companyId }),
   post: <T>(path: string, body?: unknown, companyId?: string) =>
     apiFetch<T>(path, { method: "POST", body, companyId }),
+  put: <T>(path: string, body?: unknown, companyId?: string) =>
+    apiFetch<T>(path, { method: "PUT", body, companyId }),
   patch: <T>(path: string, body?: unknown, companyId?: string) =>
     apiFetch<T>(path, { method: "PATCH", body, companyId }),
   delete: <T>(path: string, companyId?: string) =>
