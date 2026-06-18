@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { MailCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import { signUp } from "@/lib/auth";
 import { AuthField, PasswordField } from "@/components/auth/auth-field";
 import { GoogleButton } from "@/components/auth/google-button";
 import { Reveal } from "@/components/marketing/reveal";
@@ -25,6 +28,9 @@ const schema = z
 type Values = z.infer<typeof schema>;
 
 export default function SignupPage() {
+  const [submitted, setSubmitted] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -34,10 +40,42 @@ export default function SignupPage() {
     defaultValues: { name: "", email: "", password: "", confirm: "" },
   });
 
-  const onSubmit = (values: Values) => {
-    // UI-only — wiring comes later.
-    console.log("signup", values);
+  const onSubmit = async (values: Values) => {
+    setFormError(null);
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
+    const { error } = await signUp({
+      email: values.email,
+      password: values.password,
+      data: { full_name: values.name },
+      emailRedirectTo: `${siteUrl}/login`,
+    });
+    if (error) {
+      setFormError(error.message);
+      return;
+    }
+    setSubmitted(true);
   };
+
+  if (submitted) {
+    return (
+      <Reveal className="space-y-6 text-center">
+        <span className="mx-auto inline-flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <MailCheck className="size-6" />
+        </span>
+        <div>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+            Confirm your email
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            We&apos;ve sent a verification link to your inbox. Confirm it, then sign in to continue.
+          </p>
+        </div>
+        <Link href="/login" className="text-sm font-medium text-primary hover:underline">
+          Back to sign in
+        </Link>
+      </Reveal>
+    );
+  }
 
   return (
     <Reveal className="space-y-6">
@@ -92,6 +130,8 @@ export default function SignupPage() {
           error={errors.confirm?.message}
           {...register("confirm")}
         />
+
+        {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
 
         <Button type="submit" size="lg" className="h-10 w-full" disabled={isSubmitting}>
           Create account

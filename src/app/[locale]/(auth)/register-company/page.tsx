@@ -10,6 +10,7 @@ import { ArrowLeft, ArrowRight, Check, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import { signUp } from "@/lib/auth";
 import { AuthField, PasswordField, SelectField } from "@/components/auth/auth-field";
 import { Stepper } from "@/components/auth/stepper";
 import { Reveal } from "@/components/marketing/reveal";
@@ -79,6 +80,7 @@ export default function RegisterCompanyPage() {
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
   const [slugEdited, setSlugEdited] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const reduce = useReducedMotion();
 
   const {
@@ -119,9 +121,26 @@ export default function RegisterCompanyPage() {
   };
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
-  const onSubmit = (values: Values) => {
-    // UI-only — wiring comes later.
-    console.log("register-company", values);
+  const onSubmit = async (values: Values) => {
+    setFormError(null);
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
+    const { error } = await signUp({
+      email: values.adminEmail,
+      password: values.adminPassword,
+      data: {
+        full_name: values.adminName,
+        company_name: values.companyName,
+        country: values.country,
+        timezone: values.timezone,
+        plan: values.plan,
+      },
+      emailRedirectTo: `${siteUrl}/login`,
+    });
+    if (error) {
+      setFormError(error.message);
+      setStep(1); // back to the Admin step where the email/password live
+      return;
+    }
     setDone(true);
   };
 
@@ -134,10 +153,11 @@ export default function RegisterCompanyPage() {
         </span>
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
-            Workspace created
+            Confirm your email
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {values.companyName} is ready on the {values.plan} plan. (Demo — logged to the console.)
+            We&apos;ve sent a verification link for {values.adminEmail}. Confirm it, then sign in —
+            you&apos;ll finish setting up {values.companyName} from your dashboard.
           </p>
         </div>
         <Link
@@ -305,6 +325,8 @@ export default function RegisterCompanyPage() {
 
           {step === 3 && <ReviewStep values={getValues()} />}
         </motion.div>
+
+        {formError ? <p className="mt-4 text-sm text-destructive">{formError}</p> : null}
 
         {/* Wizard controls */}
         <div className="mt-8 flex items-center justify-between gap-3">

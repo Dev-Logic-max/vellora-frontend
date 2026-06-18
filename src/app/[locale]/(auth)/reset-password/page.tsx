@@ -8,6 +8,7 @@ import { CheckCircle2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import { updatePassword } from "@/lib/auth";
 import { PasswordField } from "@/components/auth/auth-field";
 import { Reveal } from "@/components/marketing/reveal";
 
@@ -25,6 +26,7 @@ type Values = z.infer<typeof schema>;
 
 export default function ResetPasswordPage() {
   const [done, setDone] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -34,9 +36,13 @@ export default function ResetPasswordPage() {
     defaultValues: { password: "", confirm: "" },
   });
 
-  const onSubmit = (values: Values) => {
-    // UI-only — wiring comes later.
-    console.log("reset-password", values);
+  const onSubmit = async (values: Values) => {
+    setFormError(null);
+    const { error } = await updatePassword(values.password);
+    if (error) {
+      setFormError(error.message);
+      return;
+    }
     setDone(true);
   };
 
@@ -92,6 +98,8 @@ export default function ResetPasswordPage() {
           error={errors.confirm?.message}
           {...register("confirm")}
         />
+        {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
+
         <Button type="submit" size="lg" className="h-10 w-full" disabled={isSubmitting}>
           Update password
         </Button>

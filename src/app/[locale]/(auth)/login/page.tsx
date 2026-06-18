@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
+import { signInWithPassword } from "@/lib/auth";
 import { AuthField, PasswordField } from "@/components/auth/auth-field";
 import { GoogleButton } from "@/components/auth/google-button";
 import { Reveal } from "@/components/marketing/reveal";
@@ -19,6 +21,9 @@ const schema = z.object({
 type Values = z.infer<typeof schema>;
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [formError, setFormError] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -28,9 +33,15 @@ export default function LoginPage() {
     defaultValues: { email: "", password: "", remember: false },
   });
 
-  const onSubmit = (values: Values) => {
-    // UI-only — wiring comes later.
-    console.log("login", values);
+  const onSubmit = async (values: Values) => {
+    setFormError(null);
+    const { error } = await signInWithPassword(values.email, values.password);
+    if (error) {
+      setFormError(error.message);
+      return;
+    }
+    router.push("/dashboard");
+    router.refresh();
   };
 
   return (
@@ -85,6 +96,8 @@ export default function LoginPage() {
             Forgot password?
           </Link>
         </div>
+
+        {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
 
         <Button type="submit" size="lg" className="h-10 w-full" disabled={isSubmitting}>
           Sign in
