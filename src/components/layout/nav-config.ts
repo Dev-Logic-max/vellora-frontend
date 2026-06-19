@@ -6,6 +6,7 @@ import {
   CalendarOff,
   ClipboardList,
   Clock,
+  CreditCard,
   FileText,
   LayoutDashboard,
   MessagesSquare,
@@ -66,6 +67,7 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ["owner", "hr", "area_manager", "store_manager"],
     soon: true,
   },
+  { label: "Billing", href: "/settings/billing", icon: CreditCard, roles: ["owner"] },
   { label: "Settings", href: "/settings", icon: Settings, roles: ["owner", "hr"] },
 ];
 
