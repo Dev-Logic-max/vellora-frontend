@@ -1,7 +1,8 @@
 "use client";
 
-import { Bell, Menu, Search } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import { Button } from "@/components/ui/button";
 import type { CurrentUser } from "@/features/session/types";
 import { CompanySwitcher } from "./company-switcher";
@@ -46,9 +47,7 @@ export function TopBar({ user, onOpenMobileNav, onOpenSearch }: TopBarProps) {
         <Search />
       </Button>
 
-      <Button variant="ghost" size="icon" aria-label="Notifications" disabled>
-        <Bell />
-      </Button>
+      <NotificationBell />
 
       <UserMenu user={user} />
     </header>

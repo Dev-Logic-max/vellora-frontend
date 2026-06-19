@@ -56,7 +56,7 @@ export default async function LocaleLayout({
       suppressHydrationWarning
       className={`${inter.variable} ${sora.variable} ${jetbrainsMono.variable} h-full`}
     >
-      <body className="flex min-h-full flex-col">
+      <body className="flex min-h-full flex-col" suppressHydrationWarning>
         <NextIntlClientProvider>
           <ThemeProvider
             attribute="class"

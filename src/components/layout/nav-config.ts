@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  Bell,
   Building2,
   CalendarDays,
   CalendarOff,
@@ -7,6 +8,7 @@ import {
   Clock,
   FileText,
   LayoutDashboard,
+  MessagesSquare,
   Settings,
   Shuffle,
   Store,
@@ -54,7 +56,9 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Shuffle,
     roles: ["owner", "hr", "area_manager", "store_manager"],
   },
-  { label: "Documents", href: "/documents", icon: FileText, roles: ALL_ROLES, soon: true },
+  { label: "Documents", href: "/documents", icon: FileText, roles: ALL_ROLES },
+  { label: "Messages", href: "/messages", icon: MessagesSquare, roles: ALL_ROLES },
+  { label: "Notifications", href: "/notifications", icon: Bell, roles: ALL_ROLES },
   {
     label: "Reports",
     href: "/reports",

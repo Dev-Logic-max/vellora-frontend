@@ -2,7 +2,9 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { TriangleAlert } from "lucide-react";
+import { Toaster } from "sonner";
 
+import { RealtimeNotifications } from "@/components/notifications/realtime-notifications";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrentUser } from "@/features/session/use-current-user";
@@ -71,6 +73,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       </div>
       <MobileNav role={user.role} open={mobileOpen} onOpenChange={setMobileOpen} />
       <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
+      <RealtimeNotifications />
+      <Toaster position="bottom-right" theme="light" richColors closeButton />
     </div>
   );
 }
