@@ -11,6 +11,7 @@ import {
   Briefcase,
   LayoutDashboard,
   MessagesSquare,
+  Palette,
   Settings,
   Shuffle,
   Store,
@@ -70,6 +71,7 @@ export const NAV_ITEMS: NavItem[] = [
     soon: true,
   },
   { label: "Billing", href: "/settings/billing", icon: CreditCard, roles: ["owner"] },
+  { label: "Design", href: "/settings/design", icon: Palette, roles: ["owner"] },
   { label: "Settings", href: "/settings", icon: Settings, roles: ["owner", "hr"] },
 ];
 

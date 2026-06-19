@@ -5,54 +5,63 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================================
-   Vellora design tokens — see docs/roadmap.md §2.
-   The canonical palette below is the single source of truth. Re-theming
-   (Phase 5: Modern → Wooden → Glassy → Ice) = swapping these values only.
-   The @theme inline block maps shadcn/ui's component token names onto this
-   palette so every shadcn component renders on-brand.
+   Vellora design tokens — see .claude/docs/design-theme-system.md.
+   Color values are space-separated `R G B` so any opacity comes from one token
+   via `rgb(var(--token) / <alpha>)` (the @theme mappings below expose Tailwind's
+   alpha hook, so `bg-primary/10` etc. work). This file = the LANDING/auth look
+   (original indigo, unchanged colors). The authenticated dashboard overrides
+   these same variables under `.app-shell` in `dashboard.css` (Aurora theme) —
+   so the landing page is never affected by dashboard theming.
    ============================================================================ */
 
 :root {
-  /* ---- Canonical palette (default theme: minimalist, mostly-white) ---- */
-  --background: #fafafb; /* app canvas — soft off-white (never pure white) */
-  --surface: #ffffff; /* cards, panels */
-  --surface-subtle: #f4f4f5; /* subtle neutral fills, hovers */
-  --border: #e7e7e9; /* dividers, inputs */
-  --foreground: #0a0a0b; /* primary text */
-  --muted: #6b7280; /* secondary text */
-  --accent: #4f46e5; /* indigo — the single brand accent */
-  --accent-foreground: #ffffff; /* text/icons on the accent */
-  --success: #16a34a; /* green */
-  --warning: #d97706; /* amber */
-  --danger: #dc2626; /* red */
-  --info: #0ea5e9; /* sky */
+  /* ---- Canonical palette (landing/auth: minimalist, mostly-white indigo) ---- */
+  --background: 250 250 251; /* app canvas — soft off-white (never pure white) */
+  --surface: 255 255 255; /* cards, panels */
+  --surface-subtle: 244 244 245; /* subtle neutral fills, hovers */
+  --border: 231 231 233; /* dividers, inputs */
+  --foreground: 10 10 11; /* primary text */
+  --muted: 107 114 128; /* secondary text */
+  --accent: 79 70 229; /* indigo — the single brand accent */
+  --accent-foreground: 255 255 255; /* text/icons on the accent */
+  --success: 22 163 74; /* green */
+  --warning: 217 119 6; /* amber */
+  --danger: 220 38 38; /* red */
+  --info: 14 165 233; /* sky */
 
   /* indigo brand — soft fills + strong (hover) */
-  --accent-soft: #eef0ff;
-  --accent-strong: #4338ca;
-  --faint: #9ca3af;
+  --accent-soft: 238 240 255;
+  --accent-strong: 67 56 202;
+  --faint: 156 163 175;
+
+  /* secondary/tertiary accents + deepest surface — overridden by Aurora in
+     dashboard.css under .app-shell; here they fall back to indigo/neutral so
+     the utilities resolve on landing/auth too (not actively used there). */
+  --secondary-accent: 79 70 229;
+  --tertiary-accent: 79 70 229;
+  --surface-3: 237 238 242;
 
   /* soft semantic tints for chips */
-  --success-soft: #e9f7ef;
-  --warning-soft: #fdf3e6;
-  --danger-soft: #fef2f2;
-  --info-soft: #eaf7ff;
+  --success-soft: 233 247 239;
+  --warning-soft: 253 243 230;
+  --danger-soft: 254 242 242;
+  --info-soft: 234 247 255;
 
   /* supportive palette — charts / category tags / gradients ONLY (never buttons) */
-  --chart-1: #4f46e5; /* indigo */
-  --chart-2: #3b82f6; /* blue   */
-  --chart-3: #8b5cf6; /* purple */
-  --chart-4: #14b8a6; /* teal   */
-  --chart-5: #10b981; /* green  */
-  --chart-6: #f472b6; /* pink   */
+  --chart-1: 79 70 229; /* indigo */
+  --chart-2: 59 130 246; /* blue   */
+  --chart-3: 139 92 246; /* purple */
+  --chart-4: 20 184 166; /* teal   */
+  --chart-5: 16 185 129; /* green  */
+  --chart-6: 244 114 182; /* pink   */
 
   /* dark indigo rail (design-system §2 option A) — constant across themes */
-  --rail-bg: #0e0f1a;
-  --rail-foreground: #e2e4f0;
-  --rail-muted: #9498b2;
-  --rail-active: #4f46e5;
-  --rail-active-foreground: #ffffff;
-  --rail-border: #1c1d2e;
+  --rail-bg: 14 15 26;
+  --rail-foreground: 226 228 240;
+  --rail-muted: 148 152 178;
+  --rail-active: 79 70 229;
+  --rail-active-foreground: 255 255 255;
+  --rail-border: 28 29 46;
 
   --radius: 0.75rem;
 
@@ -75,17 +84,17 @@
 }
 
 .dark {
-  --background: #0a0a0b;
-  --surface: #141416;
-  --surface-subtle: #1c1c1f;
-  --border: #26262a;
-  --foreground: #fafafa;
-  --muted: #9ca3af;
-  --accent: #6366f1;
-  --accent-foreground: #ffffff;
-  --success: #34d399;
-  --warning: #fbbf24;
-  --danger: #fb7185;
+  --background: 10 10 11;
+  --surface: 20 20 22;
+  --surface-subtle: 28 28 31;
+  --border: 38 38 42;
+  --foreground: 250 250 250;
+  --muted: 156 163 175;
+  --accent: 99 102 241;
+  --accent-foreground: 255 255 255;
+  --success: 52 211 153;
+  --warning: 251 191 36;
+  --danger: 251 113 133;
 
   --card: var(--surface);
   --card-foreground: var(--foreground);
@@ -105,59 +114,61 @@
 }
 
 @theme inline {
-  /* ---- Colors: Tailwind utilities → canonical palette ---- */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
+  /* ---- Colors: Tailwind utilities → palette (rgb(var()/α) so /opacity works) ---- */
+  --color-background: rgb(var(--background) / <alpha-value>);
+  --color-foreground: rgb(var(--foreground) / <alpha-value>);
+  --color-surface: rgb(var(--surface) / <alpha-value>);
+  --color-surface-subtle: rgb(var(--surface-subtle) / <alpha-value>);
+  --color-card: rgb(var(--card) / <alpha-value>);
+  --color-card-foreground: rgb(var(--card-foreground) / <alpha-value>);
+  --color-popover: rgb(var(--popover) / <alpha-value>);
+  --color-popover-foreground: rgb(var(--popover-foreground) / <alpha-value>);
+  --color-primary: rgb(var(--primary) / <alpha-value>);
+  --color-primary-foreground: rgb(var(--primary-foreground) / <alpha-value>);
+  --color-secondary: rgb(var(--secondary) / <alpha-value>);
+  --color-secondary-foreground: rgb(var(--secondary-foreground) / <alpha-value>);
   /* shadcn `muted` = subtle neutral background; secondary text = muted-foreground */
-  --color-muted: var(--muted-surface);
-  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: rgb(var(--muted-surface) / <alpha-value>);
+  --color-muted-foreground: rgb(var(--muted-foreground) / <alpha-value>);
   /* shadcn `accent` = neutral hover/active background (not the brand accent) */
-  --color-accent: var(--subtle);
-  --color-accent-foreground: var(--subtle-foreground);
-  --color-destructive: var(--destructive);
-  --color-success: var(--success);
-  --color-success-soft: var(--success-soft);
-  --color-warning: var(--warning);
-  --color-warning-soft: var(--warning-soft);
-  --color-danger: var(--danger);
-  --color-danger-soft: var(--danger-soft);
-  --color-info: var(--info);
-  --color-info-soft: var(--info-soft);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+  --color-accent: rgb(var(--subtle) / <alpha-value>);
+  --color-accent-foreground: rgb(var(--subtle-foreground) / <alpha-value>);
+  --color-destructive: rgb(var(--destructive) / <alpha-value>);
+  --color-success: rgb(var(--success) / <alpha-value>);
+  --color-success-soft: rgb(var(--success-soft) / <alpha-value>);
+  --color-warning: rgb(var(--warning) / <alpha-value>);
+  --color-warning-soft: rgb(var(--warning-soft) / <alpha-value>);
+  --color-danger: rgb(var(--danger) / <alpha-value>);
+  --color-danger-soft: rgb(var(--danger-soft) / <alpha-value>);
+  --color-info: rgb(var(--info) / <alpha-value>);
+  --color-info-soft: rgb(var(--info-soft) / <alpha-value>);
+  --color-border: rgb(var(--border) / <alpha-value>);
+  --color-input: rgb(var(--input) / <alpha-value>);
+  --color-ring: rgb(var(--ring) / <alpha-value>);
 
-  /* brand soft/strong + faint text */
-  --color-surface: var(--surface);
-  --color-surface-subtle: var(--surface-subtle);
-  --color-accent-soft: var(--accent-soft);
-  --color-accent-strong: var(--accent-strong);
-  --color-faint: var(--faint);
+  /* brand soft/strong + secondary/tertiary accents (dashboard) + faint text */
+  --color-accent-soft: rgb(var(--accent-soft) / <alpha-value>);
+  --color-accent-strong: rgb(var(--accent-strong) / <alpha-value>);
+  --color-secondary-accent: rgb(var(--secondary-accent) / <alpha-value>);
+  --color-tertiary-accent: rgb(var(--tertiary-accent) / <alpha-value>);
+  --color-surface-3: rgb(var(--surface-3) / <alpha-value>);
+  --color-faint: rgb(var(--faint) / <alpha-value>);
 
   /* dark indigo rail */
-  --color-rail: var(--rail-bg);
-  --color-rail-foreground: var(--rail-foreground);
-  --color-rail-muted: var(--rail-muted);
-  --color-rail-active: var(--rail-active);
-  --color-rail-active-foreground: var(--rail-active-foreground);
-  --color-rail-border: var(--rail-border);
+  --color-rail: rgb(var(--rail-bg) / <alpha-value>);
+  --color-rail-foreground: rgb(var(--rail-foreground) / <alpha-value>);
+  --color-rail-muted: rgb(var(--rail-muted) / <alpha-value>);
+  --color-rail-active: rgb(var(--rail-active) / <alpha-value>);
+  --color-rail-active-foreground: rgb(var(--rail-active-foreground) / <alpha-value>);
+  --color-rail-border: rgb(var(--rail-border) / <alpha-value>);
 
   /* supportive chart palette */
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-chart-6: var(--chart-6);
+  --color-chart-1: rgb(var(--chart-1) / <alpha-value>);
+  --color-chart-2: rgb(var(--chart-2) / <alpha-value>);
+  --color-chart-3: rgb(var(--chart-3) / <alpha-value>);
+  --color-chart-4: rgb(var(--chart-4) / <alpha-value>);
+  --color-chart-5: rgb(var(--chart-5) / <alpha-value>);
+  --color-chart-6: rgb(var(--chart-6) / <alpha-value>);
 
   /* ---- Fonts: exposed as font-sans / font-display / font-mono ---- */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;

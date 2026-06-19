@@ -56,7 +56,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="app-shell flex min-h-screen bg-background">
       <AppSidebar
         role={user.role}
         collapsed={collapsed}

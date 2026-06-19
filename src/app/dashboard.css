@@ -1,0 +1,74 @@
+/* ============================================================================
+   Vellora — DASHBOARD theme ("Aurora", multi-accent premium light).
+   Imported ONLY by the authenticated (app) layout; scoped to `.app-shell`.
+   It overrides the same SEMANTIC variables defined in globals.css, so every
+   Tailwind utility (which maps to those variables) automatically resolves to
+   Aurora values inside the dashboard and stays the original indigo on the
+   landing/auth pages. Values are `R G B` triples consumed as rgba via the
+   shared @theme mappings. See .claude/docs/design-theme-system.md.
+   ============================================================================ */
+
+.app-shell {
+  /* ---- Aurora primitives (raw ramps used by the gradient/effects below) ---- */
+  --indigo-500: 79 70 229;
+  --violet-500: 139 92 246;
+  --teal-500: 20 184 166;
+
+  /* ---- Semantic overrides (multi-accent: indigo + teal + violet) ---- */
+  --background: 250 250 251;
+  --surface: 255 255 255;
+  --surface-subtle: 244 244 246;
+  --surface-3: 237 238 242;
+  --border: 231 231 233;
+  --foreground: 10 10 11;
+  --muted: 107 114 128;
+  --faint: 156 163 175;
+
+  --accent: 79 70 229; /* indigo — primary action */
+  --accent-foreground: 255 255 255;
+  --accent-soft: 238 240 255;
+  --accent-strong: 67 56 202;
+  --secondary-accent: 20 184 166; /* teal — secondary */
+  --tertiary-accent: 139 92 246; /* violet — accent/AI/new */
+
+  /* effects (literal rgba values) */
+  --gradient-brand: linear-gradient(
+    135deg,
+    rgba(var(--indigo-500) / 1),
+    rgba(var(--violet-500) / 1) 55%,
+    rgba(var(--teal-500) / 1)
+  );
+  --glass-bg: rgba(255 255 255 / 0.6);
+  --glass-border: rgba(255 255 255 / 0.5);
+  --shadow-accent: 0 8px 24px rgba(var(--accent) / 0.22);
+}
+
+/* Dark dashboard (when next-themes adds `.dark` above the shell). */
+.dark .app-shell {
+  --background: 10 10 11;
+  --surface: 20 20 22;
+  --surface-subtle: 28 28 31;
+  --surface-3: 38 38 42;
+  --border: 38 38 42;
+  --foreground: 250 250 250;
+  --muted: 156 163 175;
+
+  --accent: 99 102 241;
+  --accent-soft: 49 46 129;
+  --accent-strong: 129 140 248;
+  --secondary-accent: 45 212 191;
+  --tertiary-accent: 167 139 250;
+
+  --glass-bg: rgba(20 20 22 / 0.55);
+  --glass-border: rgba(255 255 255 / 0.08);
+}
+
+/* Premium surface utilities (dashboard chrome / CTAs / hero only). */
+.app-shell .surface-brand {
+  background-image: var(--gradient-brand);
+}
+.app-shell .surface-glass {
+  background-color: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px) saturate(1.4);
+}

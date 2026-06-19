@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import "../../dashboard.css"; // Aurora dashboard theme (scoped to .app-shell)
 import { AppShell } from "@/components/layout/app-shell";
 import { redirect } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
