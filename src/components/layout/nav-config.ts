@@ -1,13 +1,20 @@
 import {
   BarChart3,
+  Bell,
   Building2,
   CalendarDays,
   CalendarOff,
   ClipboardList,
   Clock,
+  CreditCard,
   FileText,
+  Briefcase,
   LayoutDashboard,
+  MessagesSquare,
+  Palette,
   Settings,
+  ShieldCheck,
+  Shuffle,
   Store,
   Users,
   type LucideIcon,
@@ -45,23 +52,45 @@ export const NAV_ITEMS: NavItem[] = [
   },
   { label: "Scheduling", href: "/scheduling", icon: CalendarDays, roles: ALL_ROLES },
   { label: "Attendance", href: "/attendance", icon: Clock, roles: ALL_ROLES },
-  { label: "Leave", href: "/leave", icon: CalendarOff, roles: ALL_ROLES, soon: true },
-  { label: "Onboarding", href: "/onboarding", icon: ClipboardList, roles: ALL_ROLES, soon: true },
-  { label: "Documents", href: "/documents", icon: FileText, roles: ALL_ROLES, soon: true },
+  { label: "Leave", href: "/leave", icon: CalendarOff, roles: ALL_ROLES },
+  { label: "Onboarding", href: "/onboarding", icon: ClipboardList, roles: ALL_ROLES },
+  {
+    label: "Transfers",
+    href: "/transfers",
+    icon: Shuffle,
+    roles: ["owner", "hr", "area_manager", "store_manager"],
+  },
+  { label: "Recruiting", href: "/recruiting", icon: Briefcase, roles: ["owner", "hr"] },
+  { label: "Documents", href: "/documents", icon: FileText, roles: ALL_ROLES },
+  { label: "Messages", href: "/messages", icon: MessagesSquare, roles: ALL_ROLES },
+  { label: "Notifications", href: "/notifications", icon: Bell, roles: ALL_ROLES },
   {
     label: "Reports",
     href: "/reports",
     icon: BarChart3,
     roles: ["owner", "hr", "area_manager", "store_manager"],
-    soon: true,
   },
+  { label: "Billing", href: "/settings/billing", icon: CreditCard, roles: ["owner"] },
+  { label: "Design", href: "/settings/design", icon: Palette, roles: ["owner"] },
   { label: "Settings", href: "/settings", icon: Settings, roles: ["owner", "hr"] },
 ];
 
-/** Nav filtered to a role. With no membership yet, only the dashboard shows. */
-export function navForRole(role: MembershipRole | undefined): NavItem[] {
-  if (!role) {
-    return NAV_ITEMS.filter((item) => item.href === "/dashboard");
-  }
-  return NAV_ITEMS.filter((item) => item.roles.includes(role));
+/** Platform-console entry — shown only to users with a platform_role. */
+export const ADMIN_NAV_ITEM: NavItem = {
+  label: "Admin",
+  href: "/admin",
+  icon: ShieldCheck,
+  roles: [],
+};
+
+/** Nav filtered to a role. With no membership yet, only the dashboard shows.
+ * `isPlatform` appends the cross-tenant Admin console entry. */
+export function navForRole(
+  role: MembershipRole | undefined,
+  isPlatform = false,
+): NavItem[] {
+  const base = !role
+    ? NAV_ITEMS.filter((item) => item.href === "/dashboard")
+    : NAV_ITEMS.filter((item) => item.roles.includes(role));
+  return isPlatform ? [...base, ADMIN_NAV_ITEM] : base;
 }

@@ -7,6 +7,15 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  experimental: {
+    // Keep Turbopack's dev cache IN-MEMORY. The on-disk persistent cache
+    // corrupts under this project's location (Windows + Desktop/OneDrive +
+    // Defender real-time scan), surfacing as "Another write batch or compaction
+    // is already active" and stale `build-manifest.json` ENOENT — which break
+    // HMR and force a manual restart. In-memory dev cache fixes both; you lose
+    // only cross-restart cache warmth, not correctness.
+    turbopackFileSystemCacheForDev: false,
+  },
 };
 
 const withNextIntl = createNextIntlPlugin();

@@ -2,10 +2,14 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { TriangleAlert } from "lucide-react";
+import { Toaster } from "sonner";
 
+import { ImpersonationBanner } from "@/components/admin/impersonation-banner";
+import { RealtimeNotifications } from "@/components/notifications/realtime-notifications";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrentUser } from "@/features/session/use-current-user";
+import { readCachedAccent } from "@/features/design/apply";
 import { AppSidebar } from "./app-sidebar";
 import { CommandPalette } from "./command-palette";
 import { MobileNav } from "./mobile-nav";
@@ -17,6 +21,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [collapsed, toggleCollapsed] = useSidebarCollapsed();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  // Selected accent preset (white base never changes). Read from cache on first
+  // render so the dashboard paints in the chosen theme without a flash; the
+  // backend value (loaded in the Design module) takes over once available.
+  const [accent] = useState(() => readCachedAccent());
 
   // Cmd/Ctrl-K toggles the super-search palette.
   useEffect(() => {
@@ -54,14 +62,16 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="app-shell flex min-h-screen bg-background" data-accent={accent}>
       <AppSidebar
         role={user.role}
+        isPlatform={Boolean(user.platformRole)}
         collapsed={collapsed}
         onToggle={toggleCollapsed}
         className="hidden lg:flex"
       />
       <div className="flex min-h-screen flex-1 flex-col">
+        <ImpersonationBanner />
         <TopBar
           user={user}
           onOpenMobileNav={() => setMobileOpen(true)}
@@ -69,8 +79,15 @@ export function AppShell({ children }: { children: ReactNode }) {
         />
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</main>
       </div>
-      <MobileNav role={user.role} open={mobileOpen} onOpenChange={setMobileOpen} />
+      <MobileNav
+        role={user.role}
+        isPlatform={Boolean(user.platformRole)}
+        open={mobileOpen}
+        onOpenChange={setMobileOpen}
+      />
       <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
+      <RealtimeNotifications />
+      <Toaster position="bottom-right" theme="light" richColors closeButton />
     </div>
   );
 }
