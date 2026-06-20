@@ -1,7 +1,11 @@
-/** Sparse map of overridden semantic tokens: `{ '--accent': '79 70 229' }` (R G B). */
+/** Optional fine-grained semantic-token overrides: `{ '--accent': '79 70 229' }`. */
 export type TokenMap = Record<string, string>;
 
-/** Active platform design returned by the backend (Aurora defaults if unset). */
+/**
+ * Active platform design. The platform base is white & fixed; `themeKey` is the
+ * selected ACCENT preset (indigo/green/blue/…). `tokens` is reserved for
+ * advanced per-token overrides on top of the preset.
+ */
 export interface ActiveDesign {
   themeKey: string;
   tokens: TokenMap;
@@ -10,14 +14,4 @@ export interface ActiveDesign {
 export interface UpdateDesignInput {
   themeKey?: string;
   tokens?: TokenMap;
-}
-
-/** A theme pack shown in the Theme Packs tab. Only `aurora` is live in v1.1. */
-export interface ThemePack {
-  key: string;
-  label: string;
-  description: string;
-  /** Preview swatches as `R G B` triples. */
-  swatches: string[];
-  status: "active" | "soon";
 }

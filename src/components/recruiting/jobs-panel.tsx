@@ -12,6 +12,7 @@ import {
 import type { Job } from "@/features/recruiting/types";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { ErrorState } from "@/components/ui/error-state";
 import { FormField } from "@/components/ui/form-field";
 import {
   Sheet,
@@ -137,13 +138,15 @@ function JobRow({ job }: { job: Job }) {
 }
 
 export function JobsPanel() {
-  const { data, isLoading } = useJobs();
+  const { data, isLoading, error, refetch } = useJobs();
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
         <JobEditor />
       </div>
-      {isLoading ? (
+      {error ? (
+        <ErrorState error={error} onRetry={() => void refetch()} />
+      ) : isLoading ? (
         <Skeleton className="h-40 w-full rounded-xl" />
       ) : !data?.length ? (
         <EmptyState

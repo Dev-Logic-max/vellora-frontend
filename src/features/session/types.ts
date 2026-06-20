@@ -5,6 +5,7 @@
  */
 export type MembershipRole = "owner" | "hr" | "area_manager" | "store_manager" | "employee";
 export type ScopeType = "group" | "company" | "area" | "store" | "self";
+export type PlatformRole = "super_admin" | "platform_admin" | "operations";
 
 export interface MembershipContext {
   companyId: string;
@@ -23,4 +24,5 @@ export interface CurrentUser {
   role?: MembershipRole;
   scopeType?: ScopeType;
   scopeIds?: string[];
+  platformRole?: PlatformRole | null;
 }

@@ -1,67 +1,65 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Palette, LayoutGrid, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Blocks, LayoutGrid, Palette, SwatchBook } from "lucide-react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePlatformDesign } from "@/features/design/design";
-import { applyTokens, cacheTokens, readCachedTokens } from "@/features/design/apply";
-import type { TokenMap } from "@/features/design/types";
-import { PaletteTab } from "./palette-tab";
+import { applyAccent, cacheAccent, readCachedAccent } from "@/features/design/apply";
+import { AccentTab } from "./accent-tab";
 import { ComponentsTab } from "./components-tab";
-import { ThemePacksTab } from "./theme-packs-tab";
+import { PaletteTab } from "./palette-tab";
+import { WidgetsTab } from "./widgets-tab";
 
 /**
- * Design Settings module — tabbed shell. The effective palette = server tokens
- * (or cached, before the API responds) merged with the admin's in-session edits.
- * Effects only sync the DOM/localStorage (never setState) to keep renders clean.
+ * Design Settings module — tabbed shell. The platform base is white & fixed; the
+ * selected accent only tints the dashboard. Applies the effective accent live to
+ * `.app-shell` via `data-accent` (with hover-preview), and hosts the four tabs.
  */
 export function DesignSettingsView() {
   const { data } = usePlatformDesign();
-  // Cached tokens read once (lazy init) for instant, no-flash preview.
-  const [cached] = useState<TokenMap>(() => readCachedTokens());
-  // Only the admin's in-session edits live in state; base comes from the query.
-  const [edits, setEdits] = useState<TokenMap>({});
+  // Committed pick (null → fall back to server/cache) + a transient hover preview.
+  const [pick, setPick] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const committed = pick ?? data?.themeKey ?? readCachedAccent();
+  const effective = preview ?? committed;
 
-  const base = data?.tokens ?? cached;
-  const draft = useMemo<TokenMap>(() => ({ ...base, ...edits }), [base, edits]);
-
-  // Apply the effective palette to the live dashboard scope + cache it.
+  // Apply the previewed-or-committed accent live; only the COMMITTED one is cached.
   useEffect(() => {
-    applyTokens(draft);
-    cacheTokens(draft);
-  }, [draft]);
-
-  function previewToken(varName: string, triple: string) {
-    setEdits((prev) => ({ ...prev, [varName]: triple }));
-  }
-
-  function resetDraft() {
-    setEdits({});
-  }
+    applyAccent(effective);
+  }, [effective]);
+  useEffect(() => {
+    cacheAccent(committed);
+  }, [committed]);
 
   return (
-    <Tabs defaultValue="palette" className="space-y-6">
+    <Tabs defaultValue="accent" className="space-y-6">
       <TabsList>
+        <TabsTrigger value="accent">
+          <SwatchBook className="size-4" /> Theme
+        </TabsTrigger>
         <TabsTrigger value="palette">
           <Palette className="size-4" /> Palette
         </TabsTrigger>
         <TabsTrigger value="components">
           <LayoutGrid className="size-4" /> Components
         </TabsTrigger>
-        <TabsTrigger value="packs">
-          <Sparkles className="size-4" /> Theme packs
+        <TabsTrigger value="widgets">
+          <Blocks className="size-4" /> Widgets
         </TabsTrigger>
       </TabsList>
 
+      <TabsContent value="accent">
+        <AccentTab accent={committed} onSelect={setPick} onPreview={setPreview} />
+      </TabsContent>
       <TabsContent value="palette">
-        <PaletteTab draft={draft} onPreview={previewToken} onReset={resetDraft} />
+        <PaletteTab accent={effective} />
       </TabsContent>
       <TabsContent value="components">
         <ComponentsTab />
       </TabsContent>
-      <TabsContent value="packs">
-        <ThemePacksTab />
+      <TabsContent value="widgets">
+        <WidgetsTab />
       </TabsContent>
     </Tabs>
   );

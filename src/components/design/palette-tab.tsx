@@ -1,112 +1,108 @@
 "use client";
 
-import { RotateCcw, Save } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Check, Copy, Lock, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  TOKEN_GROUPS,
-  clearTokens,
-  cacheTokens,
-  hexToRgbTriple,
-  rgbTripleToHex,
-} from "@/features/design/apply";
-import { useResetDesign, useUpdateDesign } from "@/features/design/design";
-import type { TokenMap } from "@/features/design/types";
+import { PALETTE_GROUPS, readLiveToken } from "@/features/design/apply";
+import { cn } from "@/lib/utils";
 
-interface Props {
-  draft: TokenMap;
-  onPreview: (varName: string, triple: string) => void;
-  onReset: () => void;
+/** "79 70 229" → "#4F46E5" for display/copy. */
+function tripleToHex(triple: string): string {
+  const [r, g, b] = triple.trim().split(/\s+/).map(Number);
+  if ([r, g, b].some((n) => Number.isNaN(n))) return "#000000";
+  return `#${[r, g, b].map((n) => n.toString(16).padStart(2, "0")).join("")}`.toUpperCase();
 }
 
 /**
- * Palette editor: every editable SEMANTIC token as a swatch + color picker.
- * Edits apply live (CSS vars) and are saved to the platform on Save. Values are
- * stored as `R G B` triples; the picker converts to/from hex.
+ * Live palette display. Shows resolved colors for the current theme — the fixed
+ * white base vs the themed accent/semantic groups — 12 per section. Click a
+ * swatch to copy its hex. Read-only (the Theme tab is the control).
  */
-export function PaletteTab({ draft, onPreview, onReset }: Props) {
-  const update = useUpdateDesign();
-  const reset = useResetDesign();
+export function PaletteTab({ accent }: { accent: string }) {
+  const [copied, setCopied] = useState<string | null>(null);
 
-  function valueFor(varName: string, fallback: string) {
-    return draft[varName] ?? fallback;
-  }
-
-  async function save() {
-    try {
-      await update.mutateAsync({ tokens: draft });
-      cacheTokens(draft);
-      toast.success("Design saved", { description: "The platform palette has been updated." });
-    } catch {
-      toast.error("Couldn't save design", { description: "Check your connection and try again." });
+  const values = useMemo(() => {
+    const next: Record<string, string> = {};
+    for (const group of PALETTE_GROUPS) {
+      for (const t of group.tokens) next[t.var] = readLiveToken(t.var);
     }
-  }
+    return next;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accent]);
 
-  async function resetAll() {
-    try {
-      await reset.mutateAsync();
-      clearTokens();
-      cacheTokens({});
-      onReset();
-      toast.success("Reset to Aurora", { description: "Restored the default palette." });
-    } catch {
-      toast.error("Couldn't reset design");
-    }
+  function copy(varName: string, hex: string) {
+    navigator.clipboard?.writeText(hex).then(
+      () => {
+        setCopied(varName);
+        toast.success(`Copied ${hex}`);
+        setTimeout(() => setCopied((c) => (c === varName ? null : c)), 1200);
+      },
+      () => toast.error("Couldn't copy"),
+    );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-end gap-2">
-        <Button
-          variant="outline"
-          onClick={resetAll}
-          disabled={reset.isPending}
-        >
-          <RotateCcw className="size-4" /> Reset to Aurora
-        </Button>
-        <Button onClick={save} disabled={update.isPending}>
-          <Save className="size-4" /> {update.isPending ? "Saving…" : "Save changes"}
-        </Button>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        {TOKEN_GROUPS.map((group) => (
-          <Card key={group.title}>
-            <CardHeader>
+      {PALETTE_GROUPS.map((group) => (
+        <Card key={group.title}>
+          <CardHeader className="flex-row items-start justify-between space-y-0">
+            <div className="space-y-0.5">
               <CardTitle className="text-base">{group.title}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+              {group.note && <p className="text-sm text-muted-foreground">{group.note}</p>}
+            </div>
+            {group.themed ? (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-accent-soft px-2 py-0.5 text-xs font-medium text-primary">
+                <Sparkles className="size-3" /> Themed
+              </span>
+            ) : (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-surface-subtle px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                <Lock className="size-3" /> Fixed
+              </span>
+            )}
+          </CardHeader>
+          <CardContent>
+            {/* 6 per row → 6 + 6 (two rows of 12) */}
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
               {group.tokens.map((t) => {
-                const triple = valueFor(t.var, t.default);
+                const triple = values[t.var] ?? "0 0 0";
+                const hex = tripleToHex(triple);
+                const isCopied = copied === t.var;
                 return (
-                  <div key={t.var} className="flex items-center gap-3">
-                    <label
-                      className="relative size-9 shrink-0 cursor-pointer overflow-hidden rounded-md border border-border"
+                  <button
+                    key={t.var}
+                    type="button"
+                    onClick={() => copy(t.var, hex)}
+                    title={`${t.var} · ${hex} — click to copy`}
+                    className="group flex flex-col gap-1.5 rounded-lg border border-border bg-surface p-2 text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
+                  >
+                    <span
+                      className="relative h-12 w-full rounded-md border border-border/60"
                       style={{ backgroundColor: `rgb(${triple})` }}
                     >
-                      <input
-                        type="color"
-                        className="absolute inset-0 cursor-pointer opacity-0"
-                        value={rgbTripleToHex(triple)}
-                        onChange={(e) => onPreview(t.var, hexToRgbTriple(e.target.value))}
-                        aria-label={t.label}
-                      />
-                    </label>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-foreground">{t.label}</p>
-                      <p className="truncate font-mono text-xs text-muted-foreground">
-                        {t.var} · {triple}
-                      </p>
-                    </div>
-                  </div>
+                      <span
+                        className={cn(
+                          "absolute inset-0 flex items-center justify-center rounded-md bg-black/0 text-white transition-colors",
+                          "group-hover:bg-black/15",
+                        )}
+                      >
+                        {isCopied ? (
+                          <Check className="size-4" />
+                        ) : (
+                          <Copy className="size-3.5 opacity-0 transition-opacity group-hover:opacity-90" />
+                        )}
+                      </span>
+                    </span>
+                    <span className="truncate text-xs font-medium text-foreground">{t.label}</span>
+                    <span className="truncate font-mono text-[10px] text-muted-foreground">{hex}</span>
+                  </button>
                 );
               })}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }

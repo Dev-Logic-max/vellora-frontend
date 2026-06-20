@@ -1,128 +1,152 @@
-import type { TokenMap } from "./types";
+const SCOPE_SELECTOR = ".app-shell";
 
 /**
- * The editable SEMANTIC tokens (the layer themes swap), grouped for the editor.
- * Values here are the Aurora defaults (`R G B` triples) — the baseline shown
- * when there's no override. Only these are exposed; primitives are never edited.
- * Keep in sync with `dashboard.css`.
+ * Palette catalog for the Design module's display. Values are read LIVE from the
+ * dashboard scope (so they reflect the active accent), not hard-coded. Grouped
+ * into the FIXED white base (never themed) and the THEME accent (swappable).
  */
 export interface TokenDef {
   var: string;
   label: string;
-  default: string; // R G B
 }
 export interface TokenGroup {
   title: string;
+  note?: string;
+  /** Whether this group changes with the selected theme. */
+  themed: boolean;
   tokens: TokenDef[];
 }
 
-export const TOKEN_GROUPS: TokenGroup[] = [
+export const PALETTE_GROUPS: TokenGroup[] = [
   {
-    title: "Brand & accents",
+    title: "Platform base — white & neutrals (fixed)",
+    note: "The permanent foundation — never changes with the theme.",
+    themed: false,
     tokens: [
-      { var: "--accent", label: "Primary (indigo)", default: "79 70 229" },
-      { var: "--accent-strong", label: "Primary hover", default: "67 56 202" },
-      { var: "--secondary-accent", label: "Secondary (teal)", default: "20 184 166" },
-      { var: "--tertiary-accent", label: "Accent (violet)", default: "139 92 246" },
+      { var: "--background", label: "Canvas" },
+      { var: "--surface", label: "Surface" },
+      { var: "--surface-subtle", label: "Subtle" },
+      { var: "--surface-3", label: "Deepest" },
+      { var: "--border", label: "Border" },
+      { var: "--rail-bg", label: "Sidebar" },
+      { var: "--foreground", label: "Text" },
+      { var: "--muted", label: "Muted text" },
+      { var: "--faint", label: "Faint text" },
+      { var: "--rail-muted", label: "Nav idle" },
+      { var: "--rail-foreground", label: "Nav text" },
+      { var: "--rail-border", label: "Sidebar line" },
     ],
   },
   {
-    title: "Surfaces",
+    title: "Theme accent & shades (changes with theme)",
+    note: "Derived from the selected theme — tints actions, nav, focus, gradients.",
+    themed: true,
     tokens: [
-      { var: "--background", label: "Canvas", default: "250 250 251" },
-      { var: "--surface", label: "Card", default: "255 255 255" },
-      { var: "--surface-subtle", label: "Subtle", default: "244 244 246" },
-      { var: "--surface-3", label: "Deepest", default: "237 238 242" },
-      { var: "--border", label: "Border", default: "231 231 233" },
+      { var: "--accent", label: "Accent" },
+      { var: "--accent-strong", label: "Strong" },
+      { var: "--accent-soft", label: "Soft" },
+      { var: "--primary", label: "Primary" },
+      { var: "--secondary-accent", label: "Secondary" },
+      { var: "--tertiary-accent", label: "Tertiary" },
+      { var: "--ring", label: "Focus ring" },
+      { var: "--accent-foreground", label: "On-accent" },
+      { var: "--chart-1", label: "Chart lead" },
+      { var: "--chart-3", label: "Chart alt" },
+      { var: "--chart-4", label: "Chart 3rd" },
+      { var: "--chart-2", label: "Chart blue" },
     ],
   },
   {
-    title: "Text",
+    title: "Semantic & data colors",
+    note: "Status meanings (success/warning/danger/info) + chart series order.",
+    themed: true,
     tokens: [
-      { var: "--foreground", label: "Foreground", default: "10 10 11" },
-      { var: "--muted", label: "Muted", default: "107 114 128" },
-      { var: "--faint", label: "Faint", default: "156 163 175" },
-    ],
-  },
-  {
-    title: "Semantic states",
-    tokens: [
-      { var: "--success", label: "Success", default: "22 163 74" },
-      { var: "--warning", label: "Warning", default: "217 119 6" },
-      { var: "--danger", label: "Danger", default: "220 38 38" },
-      { var: "--info", label: "Info", default: "14 165 233" },
-    ],
-  },
-  {
-    title: "Chart series",
-    tokens: [
-      { var: "--chart-1", label: "Series 1", default: "79 70 229" },
-      { var: "--chart-2", label: "Series 2", default: "59 130 246" },
-      { var: "--chart-3", label: "Series 3", default: "139 92 246" },
-      { var: "--chart-4", label: "Series 4", default: "20 184 166" },
-      { var: "--chart-5", label: "Series 5", default: "16 185 129" },
-      { var: "--chart-6", label: "Series 6", default: "244 114 182" },
+      { var: "--success", label: "Success" },
+      { var: "--success-soft", label: "Success soft" },
+      { var: "--warning", label: "Warning" },
+      { var: "--warning-soft", label: "Warning soft" },
+      { var: "--danger", label: "Danger" },
+      { var: "--danger-soft", label: "Danger soft" },
+      { var: "--info", label: "Info" },
+      { var: "--info-soft", label: "Info soft" },
+      { var: "--chart-2", label: "Series blue" },
+      { var: "--chart-4", label: "Series teal" },
+      { var: "--chart-5", label: "Series green" },
+      { var: "--chart-6", label: "Series pink" },
     ],
   },
 ];
 
-/** Flat default token map (every editable token → its Aurora default). */
-export const AURORA_DEFAULT_TOKENS: TokenMap = Object.fromEntries(
-  TOKEN_GROUPS.flatMap((g) => g.tokens.map((t) => [t.var, t.default])),
-);
-
-const SCOPE_SELECTOR = ".app-shell";
-const STORAGE_KEY = "vellora-design-tokens";
-
-/** Applies overrides to the live dashboard scope via inline CSS variables. */
-export function applyTokens(tokens: TokenMap) {
-  if (typeof document === "undefined") return;
+/** Reads a CSS variable's live resolved `R G B` value from the dashboard scope. */
+export function readLiveToken(varName: string): string {
+  if (typeof document === "undefined") return "0 0 0";
   const el = document.querySelector<HTMLElement>(SCOPE_SELECTOR);
-  if (!el) return;
-  for (const [k, v] of Object.entries(tokens)) {
-    el.style.setProperty(k, v);
-  }
+  if (!el) return "0 0 0";
+  return getComputedStyle(el).getPropertyValue(varName).trim() || "0 0 0";
 }
 
-/** Clears all inline overrides, falling back to dashboard.css Aurora values. */
-export function clearTokens() {
+const ACCENT_STORAGE_KEY = "vellora-accent";
+
+/**
+ * Selectable accent presets. The platform BASE stays white; the accent only
+ * tints active nav, hovers, focus rings, borders, badges, gradients, charts.
+ * Each preset's actual shades live in `dashboard.css` under
+ * `.app-shell[data-accent="<key>"]`; the swatch here is just for the picker.
+ */
+export interface AccentOption {
+  key: string;
+  label: string;
+  /** R G B of the main accent shade (used to render shade ramps + gradient). */
+  swatch: string;
+  /** Premium theme — selectable now, gated to a paid plan later. */
+  pro?: boolean;
+}
+export const ACCENT_OPTIONS: AccentOption[] = [
+  { key: "indigo", label: "Indigo", swatch: "79 70 229" },
+  { key: "blue", label: "Blue", swatch: "37 99 235" },
+  { key: "sky", label: "Sky", swatch: "2 132 199" },
+  { key: "cyan", label: "Cyan", swatch: "8 145 178" },
+  { key: "teal", label: "Teal", swatch: "13 148 136" },
+  { key: "emerald", label: "Emerald", swatch: "5 150 105" },
+  { key: "green", label: "Green", swatch: "22 163 74" },
+  { key: "lime", label: "Lime", swatch: "101 163 13", pro: true },
+  { key: "amber", label: "Amber", swatch: "217 119 6" },
+  { key: "orange", label: "Orange", swatch: "234 88 12" },
+  { key: "red", label: "Red", swatch: "220 38 38" },
+  { key: "rose", label: "Rose", swatch: "225 29 72" },
+  { key: "pink", label: "Pink", swatch: "219 39 119", pro: true },
+  { key: "fuchsia", label: "Fuchsia", swatch: "192 38 211", pro: true },
+  { key: "violet", label: "Violet", swatch: "124 58 237" },
+  { key: "purple", label: "Purple", swatch: "147 51 234", pro: true },
+  { key: "slate", label: "Slate", swatch: "71 85 105" },
+];
+export const DEFAULT_ACCENT = "indigo";
+
+/** A 6-step light→full ramp of an accent for swatch rows (rgba alphas). */
+export function accentRamp(swatch: string): string[] {
+  return [0.1, 0.25, 0.45, 0.7, 0.9, 1].map((a) => `rgb(${swatch} / ${a})`);
+}
+
+/** Applies the accent preset to the live dashboard scope via `data-accent`. */
+export function applyAccent(accent: string) {
   if (typeof document === "undefined") return;
-  const el = document.querySelector<HTMLElement>(SCOPE_SELECTOR);
-  if (!el) return;
-  for (const def of TOKEN_GROUPS.flatMap((g) => g.tokens)) {
-    el.style.removeProperty(def.var);
-  }
+  document.querySelectorAll<HTMLElement>(SCOPE_SELECTOR).forEach((el) => {
+    el.dataset.accent = accent;
+  });
 }
 
-/** localStorage cache for instant apply before the API responds (degrade-safe). */
-export function cacheTokens(tokens: TokenMap) {
+export function cacheAccent(accent: string) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens));
+    localStorage.setItem(ACCENT_STORAGE_KEY, accent);
   } catch {
-    /* ignore quota/availability errors */
+    /* ignore */
   }
 }
-export function readCachedTokens(): TokenMap {
+export function readCachedAccent(): string {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as TokenMap) : {};
+    return localStorage.getItem(ACCENT_STORAGE_KEY) ?? DEFAULT_ACCENT;
   } catch {
-    return {};
+    return DEFAULT_ACCENT;
   }
 }
 
-/* ── color conversion helpers (the editor uses <input type=color> = hex) ── */
-
-export function rgbTripleToHex(triple: string): string {
-  const [r, g, b] = triple.trim().split(/\s+/).map(Number);
-  if ([r, g, b].some((n) => Number.isNaN(n))) return "#000000";
-  const h = (n: number) => n.toString(16).padStart(2, "0");
-  return `#${h(r)}${h(g)}${h(b)}`;
-}
-
-export function hexToRgbTriple(hex: string): string {
-  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
-  if (!m) return "0 0 0";
-  const int = parseInt(m[1], 16);
-  return `${(int >> 16) & 255} ${(int >> 8) & 255} ${int & 255}`;
-}

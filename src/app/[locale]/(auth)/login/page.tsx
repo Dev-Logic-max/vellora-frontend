@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -22,6 +23,8 @@ type Values = z.infer<typeof schema>;
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const sessionExpired = searchParams.get("reason") === "session-expired";
   const [formError, setFormError] = useState<string | null>(null);
 
   const {
@@ -52,6 +55,12 @@ export default function LoginPage() {
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">Sign in to your Vellora account.</p>
       </div>
+
+      {sessionExpired ? (
+        <div className="rounded-lg border border-warning/30 bg-warning-soft px-3 py-2 text-sm text-warning">
+          Your session expired. Please sign in again to continue.
+        </div>
+      ) : null}
 
       <GoogleButton />
 

@@ -1,66 +1,140 @@
 /* ============================================================================
-   Vellora — DASHBOARD theme ("Aurora", multi-accent premium light).
+   Vellora — DASHBOARD theme (premium WHITE base + swappable ACCENT).
    Imported ONLY by the authenticated (app) layout; scoped to `.app-shell`.
-   It overrides the same SEMANTIC variables defined in globals.css, so every
-   Tailwind utility (which maps to those variables) automatically resolves to
-   Aurora values inside the dashboard and stays the original indigo on the
-   landing/auth pages. Values are `R G B` triples consumed as rgba via the
-   shared @theme mappings. See .claude/docs/design-theme-system.md.
+
+   Model (per product direction):
+   - The BASE is WHITE and never changes: canvas, sidebar, and content are white
+     / near-white shades. These tokens are fixed here.
+   - The selected THEME only tints the ACCENT: active nav, hovers, focus rings,
+     borders-on-focus, badges, gradients, chart series. Switch via
+     `data-accent="<name>"` on `.app-shell` (default = indigo). Each preset
+     defines accent + strong + soft + on-accent + secondary/tertiary + gradient.
+   - Dark mode is intentionally NOT here yet (white-only for now).
+
+   Values are `R G B` triples consumed through the shared @theme mappings in
+   globals.css (`rgb(var(--token))`; v4 adds opacity). See design-theme-system.md.
    ============================================================================ */
 
 .app-shell {
-  /* ---- Aurora primitives (raw ramps used by the gradient/effects below) ---- */
-  --indigo-500: 79 70 229;
-  --violet-500: 139 92 246;
-  --teal-500: 20 184 166;
+  /* ---- Fixed WHITE base (never themed) ---- */
+  --background: 251 251 253; /* app canvas — barely-there cool white */
+  --surface: 255 255 255; /* cards, panels, content */
+  --surface-subtle: 246 247 249; /* nested fills, hovers, subtle rows */
+  --surface-3: 240 241 244; /* deepest neutral layer */
+  --border: 232 234 238; /* hairline dividers */
+  --foreground: 17 19 24; /* near-black text */
+  --muted: 100 109 124; /* secondary text */
+  --faint: 156 163 175; /* tertiary / placeholder */
 
-  /* ---- Semantic overrides (multi-accent: indigo + teal + violet) ---- */
-  --background: 250 250 251;
-  --surface: 255 255 255;
-  --surface-subtle: 244 244 246;
-  --surface-3: 237 238 242;
-  --border: 231 231 233;
-  --foreground: 10 10 11;
-  --muted: 107 114 128;
-  --faint: 156 163 175;
+  /* ---- WHITE sidebar (premium, not a dark rail) ---- */
+  --rail-bg: 255 255 255; /* sidebar surface — white */
+  --rail-foreground: 17 19 24; /* sidebar text */
+  --rail-muted: 113 122 137; /* inactive nav items */
+  --rail-active: var(--accent); /* active = theme accent (used soft) */
+  --rail-active-foreground: var(--accent); /* active text/icon = accent */
+  --rail-border: 235 237 241; /* sidebar hairline */
 
-  --accent: 79 70 229; /* indigo — primary action */
-  --accent-foreground: 255 255 255;
-  --accent-soft: 238 240 255;
-  --accent-strong: 67 56 202;
-  --secondary-accent: 20 184 166; /* teal — secondary */
-  --tertiary-accent: 139 92 246; /* violet — accent/AI/new */
+  /* ---- ACCENT (default indigo; overridden by [data-accent]) ---- */
+  --accent: 79 70 229;
+  --accent-strong: 67 56 202; /* hover / active-strong */
+  --accent-soft: 238 240 255; /* soft tint fills (active nav, chips) */
+  --accent-foreground: 255 255 255; /* text on a SOLID accent (e.g. primary button) */
+  --secondary-accent: 13 148 136; /* teal — secondary emphasis */
+  --tertiary-accent: 124 58 237; /* violet — tertiary / AI / new */
 
-  /* effects (literal rgba values) */
+  /* brand gradient (chrome / CTAs / hero only) + glass */
   --gradient-brand: linear-gradient(
     135deg,
-    rgba(var(--indigo-500) / 1),
-    rgba(var(--violet-500) / 1) 55%,
-    rgba(var(--teal-500) / 1)
+    rgba(var(--accent) / 1),
+    rgba(var(--tertiary-accent) / 1) 60%,
+    rgba(var(--secondary-accent) / 1)
   );
-  --glass-bg: rgba(255 255 255 / 0.6);
-  --glass-border: rgba(255 255 255 / 0.5);
-  --shadow-accent: 0 8px 24px rgba(var(--accent) / 0.22);
+  --glass-bg: rgba(255 255 255 / 0.7);
+  --glass-border: rgba(255 255 255 / 0.6);
+  --shadow-accent: 0 8px 24px rgba(var(--accent) / 0.18);
+
+  /* charts: accent-led, fixed supportive hues after it */
+  --chart-1: var(--accent);
+  --chart-2: 59 130 246;
+  --chart-3: var(--tertiary-accent);
+  --chart-4: var(--secondary-accent);
+  --chart-5: 16 185 129;
+  --chart-6: 244 114 182;
+
+  --primary: var(--accent);
+  --ring: var(--accent);
 }
 
-/* Dark dashboard (when next-themes adds `.dark` above the shell). */
-.dark .app-shell {
-  --background: 10 10 11;
-  --surface: 20 20 22;
-  --surface-subtle: 28 28 31;
-  --surface-3: 38 38 42;
-  --border: 38 38 42;
-  --foreground: 250 250 250;
-  --muted: 156 163 175;
-
-  --accent: 99 102 241;
-  --accent-soft: 49 46 129;
-  --accent-strong: 129 140 248;
-  --secondary-accent: 45 212 191;
-  --tertiary-accent: 167 139 250;
-
-  --glass-bg: rgba(20 20 22 / 0.55);
-  --glass-border: rgba(255 255 255 / 0.08);
+/* ── Accent presets (16). Each sets the main accent + hover(strong) + soft tint
+   + two supporting hues; --primary/--ring/--chart-1/gradient all follow --accent.
+   Light/dark shades of the main color are derived via alpha at use. ─────────── */
+.app-shell[data-accent="indigo"] {
+  --accent: 79 70 229; --accent-strong: 67 56 202; --accent-soft: 238 240 255;
+  --secondary-accent: 13 148 136; --tertiary-accent: 124 58 237;
+}
+.app-shell[data-accent="blue"] {
+  --accent: 37 99 235; --accent-strong: 29 78 216; --accent-soft: 235 242 255;
+  --secondary-accent: 14 165 233; --tertiary-accent: 79 70 229;
+}
+.app-shell[data-accent="sky"] {
+  --accent: 2 132 199; --accent-strong: 3 105 161; --accent-soft: 230 244 252;
+  --secondary-accent: 6 182 212; --tertiary-accent: 37 99 235;
+}
+.app-shell[data-accent="cyan"] {
+  --accent: 8 145 178; --accent-strong: 14 116 144; --accent-soft: 228 247 250;
+  --secondary-accent: 6 182 212; --tertiary-accent: 13 148 136;
+}
+.app-shell[data-accent="teal"] {
+  --accent: 13 148 136; --accent-strong: 15 118 110; --accent-soft: 230 248 245;
+  --secondary-accent: 6 182 212; --tertiary-accent: 16 185 129;
+}
+.app-shell[data-accent="emerald"] {
+  --accent: 5 150 105; --accent-strong: 4 120 87; --accent-soft: 230 248 240;
+  --secondary-accent: 13 148 136; --tertiary-accent: 16 185 129;
+}
+.app-shell[data-accent="green"] {
+  --accent: 22 163 74; --accent-strong: 21 128 61; --accent-soft: 233 248 238;
+  --secondary-accent: 13 148 136; --tertiary-accent: 132 204 22;
+}
+.app-shell[data-accent="lime"] {
+  --accent: 101 163 13; --accent-strong: 77 124 15; --accent-soft: 241 248 226;
+  --secondary-accent: 22 163 74; --tertiary-accent: 132 204 22;
+}
+.app-shell[data-accent="amber"] {
+  --accent: 217 119 6; --accent-strong: 180 83 9; --accent-soft: 254 246 229;
+  --secondary-accent: 245 158 11; --tertiary-accent: 234 88 12;
+}
+.app-shell[data-accent="orange"] {
+  --accent: 234 88 12; --accent-strong: 194 65 12; --accent-soft: 255 240 230;
+  --secondary-accent: 245 158 11; --tertiary-accent: 239 68 68;
+}
+.app-shell[data-accent="red"] {
+  --accent: 220 38 38; --accent-strong: 185 28 28; --accent-soft: 254 236 236;
+  --secondary-accent: 234 88 12; --tertiary-accent: 225 29 72;
+}
+.app-shell[data-accent="rose"] {
+  --accent: 225 29 72; --accent-strong: 190 18 60; --accent-soft: 255 235 240;
+  --secondary-accent: 244 114 182; --tertiary-accent: 168 85 247;
+}
+.app-shell[data-accent="pink"] {
+  --accent: 219 39 119; --accent-strong: 190 24 93; --accent-soft: 255 235 244;
+  --secondary-accent: 244 114 182; --tertiary-accent: 192 38 211;
+}
+.app-shell[data-accent="fuchsia"] {
+  --accent: 192 38 211; --accent-strong: 162 28 175; --accent-soft: 251 235 254;
+  --secondary-accent: 217 70 239; --tertiary-accent: 147 51 234;
+}
+.app-shell[data-accent="violet"] {
+  --accent: 124 58 237; --accent-strong: 109 40 217; --accent-soft: 243 238 255;
+  --secondary-accent: 79 70 229; --tertiary-accent: 168 85 247;
+}
+.app-shell[data-accent="purple"] {
+  --accent: 147 51 234; --accent-strong: 126 34 206; --accent-soft: 246 238 255;
+  --secondary-accent: 168 85 247; --tertiary-accent: 124 58 237;
+}
+.app-shell[data-accent="slate"] {
+  --accent: 71 85 105; --accent-strong: 51 65 85; --accent-soft: 240 242 246;
+  --secondary-accent: 100 116 139; --tertiary-accent: 79 70 229;
 }
 
 /* Premium surface utilities (dashboard chrome / CTAs / hero only). */

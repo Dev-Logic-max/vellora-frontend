@@ -16,6 +16,7 @@ import { useState } from "react";
 import { useCandidates, useMoveCandidate } from "@/features/recruiting/recruiting";
 import { STAGE_LABELS, STAGE_ORDER, type Candidate, type CandidateStage } from "@/features/recruiting/types";
 import { EmptyState } from "@/components/ui/empty-state";
+import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CandidateCard } from "./candidate-card";
 
@@ -54,12 +55,13 @@ function Column({
 }
 
 export function CandidatePipeline({ onOpen }: { onOpen: (id: string) => void }) {
-  const { data, isLoading } = useCandidates();
+  const { data, isLoading, error, refetch } = useCandidates();
   const move = useMoveCandidate();
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
   // Optimistic stage overrides keyed by candidate id.
   const [overrides, setOverrides] = useState<Record<string, CandidateStage>>({});
 
+  if (error) return <ErrorState error={error} onRetry={() => void refetch()} />;
   if (isLoading) return <Skeleton className="h-96 w-full rounded-xl" />;
   if (!data?.length) {
     return (

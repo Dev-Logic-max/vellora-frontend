@@ -13,6 +13,7 @@ import {
   MessagesSquare,
   Palette,
   Settings,
+  ShieldCheck,
   Shuffle,
   Store,
   Users,
@@ -68,17 +69,28 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/reports",
     icon: BarChart3,
     roles: ["owner", "hr", "area_manager", "store_manager"],
-    soon: true,
   },
   { label: "Billing", href: "/settings/billing", icon: CreditCard, roles: ["owner"] },
   { label: "Design", href: "/settings/design", icon: Palette, roles: ["owner"] },
   { label: "Settings", href: "/settings", icon: Settings, roles: ["owner", "hr"] },
 ];
 
-/** Nav filtered to a role. With no membership yet, only the dashboard shows. */
-export function navForRole(role: MembershipRole | undefined): NavItem[] {
-  if (!role) {
-    return NAV_ITEMS.filter((item) => item.href === "/dashboard");
-  }
-  return NAV_ITEMS.filter((item) => item.roles.includes(role));
+/** Platform-console entry — shown only to users with a platform_role. */
+export const ADMIN_NAV_ITEM: NavItem = {
+  label: "Admin",
+  href: "/admin",
+  icon: ShieldCheck,
+  roles: [],
+};
+
+/** Nav filtered to a role. With no membership yet, only the dashboard shows.
+ * `isPlatform` appends the cross-tenant Admin console entry. */
+export function navForRole(
+  role: MembershipRole | undefined,
+  isPlatform = false,
+): NavItem[] {
+  const base = !role
+    ? NAV_ITEMS.filter((item) => item.href === "/dashboard")
+    : NAV_ITEMS.filter((item) => item.roles.includes(role));
+  return isPlatform ? [...base, ADMIN_NAV_ITEM] : base;
 }

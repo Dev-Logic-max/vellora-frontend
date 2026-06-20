@@ -7,14 +7,16 @@ import { navForRole } from "./nav-config";
 
 interface SidebarNavProps {
   role?: MembershipRole;
+  /** Show the platform Admin console entry (cross-tenant operators). */
+  isPlatform?: boolean;
   collapsed?: boolean;
   /** Called after navigating — used to close the mobile drawer. */
   onNavigate?: () => void;
 }
 
-export function SidebarNav({ role, collapsed = false, onNavigate }: SidebarNavProps) {
+export function SidebarNav({ role, isPlatform = false, collapsed = false, onNavigate }: SidebarNavProps) {
   const pathname = usePathname();
-  const items = navForRole(role);
+  const items = navForRole(role, isPlatform);
 
   return (
     <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-2">
@@ -29,15 +31,15 @@ export function SidebarNav({ role, collapsed = false, onNavigate }: SidebarNavPr
               title={item.label}
               aria-disabled
               className={cn(
-                "flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2 text-sm text-rail-muted/60",
+                "flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2 text-sm text-faint",
                 collapsed && "justify-center px-0",
               )}
             >
-              <Icon className="size-[18px] shrink-0" />
+              <Icon className="size-4.5 shrink-0" />
               {!collapsed && (
                 <>
                   <span className="flex-1">{item.label}</span>
-                  <span className="rounded-full bg-white/5 px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-rail-muted uppercase">
+                  <span className="rounded-full bg-surface-subtle px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-muted uppercase">
                     Soon
                   </span>
                 </>
@@ -54,17 +56,17 @@ export function SidebarNav({ role, collapsed = false, onNavigate }: SidebarNavPr
             title={collapsed ? item.label : undefined}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+              "relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
               active
-                ? "bg-rail-active text-rail-active-foreground"
-                : "text-rail-muted hover:bg-white/6 hover:text-rail-foreground",
+                ? "bg-accent-soft text-primary"
+                : "text-rail-muted hover:bg-surface-subtle hover:text-rail-foreground",
               collapsed && "justify-center px-0",
             )}
           >
             {active && !collapsed && (
-              <span className="absolute top-1/2 left-0 h-5 w-0.5 -translate-y-1/2 rounded-r bg-rail-active-foreground" />
+              <span className="absolute top-1/2 left-0 h-5 w-0.5 -translate-y-1/2 rounded-r bg-primary" />
             )}
-            <Icon className="size-[18px] shrink-0" />
+            <Icon className="size-4.5 shrink-0" />
             {!collapsed && <span>{item.label}</span>}
           </Link>
         );
