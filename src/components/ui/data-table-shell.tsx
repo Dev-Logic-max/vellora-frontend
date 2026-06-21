@@ -134,7 +134,7 @@ export function DataTableShell<TData>({
             {table.getHeaderGroups().map((headerGroup) => (
               <tr
                 key={headerGroup.id}
-                className="border-b border-border bg-surface-subtle text-left text-xs tracking-wide text-foreground-2 uppercase"
+                className="table-header-tint-strong border-b border-accent/20 text-left text-xs tracking-wide text-foreground-2 uppercase"
               >
                 {headerGroup.headers.map((header) => {
                   const meta = header.column.columnDef.meta as DataTableColumnMeta | undefined;
@@ -173,7 +173,7 @@ export function DataTableShell<TData>({
                   key={row.id}
                   onClick={onRowClick ? () => onRowClick(row.original) : undefined}
                   className={cn(
-                    "border-b border-border transition-colors last:border-0 hover:bg-surface-subtle",
+                    "group border-b border-border transition-colors last:border-0 hover:bg-accent-soft/30",
                     onRowClick && "cursor-pointer",
                   )}
                 >
@@ -233,6 +233,7 @@ function TablePagination({
           aria-label="Previous page"
           disabled={page <= 1}
           onClick={() => onPageChange(Math.max(1, page - 1))}
+          className="size-8 border-border hover:border-accent/40 hover:bg-accent-soft/40 hover:text-accent-strong"
         >
           <ChevronLeft />
         </Button>
@@ -249,10 +250,10 @@ function TablePagination({
               onClick={() => onPageChange(p)}
               aria-current={p === page ? "page" : undefined}
               className={cn(
-                "inline-flex h-7 min-w-7 items-center justify-center rounded-md px-2 text-sm font-medium tabular-nums transition-colors",
+                "inline-flex h-8 min-w-8 items-center justify-center rounded-lg border px-2 text-sm font-medium tabular-nums transition-colors",
                 p === page
-                  ? "border border-accent/30 bg-accent-soft text-accent-strong shadow-accent-sm"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  ? "border-accent/40 bg-accent-soft text-accent-strong shadow-accent-sm"
+                  : "border-border text-muted-foreground hover:border-accent/30 hover:bg-accent-soft/40 hover:text-foreground",
               )}
             >
               {p}
@@ -266,6 +267,7 @@ function TablePagination({
           aria-label="Next page"
           disabled={page >= totalPages}
           onClick={() => onPageChange(Math.min(totalPages, page + 1))}
+          className="size-8 border-border hover:border-accent/40 hover:bg-accent-soft/40 hover:text-accent-strong"
         >
           <ChevronRight />
         </Button>

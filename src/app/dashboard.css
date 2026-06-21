@@ -192,6 +192,16 @@
   box-shadow: var(--glow-accent);
 }
 
+/* Themed table-header tint ("hydrocolor") — a slightly darker, accent-tinted
+   wash that reads as the selected theme on every accent preset (alpha over the
+   surface, not a fixed color). Used by DataTableShell + the permission matrix. */
+.app-shell .table-header-tint {
+  background-color: rgba(var(--accent) / 0.1);
+}
+.app-shell .table-header-tint-strong {
+  background-color: rgba(var(--accent) / 0.14);
+}
+
 /* ── Thin themed scrollbars ─────────────────────────────────────────────────
    Light track, accent-tinted thumb that darkens on hover. Applied via the
    `.scrollbar-thin` utility on any scroll container in the dashboard. ─────── */

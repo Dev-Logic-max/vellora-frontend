@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, Flag, ScrollText, ShieldAlert } from "lucide-react";
+import { Building2, Flag, Network, ScrollText, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 
 import { PageHeader } from "@/components/layout/page-header";
@@ -9,6 +9,7 @@ import { SegmentedTabs, type SegmentedTab } from "@/components/ui/segmented-tabs
 import { useCurrentUser } from "@/features/session/use-current-user";
 import { AuditLogViewer } from "./audit-log-viewer";
 import { FeatureFlagsPanel } from "./feature-flags-panel";
+import { RolesGroupsTab } from "./roles-groups-tab";
 import { TenantDrawer } from "./tenant-drawer";
 import { TenantsTable } from "./tenants-table";
 
@@ -16,10 +17,11 @@ import { TenantsTable } from "./tenants-table";
  * Platform console (P9-F). Visible only to platform operators; everyone else
  * sees a block. The backend PlatformGuard is the real gate.
  */
-type AdminTab = "tenants" | "flags" | "audit";
+type AdminTab = "tenants" | "roles" | "flags" | "audit";
 
 const ADMIN_TABS: SegmentedTab<AdminTab>[] = [
   { value: "tenants", label: "Tenants", icon: Building2 },
+  { value: "roles", label: "Roles & groups", icon: Network },
   { value: "flags", label: "Feature flags", icon: Flag },
   { value: "audit", label: "Audit log", icon: ScrollText },
 ];
@@ -56,6 +58,7 @@ export function AdminView() {
             <TenantDrawer id={openTenant} onClose={() => setOpenTenant(null)} />
           </>
         ) : null}
+        {tab === "roles" ? <RolesGroupsTab /> : null}
         {tab === "flags" ? <FeatureFlagsPanel /> : null}
         {tab === "audit" ? <AuditLogViewer /> : null}
       </div>

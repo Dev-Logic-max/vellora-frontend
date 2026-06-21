@@ -103,6 +103,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: "Administration",
     items: [
+      { label: "Permissions", href: "/permissions", icon: ShieldCheck, roles: ["owner", "hr"] },
       { label: "Billing", href: "/settings/billing", icon: CreditCard, roles: ["owner"] },
       { label: "Design", href: "/settings/design", icon: Palette, roles: ["owner"] },
       { label: "Settings", href: "/settings", icon: Settings, roles: ["owner", "hr"] },

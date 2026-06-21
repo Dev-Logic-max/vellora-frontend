@@ -11,8 +11,10 @@ import {
   type TableToolbarConfig,
 } from "@/components/ui/data-table-shell";
 import { EmptyState } from "@/components/ui/empty-state";
-import { EmployeeAvatar } from "@/components/employees/employee-avatar";
+import { EntityAvatar } from "@/components/ui/entity-avatar";
+import { RoleTag } from "@/components/ui/role-tag";
 import { AttendancePill } from "@/components/attendance/attendance-pill";
+import type { MembershipRole } from "@/features/session/types";
 import { formatTimeInTz } from "@/lib/schedule-time";
 import type { AttendanceLog } from "@/features/attendance/types";
 
@@ -52,22 +54,29 @@ export function LogsTable({
         header: "Employee",
         cell: ({ row }) => {
           const e = row.original.employee;
+          const name = e ? `${e.firstName} ${e.lastName}` : "Unknown";
           return (
             <div className="flex items-center gap-3">
-              <EmployeeAvatar
-                firstName={e?.firstName ?? "?"}
-                lastName={e?.lastName ?? ""}
-                avatarUrl={e?.avatarUrl ?? null}
-              />
+              <EntityAvatar name={name} src={e?.avatarUrl} className="size-9 rounded-lg" />
               <div className="min-w-0">
-                <p className="truncate font-medium text-foreground">
-                  {e ? `${e.firstName} ${e.lastName}` : "Unknown"}
-                </p>
+                <p className="truncate font-medium text-foreground">{name}</p>
                 {e?.uniqueCode ? (
                   <p className="truncate font-mono text-xs text-muted-foreground">{e.uniqueCode}</p>
                 ) : null}
               </div>
             </div>
+          );
+        },
+      },
+      {
+        header: "User role",
+        cell: ({ row }) => {
+          // Staff perform attendance — owners/admins excluded from the role chip.
+          const role = row.original.employee?.membershipRole as MembershipRole | undefined;
+          return role && role !== "owner" ? (
+            <RoleTag role={role} />
+          ) : (
+            <span className="text-muted-foreground">—</span>
           );
         },
       },

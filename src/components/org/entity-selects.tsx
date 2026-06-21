@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { RichSelect, type RichOption } from "@/components/ui/rich-select";
 import { RoleTag } from "@/components/ui/role-tag";
 import type { Company, Store } from "@/features/org/types";
-import type { Employee } from "@/features/employees/types";
+import type { Employee, Supervisor } from "@/features/employees/types";
 import type { MembershipRole } from "@/features/session/types";
 
 /** Small muted "N label" count chip rendered on the right of an option. */
@@ -104,4 +104,27 @@ export function EmployeeSelect({
   );
 
   return <RichSelect options={options} placeholder="Select employee" {...rest} />;
+}
+
+/** Supervisor dropdown — users above Employee (from /employees/supervisors). Keyed by userId. */
+export function SupervisorSelect({
+  supervisors,
+  ...rest
+}: BaseSelectProps & {
+  supervisors: Supervisor[] | undefined;
+}) {
+  const options = useMemo<RichOption[]>(
+    () =>
+      (supervisors ?? []).map((s) => ({
+        value: s.userId,
+        title: s.name || s.email,
+        subtitle: s.email,
+        imageUrl: s.avatarUrl,
+        trailing: <RoleTag role={s.role} />,
+        searchText: `${s.name ?? ""} ${s.email}`,
+      })),
+    [supervisors],
+  );
+
+  return <RichSelect options={options} placeholder="Select supervisor" {...rest} />;
 }

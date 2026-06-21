@@ -8,10 +8,10 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { DataTableShell, type DataTableColumnMeta } from "@/components/ui/data-table-shell";
 import { EmptyState } from "@/components/ui/empty-state";
+import { EntityAvatar } from "@/components/ui/entity-avatar";
 import { RoleTag } from "@/components/ui/role-tag";
 import { StatusPill } from "@/components/ui/status-pill";
 import type { FilterValues } from "@/components/ui/filter-modal";
-import { EmployeeAvatar } from "@/components/employees/employee-avatar";
 import { EmployeeFormSheet } from "@/components/employees/employee-form-sheet";
 import { ImportEmployeesDialog } from "@/components/employees/import-employees-dialog";
 import { useRouter } from "@/i18n/navigation";
@@ -66,13 +66,17 @@ export function EmployeesList() {
   const columns = useMemo<ColumnDef<Employee, unknown>[]>(
     () => [
       {
-        header: "Employee",
+        header: "Name",
         accessorKey: "lastName",
         cell: ({ row }) => {
           const e = row.original;
           return (
             <div className="flex items-center gap-3">
-              <EmployeeAvatar firstName={e.firstName} lastName={e.lastName} avatarUrl={e.avatarUrl} />
+              <EntityAvatar
+                name={`${e.firstName} ${e.lastName}`}
+                src={e.avatarUrl}
+                className="size-9 rounded-lg"
+              />
               <div className="min-w-0">
                 <p className="truncate font-medium text-foreground">
                   {e.firstName} {e.lastName}
@@ -86,17 +90,16 @@ export function EmployeesList() {
         },
       },
       {
-        header: "ID",
+        header: "User ID",
         accessorKey: "uniqueCode",
         cell: ({ row }) => (
           <span className="font-mono text-xs text-muted-foreground">{row.original.uniqueCode}</span>
         ),
       },
       {
-        header: "Role",
-        accessorKey: "role",
-        cell: ({ row }) =>
-          row.original.role ? <RoleTag role={row.original.role as MembershipRole} /> : "—",
+        header: "User role",
+        accessorKey: "membershipRole",
+        cell: ({ row }) => <UserRoleCell role={row.original.membershipRole} />,
       },
       {
         header: "Store",
@@ -108,6 +111,16 @@ export function EmployeesList() {
         cell: ({ row }) => row.original.department ?? "—",
       },
       {
+        header: "Job role",
+        accessorKey: "role",
+        cell: ({ row }) =>
+          row.original.role ? (
+            <span className="text-foreground">{row.original.role}</span>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          ),
+      },
+      {
         header: "Status",
         cell: ({ row }) => <StatusPill status={row.original.status} />,
       },
@@ -116,8 +129,9 @@ export function EmployeesList() {
         header: "",
         meta: { isActions: true } satisfies DataTableColumnMeta,
         cell: () => (
-          <span className="inline-flex justify-end text-muted-foreground">
-            <ChevronRight className="size-4" />
+          <span className="inline-flex items-center gap-1 rounded-lg bg-accent-soft px-2.5 py-1 text-xs font-medium text-accent-strong transition-colors group-hover:bg-accent group-hover:text-(--accent-foreground,white)">
+            Details
+            <ChevronRight className="size-3.5" />
           </span>
         ),
       },
@@ -217,4 +231,11 @@ export function EmployeesList() {
       )}
     </div>
   );
+}
+
+/** Company user-role chip. Owner is leadership — shown muted as "Owner" is
+ * implied; per spec we surface every other role with its color, owner excluded. */
+function UserRoleCell({ role }: { role: MembershipRole | null }) {
+  if (!role || role === "owner") return <span className="text-muted-foreground">—</span>;
+  return <RoleTag role={role} />;
 }
