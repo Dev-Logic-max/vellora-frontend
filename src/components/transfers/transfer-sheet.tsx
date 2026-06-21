@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
+import { DateField } from "@/components/ui/date-picker";
 import { FormField } from "@/components/ui/form-field";
 import { SelectField } from "@/components/ui/select-field";
 import {
@@ -124,20 +125,8 @@ export function TransferSheet({ trigger }: { trigger: ReactNode }) {
 
           {kind === "temporary" ? (
             <div className="grid grid-cols-2 gap-3">
-              <FormField
-                id="transfer-start"
-                label="From"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-              <FormField
-                id="transfer-end"
-                label="To"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
+              <DateField id="transfer-start" label="From" value={startDate} onChange={setStartDate} />
+              <DateField id="transfer-end" label="To" value={endDate} onChange={setEndDate} />
             </div>
           ) : null}
 

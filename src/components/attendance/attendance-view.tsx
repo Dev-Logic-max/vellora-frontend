@@ -1,13 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Download, Search } from "lucide-react";
+import { AlertTriangle, Clock, Download, MonitorSmartphone, Wrench } from "lucide-react";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
-import { Combobox } from "@/components/ui/combobox";
-import { SelectField } from "@/components/ui/select-field";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SegmentedTabs, type SegmentedTab } from "@/components/ui/segmented-tabs";
+import type { FilterValues } from "@/components/ui/filter-modal";
 import { AnomaliesList } from "@/components/attendance/anomalies-list";
 import { CorrectionSheet } from "@/components/attendance/correction-sheet";
 import { CorrectionsPanel } from "@/components/attendance/corrections-panel";
@@ -20,25 +19,29 @@ import { LOG_STATUS_OPTIONS } from "@/features/attendance/status";
 import { downloadAttendanceCsv } from "@/features/attendance/export";
 import type { AttendanceLog, AttendanceLogStatus } from "@/features/attendance/types";
 
-const TABS = [
-  { value: "logs", label: "Logs" },
-  { value: "anomalies", label: "Anomalies" },
-  { value: "corrections", label: "Corrections" },
-  { value: "terminals", label: "Terminals & devices" },
+type TabKey = "logs" | "anomalies" | "corrections" | "terminals";
+
+const TABS: SegmentedTab<TabKey>[] = [
+  { value: "logs", label: "Logs", icon: Clock },
+  { value: "anomalies", label: "Anomalies", icon: AlertTriangle },
+  { value: "corrections", label: "Corrections", icon: Wrench },
+  { value: "terminals", label: "Terminals & devices", icon: MonitorSmartphone },
 ];
 
 export function AttendanceView() {
   const { data: stores } = useStores();
-  const [tab, setTab] = useState("logs");
-  const [storeId, setStoreId] = useState<string | undefined>();
-  const [status, setStatus] = useState<AttendanceLogStatus | "">("");
+  const [tab, setTab] = useState<TabKey>("logs");
   const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState<FilterValues>({});
+
+  const storeId = filters.storeId || undefined;
+  const status = (filters.status as AttendanceLogStatus | undefined) || undefined;
 
   const [correcting, setCorrecting] = useState<AttendanceLog | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const tz = stores?.find((s) => s.id === storeId)?.timezone ?? "UTC";
-  const { data: logs, isLoading } = useLogs({ storeId, status: status || undefined });
+  const { data: logs, isLoading } = useLogs({ storeId, status });
 
   const filteredLogs = useMemo(() => {
     if (!logs) return [];
@@ -70,58 +73,36 @@ export function AttendanceView() {
         }
       />
 
-      <Tabs value={tab} onValueChange={(v) => setTab(v as string)}>
-        <TabsList variant="line" className="w-max">
-          {TABS.map((t) => (
-            <TabsTrigger key={t.value} value={t.value}>
-              {t.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      <SegmentedTabs tabs={TABS} value={tab} onValueChange={setTab} layoutGroup="attendance-tabs" />
 
-        <TabsContent value="logs" className="space-y-4 pt-2">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="relative flex-1">
-              <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search employee or ID…"
-                className="h-9 w-full rounded-lg border border-border bg-background pl-9 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-              />
-            </div>
-            <Combobox
-              className="sm:w-56"
-              options={storeOptions}
-              value={storeId}
-              onChange={setStoreId}
-              placeholder="All stores"
-            />
-            <SelectField
-              id="log-status-filter"
-              className="sm:w-44"
-              placeholder="All statuses"
-              options={LOG_STATUS_OPTIONS}
-              value={status}
-              onChange={(e) => setStatus(e.target.value as AttendanceLogStatus | "")}
-            />
-          </div>
-          <LogsTable logs={filteredLogs} isLoading={isLoading} tz={tz} onCorrect={openCorrection} />
-        </TabsContent>
+      {tab === "logs" ? (
+        <LogsTable
+          logs={filteredLogs}
+          isLoading={isLoading}
+          tz={tz}
+          onCorrect={openCorrection}
+          toolbar={{
+            searchValue: search,
+            onSearchChange: setSearch,
+            searchPlaceholder: "Search employee or ID…",
+            filters: [
+              { key: "storeId", label: "Store", type: "select", options: storeOptions },
+              { key: "status", label: "Status", type: "select", options: LOG_STATUS_OPTIONS },
+            ],
+            filterValues: filters,
+            onFilterChange: setFilters,
+          }}
+        />
+      ) : null}
 
-        <TabsContent value="anomalies" className="pt-2">
-          <AnomaliesList />
-        </TabsContent>
-
-        <TabsContent value="corrections" className="pt-2">
-          <CorrectionsPanel />
-        </TabsContent>
-
-        <TabsContent value="terminals" className="space-y-8 pt-2">
+      {tab === "anomalies" ? <AnomaliesList /> : null}
+      {tab === "corrections" ? <CorrectionsPanel /> : null}
+      {tab === "terminals" ? (
+        <div className="space-y-8">
           <TerminalsPanel />
           <DevicesPanel />
-        </TabsContent>
-      </Tabs>
+        </div>
+      ) : null}
 
       <CorrectionSheet log={correcting} open={sheetOpen} onOpenChange={setSheetOpen} />
     </div>

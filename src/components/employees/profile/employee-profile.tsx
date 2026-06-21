@@ -1,12 +1,24 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Mail, Pencil, Phone } from "lucide-react";
+import {
+  Award,
+  CalendarDays,
+  CalendarOff,
+  Clock,
+  FileText,
+  ClipboardList,
+  Mail,
+  Pencil,
+  Phone,
+  Settings,
+  UserRound,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusPill } from "@/components/ui/status-pill";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SegmentedTabs, type SegmentedTab } from "@/components/ui/segmented-tabs";
 import { EmployeeAvatar } from "@/components/employees/employee-avatar";
 import { EmployeeFormSheet } from "@/components/employees/employee-form-sheet";
 import { ContractTab } from "@/components/employees/profile/contract-tab";
@@ -18,16 +30,16 @@ import { CONTRACT_TYPE_LABEL } from "@/features/employees/constants";
 import { useEmployee } from "@/features/employees/employees";
 import type { EmployeeDetail, StoreRelation } from "@/features/employees/types";
 
-const TABS = [
-  { value: "profile", label: "Profile" },
-  { value: "contract", label: "Contract" },
-  { value: "shifts", label: "Shifts" },
-  { value: "leave", label: "Leave" },
-  { value: "attendance", label: "Attendance" },
-  { value: "onboarding", label: "Onboarding" },
-  { value: "documents", label: "Documents" },
-  { value: "credentials", label: "Qualifications" },
-  { value: "preferences", label: "Preferences" },
+const TABS: SegmentedTab[] = [
+  { value: "profile", label: "Profile", icon: UserRound },
+  { value: "contract", label: "Contract", icon: FileText },
+  { value: "shifts", label: "Shifts", icon: CalendarDays },
+  { value: "leave", label: "Leave", icon: CalendarOff },
+  { value: "attendance", label: "Attendance", icon: Clock },
+  { value: "onboarding", label: "Onboarding", icon: ClipboardList },
+  { value: "documents", label: "Documents", icon: FileText },
+  { value: "credentials", label: "Qualifications", icon: Award },
+  { value: "preferences", label: "Preferences", icon: Settings },
 ];
 
 const RELATION_TINT: Record<StoreRelation, string> = {
@@ -160,47 +172,28 @@ export function EmployeeProfile({ id }: { id: string }) {
         </aside>
 
         {/* Tabbed content */}
-        <Tabs value={tab} onValueChange={(v) => setTab(v as string)} className="min-w-0">
-          <div className="overflow-x-auto">
-            <TabsList variant="line" className="w-max">
-              {TABS.map((t) => (
-                <TabsTrigger key={t.value} value={t.value}>
-                  {t.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+        <div className="min-w-0">
+          <div className="overflow-x-auto pb-1">
+            <SegmentedTabs
+              tabs={TABS}
+              value={tab}
+              onValueChange={setTab}
+              layoutGroup="employee-profile-tabs"
+            />
           </div>
 
           <div className="mt-5">
-            <TabsContent value="profile">
-              <ProfileDetails employee={employee} />
-            </TabsContent>
-            <TabsContent value="contract">
-              <ContractTab employeeId={employee.id} />
-            </TabsContent>
-            <TabsContent value="shifts">
-              <StubTab label="Shifts" />
-            </TabsContent>
-            <TabsContent value="leave">
-              <StubTab label="Leave & holidays" />
-            </TabsContent>
-            <TabsContent value="attendance">
-              <StubTab label="Attendance" />
-            </TabsContent>
-            <TabsContent value="onboarding">
-              <StubTab label="Onboarding" />
-            </TabsContent>
-            <TabsContent value="documents">
-              <StubTab label="Documents" />
-            </TabsContent>
-            <TabsContent value="credentials">
-              <CredentialsTab employeeId={employee.id} />
-            </TabsContent>
-            <TabsContent value="preferences">
-              <PreferencesTab employeeId={employee.id} />
-            </TabsContent>
+            {tab === "profile" ? <ProfileDetails employee={employee} /> : null}
+            {tab === "contract" ? <ContractTab employeeId={employee.id} /> : null}
+            {tab === "shifts" ? <StubTab label="Shifts" /> : null}
+            {tab === "leave" ? <StubTab label="Leave & holidays" /> : null}
+            {tab === "attendance" ? <StubTab label="Attendance" /> : null}
+            {tab === "onboarding" ? <StubTab label="Onboarding" /> : null}
+            {tab === "documents" ? <StubTab label="Documents" /> : null}
+            {tab === "credentials" ? <CredentialsTab employeeId={employee.id} /> : null}
+            {tab === "preferences" ? <PreferencesTab employeeId={employee.id} /> : null}
           </div>
-        </Tabs>
+        </div>
       </div>
     </div>
   );

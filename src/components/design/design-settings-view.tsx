@@ -1,23 +1,35 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Blocks, LayoutGrid, Palette, SwatchBook } from "lucide-react";
+import { Blocks, LayoutGrid, LayoutTemplate, Palette, SwatchBook } from "lucide-react";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SegmentedTabs, type SegmentedTab } from "@/components/ui/segmented-tabs";
 import { usePlatformDesign } from "@/features/design/design";
 import { applyAccent, cacheAccent, readCachedAccent } from "@/features/design/apply";
 import { AccentTab } from "./accent-tab";
 import { ComponentsTab } from "./components-tab";
+import { LayoutTab } from "./layout-tab";
 import { PaletteTab } from "./palette-tab";
 import { WidgetsTab } from "./widgets-tab";
+
+type DesignTab = "accent" | "layout" | "palette" | "components" | "widgets";
+
+const TABS: SegmentedTab<DesignTab>[] = [
+  { value: "accent", label: "Theme", icon: SwatchBook },
+  { value: "layout", label: "Layout", icon: LayoutTemplate },
+  { value: "palette", label: "Palette", icon: Palette },
+  { value: "components", label: "Components", icon: LayoutGrid },
+  { value: "widgets", label: "Widgets", icon: Blocks },
+];
 
 /**
  * Design Settings module — tabbed shell. The platform base is white & fixed; the
  * selected accent only tints the dashboard. Applies the effective accent live to
- * `.app-shell` via `data-accent` (with hover-preview), and hosts the four tabs.
+ * `.app-shell` via `data-accent` (with hover-preview), and hosts the tabs.
  */
 export function DesignSettingsView() {
   const { data } = usePlatformDesign();
+  const [tab, setTab] = useState<DesignTab>("accent");
   // Committed pick (null → fall back to server/cache) + a transient hover preview.
   const [pick, setPick] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -33,34 +45,18 @@ export function DesignSettingsView() {
   }, [committed]);
 
   return (
-    <Tabs defaultValue="accent" className="space-y-6">
-      <TabsList>
-        <TabsTrigger value="accent">
-          <SwatchBook className="size-4" /> Theme
-        </TabsTrigger>
-        <TabsTrigger value="palette">
-          <Palette className="size-4" /> Palette
-        </TabsTrigger>
-        <TabsTrigger value="components">
-          <LayoutGrid className="size-4" /> Components
-        </TabsTrigger>
-        <TabsTrigger value="widgets">
-          <Blocks className="size-4" /> Widgets
-        </TabsTrigger>
-      </TabsList>
+    <div className="space-y-6">
+      <div className="overflow-x-auto pb-1">
+        <SegmentedTabs tabs={TABS} value={tab} onValueChange={setTab} layoutGroup="design-tabs" />
+      </div>
 
-      <TabsContent value="accent">
+      {tab === "accent" ? (
         <AccentTab accent={committed} onSelect={setPick} onPreview={setPreview} />
-      </TabsContent>
-      <TabsContent value="palette">
-        <PaletteTab accent={effective} />
-      </TabsContent>
-      <TabsContent value="components">
-        <ComponentsTab />
-      </TabsContent>
-      <TabsContent value="widgets">
-        <WidgetsTab />
-      </TabsContent>
-    </Tabs>
+      ) : null}
+      {tab === "layout" ? <LayoutTab /> : null}
+      {tab === "palette" ? <PaletteTab accent={effective} /> : null}
+      {tab === "components" ? <ComponentsTab /> : null}
+      {tab === "widgets" ? <WidgetsTab /> : null}
+    </div>
   );
 }

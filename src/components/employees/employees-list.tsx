@@ -2,15 +2,15 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ChevronRight, Download, Plus, Search, Upload, Users } from "lucide-react";
+import { ChevronRight, Download, Plus, Upload, Users } from "lucide-react";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
-import { Combobox } from "@/components/ui/combobox";
-import { DataTableShell } from "@/components/ui/data-table-shell";
+import { DataTableShell, type DataTableColumnMeta } from "@/components/ui/data-table-shell";
 import { EmptyState } from "@/components/ui/empty-state";
-import { SelectField } from "@/components/ui/select-field";
+import { RoleTag } from "@/components/ui/role-tag";
 import { StatusPill } from "@/components/ui/status-pill";
+import type { FilterValues } from "@/components/ui/filter-modal";
 import { EmployeeAvatar } from "@/components/employees/employee-avatar";
 import { EmployeeFormSheet } from "@/components/employees/employee-form-sheet";
 import { ImportEmployeesDialog } from "@/components/employees/import-employees-dialog";
@@ -20,6 +20,7 @@ import { useCurrentUser } from "@/features/session/use-current-user";
 import { downloadEmployeesCsv, useEmployees } from "@/features/employees/employees";
 import { EMPLOYEE_STATUS_OPTIONS } from "@/features/employees/constants";
 import type { Employee, EmployeeStatus } from "@/features/employees/types";
+import type { MembershipRole } from "@/features/session/types";
 
 const PAGE_SIZE = 25;
 
@@ -30,9 +31,11 @@ export function EmployeesList() {
 
   const [search, setSearch] = useState("");
   const [q, setQ] = useState("");
-  const [storeId, setStoreId] = useState<string | undefined>();
-  const [status, setStatus] = useState<EmployeeStatus | "">("");
+  const [filters, setFilters] = useState<FilterValues>({});
   const [page, setPage] = useState(1);
+
+  const storeId = filters.storeId || undefined;
+  const status = (filters.status as EmployeeStatus | undefined) || undefined;
 
   // Debounce the search box.
   useEffect(() => {
@@ -48,7 +51,7 @@ export function EmployeesList() {
     pageSize: PAGE_SIZE,
     q: q || undefined,
     storeId,
-    status: status || undefined,
+    status,
   });
 
   const storeName = useMemo(() => {
@@ -69,11 +72,7 @@ export function EmployeesList() {
           const e = row.original;
           return (
             <div className="flex items-center gap-3">
-              <EmployeeAvatar
-                firstName={e.firstName}
-                lastName={e.lastName}
-                avatarUrl={e.avatarUrl}
-              />
+              <EmployeeAvatar firstName={e.firstName} lastName={e.lastName} avatarUrl={e.avatarUrl} />
               <div className="min-w-0">
                 <p className="truncate font-medium text-foreground">
                   {e.firstName} {e.lastName}
@@ -96,7 +95,8 @@ export function EmployeesList() {
       {
         header: "Role",
         accessorKey: "role",
-        cell: ({ row }) => row.original.role ?? "—",
+        cell: ({ row }) =>
+          row.original.role ? <RoleTag role={row.original.role as MembershipRole} /> : "—",
       },
       {
         header: "Store",
@@ -114,16 +114,19 @@ export function EmployeesList() {
       {
         id: "open",
         header: "",
-        cell: () => <ChevronRight className="size-4 text-muted-foreground" />,
+        meta: { isActions: true } satisfies DataTableColumnMeta,
+        cell: () => (
+          <span className="inline-flex justify-end text-muted-foreground">
+            <ChevronRight className="size-4" />
+          </span>
+        ),
       },
     ],
     [storeName],
   );
 
   const total = data?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const storeOptions =
-    stores?.map((s) => ({ value: s.id, label: s.name, hint: s.code ?? undefined })) ?? [];
+  const storeOptions = stores?.map((s) => ({ value: s.id, label: s.name })) ?? [];
 
   return (
     <div className="space-y-6">
@@ -162,43 +165,6 @@ export function EmployeesList() {
         }
       />
 
-      {/* Filters */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
-          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search name, email, or ID…"
-            className="h-9 w-full rounded-lg border border-border bg-background pl-9 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-          />
-        </div>
-        <Combobox
-          className="sm:w-56"
-          options={storeOptions}
-          value={storeId}
-          onChange={(v) => {
-            setStoreId(v);
-            setPage(1);
-          }}
-          placeholder="All stores"
-        />
-        <SelectField
-          id="status-filter"
-          className="sm:w-44"
-          placeholder="All statuses"
-          options={EMPLOYEE_STATUS_OPTIONS}
-          value={status}
-          onChange={(e) => {
-            setStatus(e.target.value as EmployeeStatus | "");
-            setPage(1);
-          }}
-        />
-        <span className="inline-flex h-9 items-center rounded-lg bg-muted px-3 text-sm font-medium text-muted-foreground tabular-nums">
-          {total} total
-        </span>
-      </div>
-
       {isError ? (
         <p className="text-sm text-destructive">Couldn&apos;t load employees.</p>
       ) : (
@@ -207,6 +173,27 @@ export function EmployeesList() {
           data={data?.data ?? []}
           isLoading={isLoading}
           onRowClick={(e) => router.push(`/employees/${e.id}`)}
+          toolbar={{
+            searchValue: search,
+            onSearchChange: setSearch,
+            searchPlaceholder: "Search name, email, or ID…",
+            filters: [
+              { key: "storeId", label: "Store", type: "select", options: storeOptions },
+              { key: "status", label: "Status", type: "select", options: EMPLOYEE_STATUS_OPTIONS },
+            ],
+            filterValues: filters,
+            onFilterChange: (v) => {
+              setFilters(v);
+              setPage(1);
+            },
+          }}
+          pagination={{
+            page,
+            pageSize: PAGE_SIZE,
+            total,
+            onPageChange: setPage,
+            itemLabel: "employees",
+          }}
           empty={
             <EmptyState
               icon={Users}
@@ -228,33 +215,6 @@ export function EmployeesList() {
           }
         />
       )}
-
-      {/* Pagination */}
-      {total > PAGE_SIZE ? (
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span className="tabular-nums">
-            Page {page} of {totalPages}
-          </span>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page <= 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page >= totalPages}
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

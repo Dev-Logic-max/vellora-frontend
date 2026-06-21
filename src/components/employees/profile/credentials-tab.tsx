@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { DateField } from "@/components/ui/date-picker";
 import { FormField } from "@/components/ui/form-field";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExpiryChip } from "@/components/employees/expiry-chip";
@@ -56,19 +57,17 @@ function QualificationsCard({ employeeId }: { employeeId: string }) {
             value={form.issuer}
             onChange={(e) => setForm({ ...form, issuer: e.target.value })}
           />
-          <FormField
+          <DateField
             id="q-issued"
             label="Issued"
-            type="date"
             value={form.issued}
-            onChange={(e) => setForm({ ...form, issued: e.target.value })}
+            onChange={(v) => setForm({ ...form, issued: v })}
           />
-          <FormField
+          <DateField
             id="q-expires"
             label="Expires"
-            type="date"
             value={form.expires}
-            onChange={(e) => setForm({ ...form, expires: e.target.value })}
+            onChange={(v) => setForm({ ...form, expires: v })}
           />
           <div className="col-span-2">
             <Button onClick={submit} disabled={!form.name.trim() || add.isPending}>
@@ -138,19 +137,17 @@ function MedicalsCard({ employeeId }: { employeeId: string }) {
             value={form.type}
             onChange={(e) => setForm({ ...form, type: e.target.value })}
           />
-          <FormField
+          <DateField
             id="m-date"
             label="Date"
-            type="date"
             value={form.date}
-            onChange={(e) => setForm({ ...form, date: e.target.value })}
+            onChange={(v) => setForm({ ...form, date: v })}
           />
-          <FormField
+          <DateField
             id="m-expires"
             label="Expires"
-            type="date"
             value={form.expires}
-            onChange={(e) => setForm({ ...form, expires: e.target.value })}
+            onChange={(v) => setForm({ ...form, expires: v })}
           />
           <div className="col-span-3">
             <Button onClick={submit} disabled={!form.type.trim() || add.isPending}>

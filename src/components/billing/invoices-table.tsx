@@ -6,7 +6,7 @@ import { Download, Receipt } from "lucide-react";
 import { useInvoiceDownload, useInvoices } from "@/features/billing/billing";
 import type { Invoice } from "@/features/billing/types";
 import { Button } from "@/components/ui/button";
-import { DataTableShell } from "@/components/ui/data-table-shell";
+import { DataTableShell, type DataTableColumnMeta } from "@/components/ui/data-table-shell";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusPill } from "@/components/ui/status-pill";
 
@@ -49,6 +49,7 @@ export function InvoicesTable() {
     {
       header: "",
       id: "actions",
+      meta: { isActions: true } satisfies DataTableColumnMeta,
       cell: ({ row }) => (
         <Button
           variant="ghost"

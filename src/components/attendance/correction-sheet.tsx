@@ -3,7 +3,9 @@
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { DateField } from "@/components/ui/date-picker";
 import { FormField } from "@/components/ui/form-field";
+import { TimeField } from "@/components/ui/time-picker";
 import { SelectField } from "@/components/ui/select-field";
 import {
   Sheet,
@@ -91,13 +93,23 @@ export function CorrectionSheet({
             }}
           />
           {isTimeField ? (
-            <FormField
-              id="correction-value"
-              label="Corrected time"
-              type="datetime-local"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-            />
+            <div className="space-y-1.5">
+              <label className="text-[13px] font-medium text-foreground">Corrected time</label>
+              <div className="grid grid-cols-2 gap-2">
+                <DateField
+                  id="correction-date"
+                  value={value.slice(0, 10)}
+                  onChange={(d) => setValue(d ? `${d}T${value.slice(11, 16) || "09:00"}` : "")}
+                />
+                <TimeField
+                  id="correction-time"
+                  value={value.slice(11, 16)}
+                  onChange={(t) =>
+                    setValue(`${value.slice(0, 10) || new Date().toISOString().slice(0, 10)}T${t}`)
+                  }
+                />
+              </div>
+            </div>
           ) : (
             <SelectField
               id="correction-status"

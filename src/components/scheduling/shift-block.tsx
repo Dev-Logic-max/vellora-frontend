@@ -55,6 +55,13 @@ export function ShiftBlock({ shift, tz, onClick, onResize }: ShiftBlockProps) {
     ? `${shift.employee.firstName} ${shift.employee.lastName}`
     : "Unassigned";
 
+  // Break occupies a proportional band at the bottom of the block (hatched).
+  const breakPct =
+    shift.breakMinutes && duration > 0
+      ? Math.min(50, (shift.breakMinutes / duration) * 100)
+      : 0;
+  const isFlexBreak = shift.notes === "flex-break";
+
   return (
     <div
       ref={setNodeRef}
@@ -64,31 +71,43 @@ export function ShiftBlock({ shift, tz, onClick, onResize }: ShiftBlockProps) {
         transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
       }}
       className={cn(
-        "absolute inset-x-1 z-10 overflow-hidden rounded-md border-l-2 pl-2 pr-1 py-1 text-[11px] shadow-sm transition-shadow",
+        "absolute inset-x-1 z-10 overflow-hidden rounded-md border border-current/15 pl-2 pr-1 py-1 text-[11px] shadow-accent-sm transition-[box-shadow,transform] hover:shadow-accent-md",
         style.block,
-        isDragging && "z-30 opacity-80 shadow-lg",
+        isDragging && "z-30 opacity-80 shadow-accent-lg",
       )}
     >
+      {/* Left status rail. */}
+      <span className={cn("absolute inset-y-0 left-0 w-1", style.bar)} />
+
+      {/* Break sub-bar (hatched band at the bottom). */}
+      {breakPct > 0 ? (
+        <span
+          title={`${shift.breakMinutes}m break`}
+          className="absolute inset-x-0 bottom-0 border-t border-current/25 bg-current/10 bg-[repeating-linear-gradient(45deg,transparent,transparent_3px,rgba(0,0,0,0.08)_3px,rgba(0,0,0,0.08)_6px)]"
+          style={{ height: `${breakPct}%` }}
+        />
+      ) : null}
+
       <button
         type="button"
         {...listeners}
         {...attributes}
         onClick={onClick}
-        className="block w-full cursor-grab text-left active:cursor-grabbing"
+        className="relative block w-full cursor-grab pl-1 text-left active:cursor-grabbing"
       >
-        <span
-          className={cn("absolute top-0 bottom-0 left-0 w-0.5", style.bar)}
-          style={{ left: "-2px" }}
-        />
-        <p className="truncate font-medium tabular-nums">
-          {formatTimeInTz(shift.startsAtUtc, tz)}
+        <p className="truncate font-semibold tabular-nums">
+          {formatTimeInTz(shift.startsAtUtc, tz).replace(/\s/g, "")}–
+          {formatTimeInTz(shift.endsAtUtc, tz).replace(/\s/g, "")}
         </p>
         <p className="truncate opacity-90">{name}</p>
-        {shift.role ? <p className="truncate opacity-70">{shift.role}</p> : null}
+        <p className="truncate text-[10px] opacity-70">
+          {shift.role ?? style.label}
+          {shift.breakMinutes ? ` · ${shift.breakMinutes}m${isFlexBreak ? " flex" : ""}` : ""}
+        </p>
       </button>
       <span
         onPointerDown={startResize}
-        className="absolute inset-x-0 bottom-0 h-2 cursor-ns-resize rounded-b-md hover:bg-black/10"
+        className="absolute inset-x-0 bottom-0 z-10 h-2 cursor-ns-resize rounded-b-md hover:bg-black/10"
       />
     </div>
   );

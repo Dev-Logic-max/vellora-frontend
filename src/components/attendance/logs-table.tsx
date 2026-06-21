@@ -5,7 +5,11 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Clock, PencilLine } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { DataTableShell } from "@/components/ui/data-table-shell";
+import {
+  DataTableShell,
+  type DataTableColumnMeta,
+  type TableToolbarConfig,
+} from "@/components/ui/data-table-shell";
 import { EmptyState } from "@/components/ui/empty-state";
 import { EmployeeAvatar } from "@/components/employees/employee-avatar";
 import { AttendancePill } from "@/components/attendance/attendance-pill";
@@ -34,11 +38,13 @@ export function LogsTable({
   isLoading,
   tz,
   onCorrect,
+  toolbar,
 }: {
   logs: AttendanceLog[];
   isLoading?: boolean;
   tz: string;
   onCorrect: (log: AttendanceLog) => void;
+  toolbar?: TableToolbarConfig;
 }) {
   const columns = useMemo<ColumnDef<AttendanceLog, unknown>[]>(
     () => [
@@ -102,6 +108,7 @@ export function LogsTable({
       {
         id: "actions",
         header: "",
+        meta: { isActions: true } satisfies DataTableColumnMeta,
         cell: ({ row }) => (
           <Button
             variant="ghost"
@@ -125,6 +132,7 @@ export function LogsTable({
       columns={columns}
       data={logs}
       isLoading={isLoading}
+      toolbar={toolbar}
       empty={
         <EmptyState
           icon={Clock}

@@ -3,7 +3,7 @@
 import { LogOut, Settings, UserRound } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { EntityAvatar } from "@/components/ui/entity-avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,18 +16,6 @@ import { useRouter } from "@/i18n/navigation";
 import { signOut } from "@/lib/auth";
 import { setActiveCompanyId } from "@/lib/active-company";
 import type { CurrentUser } from "@/features/session/types";
-
-function initials(user: CurrentUser): string {
-  const base = user.name?.trim() || user.email;
-  return (
-    base
-      .split(/[\s@.]+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase() ?? "")
-      .join("") || "U"
-  );
-}
 
 export function UserMenu({ user }: { user: CurrentUser }) {
   const router = useRouter();
@@ -52,9 +40,7 @@ export function UserMenu({ user }: { user: CurrentUser }) {
           />
         }
       >
-        <Avatar>
-          <AvatarFallback>{initials(user)}</AvatarFallback>
-        </Avatar>
+        <EntityAvatar name={user.name ?? user.email} />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel className="flex flex-col gap-0.5">

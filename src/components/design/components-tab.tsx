@@ -1,11 +1,30 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { ChevronDown, Clock, MapPin, MoreHorizontal, Plus, Search, Trash2, User } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import {
+  BarChart3,
+  CalendarDays,
+  ChevronDown,
+  Clock,
+  Loader2,
+  MapPin,
+  MoreHorizontal,
+  Plus,
+  Search,
+  Trash2,
+  Users,
+  User,
+} from "lucide-react";
 
+import { ApiError } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ErrorState } from "@/components/ui/error-state";
+import { SegmentedTabs, type SegmentedTab } from "@/components/ui/segmented-tabs";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import { usePlatformDesign } from "@/features/design/design";
 import {
   Dialog,
   DialogClose,
@@ -173,6 +192,27 @@ export function ComponentsTab() {
         </div>
       </Section>
 
+      <Section
+        title="Tabs"
+        description="Module sub-tabs / segmented controls. Pick a style in Layout → Tab style; the active one is marked here."
+      >
+        <TabsShowcase />
+      </Section>
+
+      <Section
+        title="Error pages"
+        description="What users see when something fails — session expiry, denied access, not found, rate-limited, or a server error."
+      >
+        <ErrorShowcase />
+      </Section>
+
+      <Section
+        title="Loaders"
+        description="Skeletons, spinners and loading animations used while data is fetching."
+      >
+        <LoaderShowcase />
+      </Section>
+
       <Section title="Shifts" description="The signature scheduling surface.">
         <ShiftShowcase />
       </Section>
@@ -239,6 +279,163 @@ function ShiftShowcase() {
               style={{ height: `${h}%`, backgroundColor: `rgb(var(--accent) / ${0.35 + h / 200})` }}
             />
           ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Tabs (with-icons vs text-only) ──────────────────────────────────────── */
+const DEMO_TABS: SegmentedTab<string>[] = [
+  { value: "overview", label: "Overview", icon: BarChart3 },
+  { value: "people", label: "People", icon: Users },
+  { value: "schedule", label: "Schedule", icon: CalendarDays },
+];
+
+function TabsShowcase() {
+  const { data } = usePlatformDesign();
+  const iconsOn = data?.prefs?.tabsIcons ?? true;
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-2">
+      <TabsVariant title="With icons" active={iconsOn} wrapperClass="tabs-with-icons" />
+      <TabsVariant title="Text only" active={!iconsOn} wrapperClass="tabs-no-icons" />
+    </div>
+  );
+}
+
+function TabsVariant({
+  title,
+  active,
+  wrapperClass,
+}: {
+  title: string;
+  active: boolean;
+  wrapperClass: string;
+}) {
+  // Local, self-contained tab state so the preview is interactive but isolated.
+  const [pill, setPill] = useState("overview");
+  const [line, setLine] = useState("overview");
+  return (
+    <div
+      className={cn(
+        "space-y-4 rounded-xl border bg-surface p-4",
+        active ? "border-transparent ring-2 ring-primary" : "border-border",
+        wrapperClass,
+      )}
+    >
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-foreground">{title}</span>
+        {active ? <span className="text-xs font-medium text-primary">Active</span> : null}
+      </div>
+      <SegmentedTabs
+        tabs={DEMO_TABS}
+        value={pill}
+        onValueChange={setPill}
+        layoutGroup={`demo-pill-${wrapperClass}`}
+      />
+      <SegmentedTabs
+        tabs={DEMO_TABS}
+        value={line}
+        onValueChange={setLine}
+        variant="line"
+        layoutGroup={`demo-line-${wrapperClass}`}
+      />
+    </div>
+  );
+}
+
+/* ── Error pages ─────────────────────────────────────────────────────────── */
+function ErrorShowcase() {
+  const samples: { label: string; error: unknown }[] = [
+    { label: "Session expired (401)", error: new ApiError(401, "Your session has expired.") },
+    { label: "Access denied (403)", error: new ApiError(403, "Platform access required.") },
+    { label: "Not found (404)", error: new ApiError(404, "This item doesn't exist.") },
+    { label: "Rate limited (429)", error: new ApiError(429, "Too many requests.") },
+    { label: "Server error (500)", error: new ApiError(500, "Something went wrong on our end.") },
+  ];
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      {samples.map((s) => (
+        <div key={s.label} className="space-y-2">
+          <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            {s.label}
+          </p>
+          <ErrorState error={s.error} onRetry={() => {}} className="py-10" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── Loaders ─────────────────────────────────────────────────────────────── */
+function LoaderShowcase() {
+  return (
+    <div className="space-y-6">
+      {/* Skeletons */}
+      <div className="space-y-2">
+        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Skeletons</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {/* Card skeleton */}
+          <div className="space-y-3 rounded-xl border border-border bg-surface p-4">
+            <div className="flex items-center gap-3">
+              <Skeleton className="size-10 rounded-full" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-3.5 w-2/3" />
+                <Skeleton className="h-3 w-1/3" />
+              </div>
+            </div>
+            <Skeleton className="h-20 w-full" />
+          </div>
+          {/* List/table skeleton */}
+          <div className="space-y-2.5 rounded-xl border border-border bg-surface p-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <Skeleton className="size-8 rounded-lg" />
+                <Skeleton className="h-3.5 flex-1" />
+                <Skeleton className="h-5 w-14 rounded-full" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Spinners + animations */}
+      <div className="space-y-2">
+        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+          Spinners &amp; animations
+        </p>
+        <div className="flex flex-wrap items-center gap-8 rounded-xl border border-border bg-surface p-6">
+          {/* Lucide spinner */}
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="size-7 animate-spin text-primary" />
+            <span className="text-xs text-muted-foreground">Spinner</span>
+          </div>
+          {/* Ring spinner */}
+          <div className="flex flex-col items-center gap-2">
+            <span className="size-7 animate-spin rounded-full border-2 border-accent-soft border-t-primary" />
+            <span className="text-xs text-muted-foreground">Ring</span>
+          </div>
+          {/* Bouncing dots */}
+          <div className="flex flex-col items-center gap-2">
+            <span className="flex items-center gap-1">
+              {[0, 150, 300].map((d) => (
+                <span
+                  key={d}
+                  className="size-2 animate-bounce rounded-full bg-primary"
+                  style={{ animationDelay: `${d}ms` }}
+                />
+              ))}
+            </span>
+            <span className="text-xs text-muted-foreground">Dots</span>
+          </div>
+          {/* Pulsing bar */}
+          <div className="flex flex-1 flex-col items-center gap-2">
+            <span className="h-2 w-full overflow-hidden rounded-full bg-surface-subtle">
+              <span className="block h-full w-1/3 animate-pulse rounded-full bg-primary" />
+            </span>
+            <span className="text-xs text-muted-foreground">Progress (indeterminate)</span>
+          </div>
         </div>
       </div>
     </div>

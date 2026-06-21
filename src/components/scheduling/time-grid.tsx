@@ -58,13 +58,13 @@ export function TimeGrid({
   return (
     <DndContext sensors={sensors} onDragEnd={onDragEnd}>
       <div className="flex overflow-hidden rounded-xl border border-border bg-surface">
-        {/* Hour axis */}
-        <div className="w-14 shrink-0 border-r border-border pt-6">
+        {/* Hour axis — themed (soft accent wash). */}
+        <div className="w-14 shrink-0 border-r border-border bg-accent-soft/30 pt-6">
           {HOURS.map((h) => (
             <div
               key={h}
               style={{ height: HOUR_PX }}
-              className="relative -top-2 pr-2 text-right text-[10px] text-muted-foreground tabular-nums"
+              className="relative -top-2 pr-2 text-right text-[10px] font-medium text-accent-strong/70 tabular-nums"
             >
               {h.toString().padStart(2, "0")}:00
             </div>
@@ -79,8 +79,10 @@ export function TimeGrid({
               <div key={dateStr} className="border-r border-border last:border-r-0">
                 <div
                   className={cn(
-                    "sticky top-0 z-20 flex h-6 items-center justify-center border-b border-border bg-surface text-xs font-medium",
-                    dateStr === TODAY ? "text-primary" : "text-muted-foreground",
+                    "sticky top-0 z-20 flex h-6 items-center justify-center border-b border-border text-xs font-semibold",
+                    dateStr === TODAY
+                      ? "bg-accent-soft text-accent-strong"
+                      : "bg-surface-subtle text-foreground-2",
                   )}
                 >
                   {format(date, days.length > 1 ? "EEE d" : "EEEE, MMM d")}

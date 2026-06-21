@@ -4,6 +4,7 @@ import { useMemo, useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
+import { DateField } from "@/components/ui/date-picker";
 import { FormField } from "@/components/ui/form-field";
 import { SelectField } from "@/components/ui/select-field";
 import {
@@ -125,20 +126,8 @@ export function LeaveRequestSheet({
           />
 
           <div className="grid grid-cols-2 gap-3">
-            <FormField
-              id="leave-start"
-              label="From"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-            <FormField
-              id="leave-end"
-              label="To"
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
+            <DateField id="leave-start" label="From" value={startDate} onChange={setStartDate} />
+            <DateField id="leave-end" label="To" value={endDate} onChange={setEndDate} />
           </div>
 
           <label className="flex items-center gap-2 text-sm text-foreground">

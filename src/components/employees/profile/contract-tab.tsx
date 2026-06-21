@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { DateField } from "@/components/ui/date-picker";
 import { FormField } from "@/components/ui/form-field";
 import { SelectField } from "@/components/ui/select-field";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -64,19 +65,17 @@ export function ContractTab({ employeeId }: { employeeId: string }) {
             value={form.hoursWeek}
             onChange={(e) => setForm({ ...form, hoursWeek: e.target.value })}
           />
-          <FormField
+          <DateField
             id="c-start"
             label="Start date"
-            type="date"
             value={form.startDate}
-            onChange={(e) => setForm({ ...form, startDate: e.target.value })}
+            onChange={(v) => setForm({ ...form, startDate: v })}
           />
-          <FormField
+          <DateField
             id="c-end"
             label="End date"
-            type="date"
             value={form.endDate}
-            onChange={(e) => setForm({ ...form, endDate: e.target.value })}
+            onChange={(v) => setForm({ ...form, endDate: v })}
           />
           <FormField
             id="c-salary"

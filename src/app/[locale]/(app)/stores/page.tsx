@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { CapacityBar } from "@/components/stores/capacity-bar";
 import { StoreCreateSheet } from "@/components/stores/store-create-sheet";
 import { EmptyState } from "@/components/ui/empty-state";
+import { EntityAvatar } from "@/components/ui/entity-avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusPill } from "@/components/ui/status-pill";
 import { Link } from "@/i18n/navigation";
@@ -48,7 +49,7 @@ export default function StoresPage() {
         <div className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border text-left text-xs tracking-wide text-muted-foreground uppercase">
+              <tr className="border-b border-border bg-surface-subtle text-left text-xs tracking-wide text-foreground-2 uppercase">
                 <th className="px-4 py-3 font-semibold">Store</th>
                 <th className="px-4 py-3 font-semibold">Code</th>
                 <th className="px-4 py-3 font-semibold">Capacity</th>
@@ -57,12 +58,16 @@ export default function StoresPage() {
             </thead>
             <tbody>
               {data.map((store) => (
-                <tr key={store.id} className="border-b border-border last:border-0 hover:bg-surface-subtle">
+                <tr
+                  key={store.id}
+                  className="border-b border-border transition-colors last:border-0 hover:bg-surface-subtle"
+                >
                   <td className="px-4 py-3">
                     <Link
                       href={`/stores/${store.id}`}
-                      className="font-medium text-foreground hover:text-primary"
+                      className="flex items-center gap-3 font-medium text-foreground hover:text-primary"
                     >
+                      <EntityAvatar name={store.name} className="size-8 rounded-lg" />
                       {store.name}
                     </Link>
                   </td>

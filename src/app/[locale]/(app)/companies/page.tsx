@@ -6,10 +6,13 @@ import { CompanyCreateSheet } from "@/components/companies/company-create-sheet"
 import { GroupsPanel } from "@/components/companies/groups-panel";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
+import { EntityAvatar } from "@/components/ui/entity-avatar";
+import { RoleTag } from "@/components/ui/role-tag";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusPill } from "@/components/ui/status-pill";
 import { Link } from "@/i18n/navigation";
 import { useCompanies } from "@/features/org/companies";
+import type { MembershipRole } from "@/features/session/types";
 
 export default function CompaniesPage() {
   const { data, isLoading, isError } = useCompanies();
@@ -38,7 +41,7 @@ export default function CompaniesPage() {
             <div className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border text-left text-xs tracking-wide text-muted-foreground uppercase">
+                  <tr className="border-b border-border bg-surface-subtle text-left text-xs tracking-wide text-foreground-2 uppercase">
                     <th className="px-4 py-3 font-semibold">Company</th>
                     <th className="px-4 py-3 font-semibold">Locale</th>
                     <th className="px-4 py-3 font-semibold">Your role</th>
@@ -49,21 +52,30 @@ export default function CompaniesPage() {
                   {data.map((company) => (
                     <tr
                       key={company.id}
-                      className="border-b border-border last:border-0 hover:bg-surface-subtle"
+                      className="border-b border-border transition-colors last:border-0 hover:bg-surface-subtle"
                     >
                       <td className="px-4 py-3">
                         <Link
                           href={`/companies/${company.id}`}
-                          className="font-medium text-foreground hover:text-primary"
+                          className="flex items-center gap-3 font-medium text-foreground hover:text-primary"
                         >
+                          <EntityAvatar
+                            name={company.name}
+                            src={company.logoUrl}
+                            className="size-8 rounded-lg"
+                          />
                           {company.name}
                         </Link>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
                         {company.country} · {company.currency}
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground capitalize">
-                        {company.role?.replace(/_/g, " ") ?? "—"}
+                      <td className="px-4 py-3">
+                        {company.role ? (
+                          <RoleTag role={company.role as MembershipRole} />
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         <StatusPill status={company.status} />

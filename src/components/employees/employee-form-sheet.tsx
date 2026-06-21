@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Plus, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
+import { DateField } from "@/components/ui/date-picker";
 import { FormField } from "@/components/ui/form-field";
 import { SelectField } from "@/components/ui/select-field";
 import {
@@ -80,6 +81,7 @@ export function EmployeeFormSheet({
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<Values>({
     resolver: zodResolver(schema),
@@ -199,7 +201,18 @@ export function EmployeeFormSheet({
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <FormField id="hireDate" label="Hire date" type="date" {...register("hireDate")} />
+              <Controller
+                control={control}
+                name="hireDate"
+                render={({ field }) => (
+                  <DateField
+                    id="hireDate"
+                    label="Hire date"
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
               <div className="space-y-1.5">
                 <label className="text-[13px] font-medium text-foreground">Primary store</label>
                 <Combobox

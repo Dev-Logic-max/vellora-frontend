@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MessagesSquare } from "lucide-react";
+import { Mail, MessagesSquare } from "lucide-react";
 
 import { EmptyState } from "@/components/ui/empty-state";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SegmentedTabs, type SegmentedTab } from "@/components/ui/segmented-tabs";
 import { cn } from "@/lib/utils";
 import { useCurrentUser } from "@/features/session/use-current-user";
 import {
@@ -20,9 +20,16 @@ import { MessageComposer } from "./message-composer";
 import { MessageThread } from "./message-thread";
 import { NewConversationModal } from "./new-conversation-modal";
 
+type MessagingTab = "messages" | "email";
+
+const MESSAGING_TABS: SegmentedTab<MessagingTab>[] = [
+  { value: "messages", label: "Messages", icon: MessagesSquare },
+  { value: "email", label: "Email", icon: Mail },
+];
+
 export function MessagingView() {
   const { data: me } = useCurrentUser();
-  const [tab, setTab] = useState("messages");
+  const [tab, setTab] = useState<MessagingTab>("messages");
   const [selected, setSelected] = useState<string | null>(null);
 
   const { data: conversations, isLoading } = useConversations();
@@ -42,13 +49,15 @@ export function MessagingView() {
 
   return (
     <div className="space-y-4">
-      <Tabs value={tab} onValueChange={(v) => setTab(v as string)}>
-        <TabsList variant="line" className="w-max">
-          <TabsTrigger value="messages">Messages</TabsTrigger>
-          <TabsTrigger value="email">Email</TabsTrigger>
-        </TabsList>
+      <SegmentedTabs
+        tabs={MESSAGING_TABS}
+        value={tab}
+        onValueChange={setTab}
+        layoutGroup="messaging-tabs"
+      />
 
-        <TabsContent value="messages" className="pt-2">
+      {tab === "messages" ? (
+        <div className="pt-2">
           <div className="grid h-[calc(100vh-13rem)] grid-cols-1 overflow-hidden rounded-xl border border-border bg-surface shadow-sm md:grid-cols-[20rem_1fr]">
             {/* list pane (hidden on mobile when a thread is open) */}
             <div
@@ -103,12 +112,14 @@ export function MessagingView() {
               )}
             </div>
           </div>
-        </TabsContent>
+        </div>
+      ) : null}
 
-        <TabsContent value="email" className="pt-2">
+      {tab === "email" ? (
+        <div className="pt-2">
           <EmailTab />
-        </TabsContent>
-      </Tabs>
+        </div>
+      ) : null}
     </div>
   );
 }
