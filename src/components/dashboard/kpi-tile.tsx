@@ -1,9 +1,8 @@
 import type { LucideIcon } from "lucide-react";
 
 import { CountUp } from "@/components/ui/count-up";
+import type { SectionPattern } from "@/features/design/types";
 import { cn } from "@/lib/utils";
-
-type Decor = "bubbles" | "hexagon" | "dots";
 
 interface KpiTileProps {
   label: string;
@@ -16,14 +15,16 @@ interface KpiTileProps {
   icon?: LucideIcon;
   /** Optional sparkline series — renders a tiny accent-tinted trend line. */
   sparkline?: number[];
-  /** Light themed background motif in the bottom-right corner. */
-  decor?: Decor;
+  /** Themed background motif (matches the dashboard section pattern). */
+  decor?: SectionPattern;
   className?: string;
 }
 
-/** Themed bottom-right motif + a soft accent glow — visible but tasteful, so
- * each KPI tile carries a bit of the selected theme. */
-function CardDecor({ kind }: { kind: Decor }) {
+const TILE_MASK = "radial-gradient(80% 80% at 100% 100%, black 10%, transparent 78%)";
+
+/** Themed bottom-right motif + a soft accent glow, matching the selected section
+ * pattern, so each KPI tile carries a bit of the chosen theme. */
+function CardDecor({ kind }: { kind: SectionPattern }) {
   return (
     <>
       {/* soft accent glow in the bottom-right corner (theme-reactive) */}
@@ -32,46 +33,52 @@ function CardDecor({ kind }: { kind: Decor }) {
         className="pointer-events-none absolute -right-6 -bottom-8 size-28 rounded-full opacity-25 blur-2xl"
         style={{ backgroundColor: "rgb(var(--accent))" }}
       />
-      {kind === "bubbles" ? (
+      {kind === "hexagons" ? (
         <svg
           aria-hidden
-          className="pointer-events-none absolute right-1 bottom-1 size-20 text-accent opacity-[0.16]"
-          viewBox="0 0 100 100"
-          fill="currentColor"
-        >
-          <circle cx="74" cy="74" r="22" />
-          <circle cx="42" cy="82" r="10" />
-          <circle cx="86" cy="44" r="7" />
-        </svg>
-      ) : kind === "hexagon" ? (
-        <svg
-          aria-hidden
-          className="pointer-events-none absolute -right-2 -bottom-3 size-24 text-accent opacity-[0.14]"
-          viewBox="0 0 100 100"
+          className="pointer-events-none absolute inset-0 size-full text-accent opacity-[0.16]"
           fill="none"
           stroke="currentColor"
-          strokeWidth="4"
+          strokeWidth="1.4"
+          style={{ WebkitMaskImage: TILE_MASK, maskImage: TILE_MASK }}
         >
-          <polygon points="50,8 88,29 88,71 50,92 12,71 12,29" />
-          <polygon points="50,26 72,38 72,62 50,74 28,62 28,38" />
+          <defs>
+            <pattern id="kpi-hex" width="38" height="34" patternUnits="userSpaceOnUse">
+              <polygon points="19,2 35,11 35,29 19,38 3,29 3,11" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#kpi-hex)" />
         </svg>
-      ) : (
+      ) : kind === "squares" ? (
         <svg
           aria-hidden
-          className="pointer-events-none absolute right-2 bottom-2 size-16 text-accent opacity-25"
-          viewBox="0 0 60 60"
-          style={{
-            WebkitMaskImage: "radial-gradient(80% 80% at 100% 100%, black 10%, transparent 75%)",
-            maskImage: "radial-gradient(80% 80% at 100% 100%, black 10%, transparent 75%)",
-          }}
+          className="pointer-events-none absolute inset-0 size-full text-accent opacity-25"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.1"
+          style={{ WebkitMaskImage: TILE_MASK, maskImage: TILE_MASK }}
         >
-          {[0, 1, 2, 3].map((r) =>
-            [0, 1, 2, 3].map((c) => (
-              <circle key={`${r}-${c}`} cx={12 + c * 14} cy={12 + r * 14} r="2.4" fill="currentColor" />
-            )),
-          )}
+          <defs>
+            <pattern id="kpi-grid" width="22" height="22" patternUnits="userSpaceOnUse">
+              <path d="M22 0H0V22" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#kpi-grid)" />
         </svg>
-      )}
+      ) : kind === "dots" ? (
+        <svg
+          aria-hidden
+          className="pointer-events-none absolute inset-0 size-full text-accent opacity-50"
+          style={{ WebkitMaskImage: TILE_MASK, maskImage: TILE_MASK }}
+        >
+          <defs>
+            <pattern id="kpi-dots" width="16" height="16" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="1.5" fill="currentColor" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#kpi-dots)" />
+        </svg>
+      ) : null}
     </>
   );
 }

@@ -61,16 +61,21 @@ const STEPS: Step[] = [
   },
 ];
 
-/** Onboarding GUIDE shown on an empty dashboard — Stores → Shifts → Onboarding.
- * Manual (Back / Next), never auto-advances or auto-hides; the user dismisses it
- * with the close button (or after reaching the last step). Reduced-motion safe. */
-export function OnboardingShowcase() {
+/** Onboarding GUIDE (Stores → Shifts → Onboarding). Manual (Back / Next), never
+ * auto-advances or auto-hides; the user dismisses it with the close button (or
+ * Done on the last step). `onDismiss` lets the parent react. Reduced-motion safe. */
+export function OnboardingShowcase({ onDismiss }: { onDismiss?: () => void }) {
   const [index, setIndex] = useState(0);
   const [dismissed, setDismissed] = useState(false);
   const [dir, setDir] = useState(1);
   const reduce = useReducedMotion();
 
   if (dismissed) return null;
+
+  const close = () => {
+    setDismissed(true);
+    onDismiss?.();
+  };
 
   const step = STEPS[index];
   const isLast = index === STEPS.length - 1;
@@ -88,7 +93,7 @@ export function OnboardingShowcase() {
       {/* Dismiss */}
       <button
         type="button"
-        onClick={() => setDismissed(true)}
+        onClick={close}
         aria-label="Dismiss guide"
         className="absolute top-3 right-3 z-10 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-surface-subtle hover:text-foreground"
       >
@@ -139,7 +144,7 @@ export function OnboardingShowcase() {
               {isLast ? (
                 <button
                   type="button"
-                  onClick={() => setDismissed(true)}
+                  onClick={close}
                   className="inline-flex items-center gap-1.5 rounded-lg border border-accent/30 bg-accent-soft px-3 py-1.5 text-sm font-medium text-accent-strong transition-colors hover:bg-accent hover:text-(--accent-foreground,white)"
                 >
                   <Check className="size-4" /> Done

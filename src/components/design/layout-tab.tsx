@@ -16,11 +16,16 @@ import { toast } from "sonner";
 
 import { BottomActionBar } from "@/components/ui/bottom-action-bar";
 import { GradientHeaderCard } from "@/components/ui/gradient-header-card";
+import { SectionDecor } from "@/components/dashboard/section-decor";
 import { cn } from "@/lib/utils";
 import { applyPrefs, cachePrefs } from "@/features/design/apply";
 import { usePlatformDesign, useUpdateDesign } from "@/features/design/design";
 import { cacheCalendarStyle } from "@/features/scheduling/calendar-style";
-import type { CalendarStyle, Density } from "@/features/design/types";
+import {
+  SECTION_PATTERN_OPTIONS,
+  cacheSectionPattern,
+} from "@/features/design/section-pattern";
+import type { CalendarStyle, Density, SectionPattern } from "@/features/design/types";
 
 /** Calendar-style + global UI toggles (density / motion). Changes preview live
  * on the dashboard scope and persist platform-wide via the bottom action bar. */
@@ -32,17 +37,20 @@ export function LayoutTab() {
   const savedDensity = data?.prefs?.density ?? "comfortable";
   const savedMotion = data?.prefs?.motion ?? true;
   const savedTabsIcons = data?.prefs?.tabsIcons ?? true;
+  const savedPattern = data?.prefs?.sectionPattern ?? "glance";
 
   const [calendarStyle, setCalendarStyle] = useState<CalendarStyle>(savedCalendar);
   const [density, setDensity] = useState<Density>(savedDensity);
   const [motion, setMotion] = useState<boolean>(savedMotion);
   const [tabsIcons, setTabsIcons] = useState<boolean>(savedTabsIcons);
+  const [pattern, setPattern] = useState<SectionPattern>(savedPattern);
 
   const dirty =
     calendarStyle !== savedCalendar ||
     density !== savedDensity ||
     motion !== savedMotion ||
-    tabsIcons !== savedTabsIcons;
+    tabsIcons !== savedTabsIcons ||
+    pattern !== savedPattern;
 
   // Live preview of prefs on the dashboard scope.
   const previewPrefs = (next: { density?: Density; motion?: boolean; tabsIcons?: boolean }) => {
@@ -54,11 +62,12 @@ export function LayoutTab() {
   };
 
   const save = async () => {
-    const prefs = { density, motion, tabsIcons };
+    const prefs = { density, motion, tabsIcons, sectionPattern: pattern };
     try {
       await update.mutateAsync({ calendarStyle, prefs });
       cacheCalendarStyle(calendarStyle);
       cachePrefs(prefs);
+      cacheSectionPattern(pattern);
       applyPrefs(prefs);
       toast.success("Layout saved", { description: "Calendar style and UI preferences updated." });
     } catch {
@@ -71,6 +80,7 @@ export function LayoutTab() {
     setDensity(savedDensity);
     setMotion(savedMotion);
     setTabsIcons(savedTabsIcons);
+    setPattern(savedPattern);
     applyPrefs({ density: savedDensity, motion: savedMotion, tabsIcons: savedTabsIcons });
   };
 
@@ -103,6 +113,45 @@ export function LayoutTab() {
             description="Employees down the side, days across the top, with totals."
             preview={<RosterPreview />}
           />
+        </div>
+      </section>
+
+      {/* Dashboard section pattern */}
+      <section className="space-y-3">
+        <h4 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+          <LayoutGrid className="size-4 text-muted-foreground" /> Dashboard section design
+        </h4>
+        <p className="-mt-1 text-xs text-muted-foreground">
+          The motif behind dashboard cards and sections.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {SECTION_PATTERN_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => setPattern(opt.value)}
+              className={cn(
+                "group flex flex-col gap-2 rounded-xl border bg-surface p-3 text-left transition-all hover:-translate-y-0.5 hover:shadow-accent-sm",
+                pattern === opt.value
+                  ? "border-transparent ring-2 ring-primary"
+                  : "border-border hover:border-faint",
+              )}
+            >
+              <SectionDecor
+                kind={opt.value}
+                className="h-16 rounded-lg border border-border bg-surface-subtle/50"
+              >
+                <span className="sr-only">{opt.label} preview</span>
+              </SectionDecor>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-foreground">{opt.label}</span>
+                {pattern === opt.value ? (
+                  <span className="text-xs font-medium text-primary">Active</span>
+                ) : null}
+              </div>
+              <p className="text-xs text-muted-foreground">{opt.hint}</p>
+            </button>
+          ))}
         </div>
       </section>
 

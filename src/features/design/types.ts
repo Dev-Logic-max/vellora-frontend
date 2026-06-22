@@ -4,12 +4,18 @@ export type TokenMap = Record<string, string>;
 export type CalendarStyle = "grid" | "roster";
 export type Density = "comfortable" | "compact";
 
+/** Decorative motif behind dashboard cards + sections (Design → Layout).
+ * "glance" = a soft accent glow only; the others are patterned. */
+export type SectionPattern = "glance" | "dots" | "hexagons" | "squares";
+
 export interface DesignPrefs {
   density?: Density;
   /** Global motion on/off (reduced-motion still always wins). */
   motion?: boolean;
   /** Show icons in module sub-tabs / segmented controls (default on). */
   tabsIcons?: boolean;
+  /** Background motif for dashboard cards + sections (default "glance"). */
+  sectionPattern?: SectionPattern;
 }
 
 /**

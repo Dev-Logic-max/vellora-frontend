@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Building2, CalendarDays, Clock, Users } from "lucide-react";
 
@@ -10,7 +10,9 @@ import { OnboardingShowcase } from "@/components/dashboard/onboarding-showcase";
 import { SectionDecor } from "@/components/dashboard/section-decor";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cardItem, staggerContainer } from "@/lib/motion";
+import { useSectionPattern } from "@/features/design/section-pattern";
 import { useCurrentUser } from "@/features/session/use-current-user";
 import { useEmployees } from "@/features/employees/employees";
 import { useStores } from "@/features/org/stores";
@@ -19,8 +21,13 @@ import { useLogs } from "@/features/attendance/attendance";
 import { weekDates, ymd } from "@/lib/schedule-time";
 
 export default function DashboardPage() {
-  const { data: user } = useCurrentUser();
+  const { data: user, isLoading: userLoading } = useCurrentUser();
   const hasCompany = Boolean(user?.companyId);
+  const pattern = useSectionPattern();
+
+  // The user keeps the setup guide until they dismiss it (it does NOT auto-hide
+  // when data loads). Once dismissed, the activity placeholder takes its place.
+  const [guideDismissed, setGuideDismissed] = useState(false);
 
   const firstName = user?.name?.trim().split(/\s+/)[0] ?? "there";
 
@@ -49,9 +56,9 @@ export default function DashboardPage() {
   const openShifts = (shifts ?? []).filter((s) => !s.employeeId && s.status !== "off").length;
   const clockedIn = (logs ?? []).filter((l) => !l.clockOutUtc).length;
 
-  // "Activity" = any real data configured/happening.
-  const hasActivity = employeeCount > 0 || storeCount > 0 || (shifts?.length ?? 0) > 0;
-  const dash = (n: number, loading: boolean) => (loading ? "…" : String(n));
+  // Gate the dashboard UI on the core data so cards never flash empty first.
+  const coreLoading =
+    userLoading || (hasCompany && (empLoading || storesLoading || shiftsLoading || logsLoading));
 
   return (
     <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-6">
@@ -62,7 +69,9 @@ export default function DashboardPage() {
         />
       </motion.div>
 
-      {!hasCompany ? (
+      {coreLoading ? (
+        <DashboardSkeleton />
+      ) : !hasCompany ? (
         <motion.div variants={cardItem}>
           <EmptyState
             icon={Building2}
@@ -73,45 +82,24 @@ export default function DashboardPage() {
         </motion.div>
       ) : (
         <>
-          {/* KPI row — 4 tiles in one row; each tile carries its own themed
-              motif (no wrapper panel behind them). */}
+          {/* KPI row — 4 tiles in one row; each tile carries the selected themed
+              section pattern (chosen in Design → Layout). */}
           <motion.div variants={cardItem} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <KpiTile
-              label="Employees"
-              value={dash(employeeCount, empLoading)}
-              count={empLoading ? undefined : { to: employeeCount }}
-              icon={Users}
-              decor="dots"
-            />
-            <KpiTile
-              label="Stores"
-              value={dash(storeCount, storesLoading)}
-              count={storesLoading ? undefined : { to: storeCount }}
-              icon={Building2}
-              decor="hexagon"
-            />
-            <KpiTile
-              label="Open shifts"
-              value={dash(openShifts, shiftsLoading)}
-              count={shiftsLoading ? undefined : { to: openShifts }}
-              icon={CalendarDays}
-              decor="bubbles"
-            />
-            <KpiTile
-              label="Clocked in"
-              value={dash(clockedIn, logsLoading)}
-              count={logsLoading ? undefined : { to: clockedIn }}
-              icon={Clock}
-              decor="dots"
-            />
+            <KpiTile label="Employees" value={String(employeeCount)} count={{ to: employeeCount }} icon={Users} decor={pattern} />
+            <KpiTile label="Stores" value={String(storeCount)} count={{ to: storeCount }} icon={Building2} decor={pattern} />
+            <KpiTile label="Open shifts" value={String(openShifts)} count={{ to: openShifts }} icon={CalendarDays} decor={pattern} />
+            <KpiTile label="Clocked in" value={String(clockedIn)} count={{ to: clockedIn }} icon={Clock} decor={pattern} />
           </motion.div>
 
-          {/* Activity area — hexagon honeycomb background (open space → visible).
-              The onboarding guide is its own card; the "coming soon" state is
-              transparent so the motif reads behind it. */}
-          {hasActivity ? (
+          {/* Setup guide — stays until the user dismisses it (decoupled from data).
+              Once dismissed, the activity placeholder takes its place. */}
+          {!guideDismissed ? (
+            <motion.div variants={cardItem}>
+              <OnboardingShowcase onDismiss={() => setGuideDismissed(true)} />
+            </motion.div>
+          ) : (
             <SectionDecor
-              kind="hexagons"
+              kind={pattern}
               className="rounded-2xl border border-border bg-surface shadow-accent-sm"
             >
               <motion.div variants={cardItem}>
@@ -122,15 +110,11 @@ export default function DashboardPage() {
                 />
               </motion.div>
             </SectionDecor>
-          ) : (
-            <motion.div variants={cardItem}>
-              <OnboardingShowcase />
-            </motion.div>
           )}
 
-          {/* Quick highlights — two soft bubbles bottom-right. */}
+          {/* Quick highlights — selected section pattern bottom-right. */}
           <SectionDecor
-            kind="bubbles"
+            kind={pattern}
             className="rounded-2xl border border-border bg-surface p-5 shadow-accent-sm"
           >
             <motion.div variants={cardItem}>
@@ -150,5 +134,20 @@ export default function DashboardPage() {
         </>
       )}
     </motion.div>
+  );
+}
+
+/** Skeleton shown while the core dashboard data loads (no empty cards flash). */
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-28 w-full rounded-xl" />
+        ))}
+      </div>
+      <Skeleton className="h-64 w-full rounded-2xl" />
+      <Skeleton className="h-24 w-full rounded-2xl" />
+    </div>
   );
 }

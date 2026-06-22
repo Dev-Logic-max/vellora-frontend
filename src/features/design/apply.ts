@@ -157,6 +157,8 @@ export interface UiPrefs {
   density?: "comfortable" | "compact";
   motion?: boolean;
   tabsIcons?: boolean;
+  /** Dashboard section motif (glance/dots/hexagons/squares). */
+  sectionPattern?: "glance" | "dots" | "hexagons" | "squares";
 }
 
 /** Applies UI prefs to the dashboard scope via data attributes:
