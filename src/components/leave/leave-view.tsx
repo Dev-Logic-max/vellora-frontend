@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Plus } from "lucide-react";
+import { useMemo, useState } from "react";
+import { CalendarCheck, CalendarOff, Plus, ScrollText, Sun, Wallet } from "lucide-react";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
-import { SelectField } from "@/components/ui/select-field";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SegmentedTabs, type SegmentedTab } from "@/components/ui/segmented-tabs";
+import type { FilterValues } from "@/components/ui/filter-modal";
 import { ApprovalsPanel } from "@/components/leave/approvals-panel";
 import { BalancesPanel } from "@/components/leave/balances-panel";
 import { HolidayCalendar } from "@/components/leave/holiday-calendar";
@@ -18,19 +18,51 @@ import { useLeaveRequests } from "@/features/leave/leave";
 import { LEAVE_STATUS_OPTIONS } from "@/features/leave/status";
 import type { LeaveRequestStatus } from "@/features/leave/types";
 
+type TabKey = "requests" | "approvals" | "balances" | "policies" | "holidays";
+
 const MANAGER_ROLES = ["owner", "hr", "area_manager", "store_manager"];
 const ADMIN_ROLES = ["owner", "hr"];
 
 export function LeaveView() {
   const { data: me } = useCurrentUser();
-  const [tab, setTab] = useState("requests");
-  const [status, setStatus] = useState<LeaveRequestStatus | "">("");
+  const [tab, setTab] = useState<TabKey>("requests");
+  const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState<FilterValues>({});
   const [year] = useState(new Date().getFullYear());
 
   const canApprove = Boolean(me?.role && MANAGER_ROLES.includes(me.role));
   const canManage = Boolean(me?.role && ADMIN_ROLES.includes(me.role));
 
-  const { data: requests, isLoading } = useLeaveRequests({ status: status || undefined });
+  const status = (filters.status as LeaveRequestStatus | undefined) || undefined;
+  const { data: requests, isLoading } = useLeaveRequests({ status });
+
+  const filteredRequests = useMemo(() => {
+    if (!requests) return [];
+    const q = search.trim().toLowerCase();
+    if (!q) return requests;
+    return requests.filter((r) => {
+      const name = `${r.employee?.firstName ?? ""} ${r.employee?.lastName ?? ""}`.toLowerCase();
+      return name.includes(q) || (r.type?.name ?? "").toLowerCase().includes(q);
+    });
+  }, [requests, search]);
+
+  const tabs = useMemo<SegmentedTab<TabKey>[]>(
+    () => [
+      { value: "requests", label: "Requests", icon: CalendarOff },
+      ...(canApprove
+        ? [{ value: "approvals" as const, label: "Approvals", icon: CalendarCheck }]
+        : []),
+      { value: "balances", label: "Balances", icon: Wallet },
+      ...(canManage ? [{ value: "policies" as const, label: "Policies", icon: ScrollText }] : []),
+      { value: "holidays", label: "Holidays", icon: Sun },
+    ],
+    [canApprove, canManage],
+  );
+
+  const statusFilterOptions = LEAVE_STATUS_OPTIONS.filter((o) => o.value !== "") as {
+    value: string;
+    label: string;
+  }[];
 
   return (
     <div className="space-y-5">
@@ -49,48 +81,27 @@ export function LeaveView() {
         }
       />
 
-      <Tabs value={tab} onValueChange={(v) => setTab(v as string)}>
-        <TabsList variant="line" className="w-max">
-          <TabsTrigger value="requests">Requests</TabsTrigger>
-          {canApprove ? <TabsTrigger value="approvals">Approvals</TabsTrigger> : null}
-          <TabsTrigger value="balances">Balances</TabsTrigger>
-          {canManage ? <TabsTrigger value="policies">Policies</TabsTrigger> : null}
-          <TabsTrigger value="holidays">Holidays</TabsTrigger>
-        </TabsList>
+      <SegmentedTabs tabs={tabs} value={tab} onValueChange={setTab} layoutGroup="leave-tabs" />
 
-        <TabsContent value="requests" className="space-y-4 pt-2">
-          <div className="flex">
-            <SelectField
-              id="leave-status-filter"
-              className="sm:w-44"
-              options={LEAVE_STATUS_OPTIONS}
-              value={status}
-              onChange={(e) => setStatus(e.target.value as LeaveRequestStatus | "")}
-            />
-          </div>
-          <RequestsTable data={requests ?? []} isLoading={isLoading} />
-        </TabsContent>
+      {tab === "requests" ? (
+        <RequestsTable
+          data={filteredRequests}
+          isLoading={isLoading}
+          toolbar={{
+            searchValue: search,
+            onSearchChange: setSearch,
+            searchPlaceholder: "Search employee or leave type…",
+            filters: [{ key: "status", label: "Status", type: "select", options: statusFilterOptions }],
+            filterValues: filters,
+            onFilterChange: setFilters,
+          }}
+        />
+      ) : null}
 
-        {canApprove ? (
-          <TabsContent value="approvals" className="pt-2">
-            <ApprovalsPanel />
-          </TabsContent>
-        ) : null}
-
-        <TabsContent value="balances" className="pt-2">
-          <BalancesPanel year={year} />
-        </TabsContent>
-
-        {canManage ? (
-          <TabsContent value="policies" className="pt-2">
-            <PoliciesPanel canManage={canManage} />
-          </TabsContent>
-        ) : null}
-
-        <TabsContent value="holidays" className="pt-2">
-          <HolidayCalendar canManage={canManage} />
-        </TabsContent>
-      </Tabs>
+      {tab === "approvals" && canApprove ? <ApprovalsPanel /> : null}
+      {tab === "balances" ? <BalancesPanel year={year} /> : null}
+      {tab === "policies" && canManage ? <PoliciesPanel canManage={canManage} /> : null}
+      {tab === "holidays" ? <HolidayCalendar canManage={canManage} /> : null}
     </div>
   );
 }

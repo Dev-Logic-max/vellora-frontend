@@ -5,7 +5,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { RotateCcw, Smartphone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { DataTableShell } from "@/components/ui/data-table-shell";
+import { DataTableShell, type DataTableColumnMeta } from "@/components/ui/data-table-shell";
 import { EmptyState } from "@/components/ui/empty-state";
 import { AttendancePill } from "@/components/attendance/attendance-pill";
 import { RegistrationGuideDialog } from "@/components/attendance/registration-guide-dialog";
@@ -60,6 +60,7 @@ export function DevicesPanel() {
       {
         id: "actions",
         header: "",
+        meta: { isActions: true } satisfies DataTableColumnMeta,
         cell: ({ row }) => (
           <Button
             variant="outline"

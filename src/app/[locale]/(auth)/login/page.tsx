@@ -5,8 +5,10 @@ import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { FullScreenLoader } from "@/components/ui/full-screen-loader";
 import { Link, useRouter } from "@/i18n/navigation";
 import { signInWithPassword } from "@/lib/auth";
 import { AuthField, PasswordField } from "@/components/auth/auth-field";
@@ -25,7 +27,10 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionExpired = searchParams.get("reason") === "session-expired";
+  // Return-to path captured by the 401 handler (locale-prefixed, raw path).
+  const next = searchParams.get("next");
   const [formError, setFormError] = useState<string | null>(null);
+  const [redirecting, setRedirecting] = useState(false);
 
   const {
     register,
@@ -43,12 +48,22 @@ export default function LoginPage() {
       setFormError(error.message);
       return;
     }
+    // Show the overlay, then send the user back where they were (or the dashboard).
+    setRedirecting(true);
+    if (next) {
+      // `next` is already locale-prefixed → use a raw navigation (no i18n re-prefix).
+      window.location.assign(next);
+      return;
+    }
     router.push("/dashboard");
     router.refresh();
   };
 
+  const busy = isSubmitting || redirecting;
+
   return (
     <Reveal className="space-y-6">
+      {redirecting ? <FullScreenLoader /> : null}
       <div>
         <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
           Welcome back
@@ -108,8 +123,14 @@ export default function LoginPage() {
 
         {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
 
-        <Button type="submit" size="lg" className="h-10 w-full" disabled={isSubmitting}>
-          Sign in
+        <Button type="submit" size="lg" className="h-10 w-full" disabled={busy}>
+          {busy ? (
+            <>
+              <Loader2 className="size-4 animate-spin" /> Signing in…
+            </>
+          ) : (
+            "Sign in"
+          )}
         </Button>
       </form>
 

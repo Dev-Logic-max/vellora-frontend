@@ -1,14 +1,15 @@
 "use client";
 
-import { ShieldAlert } from "lucide-react";
+import { Building2, Flag, Network, ScrollText, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SegmentedTabs, type SegmentedTab } from "@/components/ui/segmented-tabs";
 import { useCurrentUser } from "@/features/session/use-current-user";
 import { AuditLogViewer } from "./audit-log-viewer";
 import { FeatureFlagsPanel } from "./feature-flags-panel";
+import { RolesGroupsTab } from "./roles-groups-tab";
 import { TenantDrawer } from "./tenant-drawer";
 import { TenantsTable } from "./tenants-table";
 
@@ -16,10 +17,19 @@ import { TenantsTable } from "./tenants-table";
  * Platform console (P9-F). Visible only to platform operators; everyone else
  * sees a block. The backend PlatformGuard is the real gate.
  */
+type AdminTab = "tenants" | "roles" | "flags" | "audit";
+
+const ADMIN_TABS: SegmentedTab<AdminTab>[] = [
+  { value: "tenants", label: "Tenants", icon: Building2 },
+  { value: "roles", label: "Roles & groups", icon: Network },
+  { value: "flags", label: "Feature flags", icon: Flag },
+  { value: "audit", label: "Audit log", icon: ScrollText },
+];
+
 export function AdminView() {
   const { data: user, isLoading } = useCurrentUser();
   const isPlatform = Boolean(user?.platformRole);
-  const [tab, setTab] = useState("tenants");
+  const [tab, setTab] = useState<AdminTab>("tenants");
   const [openTenant, setOpenTenant] = useState<string | null>(null);
 
   if (!isLoading && !isPlatform) {
@@ -39,24 +49,19 @@ export function AdminView() {
     <div className="space-y-6">
       <PageHeader title="Platform admin" description="Tenants, plans, feature flags, and audit." />
 
-      <Tabs value={tab} onValueChange={(v) => setTab(v as string)}>
-        <TabsList variant="line" className="w-max">
-          <TabsTrigger value="tenants">Tenants</TabsTrigger>
-          <TabsTrigger value="flags">Feature flags</TabsTrigger>
-          <TabsTrigger value="audit">Audit log</TabsTrigger>
-        </TabsList>
+      <SegmentedTabs tabs={ADMIN_TABS} value={tab} onValueChange={setTab} layoutGroup="admin-tabs" />
 
-        <TabsContent value="tenants" className="pt-4">
-          <TenantsTable onOpen={setOpenTenant} />
-          <TenantDrawer id={openTenant} onClose={() => setOpenTenant(null)} />
-        </TabsContent>
-        <TabsContent value="flags" className="pt-4">
-          <FeatureFlagsPanel />
-        </TabsContent>
-        <TabsContent value="audit" className="pt-4">
-          <AuditLogViewer />
-        </TabsContent>
-      </Tabs>
+      <div className="pt-1">
+        {tab === "tenants" ? (
+          <>
+            <TenantsTable onOpen={setOpenTenant} />
+            <TenantDrawer id={openTenant} onClose={() => setOpenTenant(null)} />
+          </>
+        ) : null}
+        {tab === "roles" ? <RolesGroupsTab /> : null}
+        {tab === "flags" ? <FeatureFlagsPanel /> : null}
+        {tab === "audit" ? <AuditLogViewer /> : null}
+      </div>
     </div>
   );
 }

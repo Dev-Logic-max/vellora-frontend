@@ -12,18 +12,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/ui/empty-state";
-import { FormField } from "@/components/ui/form-field";
-import { SelectField } from "@/components/ui/select-field";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AttendancePill } from "@/components/attendance/attendance-pill";
 import { QrCode } from "@/components/attendance/qr-code";
+import { TerminalCreateSheet } from "@/components/attendance/terminal-create-sheet";
 import { useStores } from "@/features/org/stores";
-import {
-  useCreateTerminal,
-  useTerminalAction,
-  useTerminalQr,
-  useTerminals,
-} from "@/features/attendance/devices";
+import { useTerminalAction, useTerminalQr, useTerminals } from "@/features/attendance/devices";
 import type { Terminal } from "@/features/attendance/types";
 
 function QrDialog({ terminal, onClose }: { terminal: Terminal; onClose: () => void }) {
@@ -52,64 +46,25 @@ function QrDialog({ terminal, onClose }: { terminal: Terminal; onClose: () => vo
 export function TerminalsPanel() {
   const { data: terminals, isLoading } = useTerminals();
   const { data: stores } = useStores();
-  const create = useCreateTerminal();
   const action = useTerminalAction();
 
-  const [adding, setAdding] = useState(false);
-  const [label, setLabel] = useState("");
-  const [storeId, setStoreId] = useState("");
   const [qrTerminal, setQrTerminal] = useState<Terminal | null>(null);
 
   const storeName = (id: string) => stores?.find((s) => s.id === id)?.name ?? "—";
-  const storeOptions = stores?.map((s) => ({ value: s.id, label: s.name })) ?? [];
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!label || !storeId) return;
-    create.mutateAsync({ storeId, label }).then(() => {
-      setLabel("");
-      setStoreId("");
-      setAdding(false);
-    });
-  };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-display text-sm font-semibold text-foreground">Store terminals</h3>
-        <Button variant="outline" size="sm" onClick={() => setAdding((v) => !v)}>
-          <Plus />
-          New terminal
-        </Button>
+        <TerminalCreateSheet
+          trigger={
+            <Button variant="outline" size="sm">
+              <Plus />
+              New terminal
+            </Button>
+          }
+        />
       </div>
-
-      {adding ? (
-        <form
-          onSubmit={submit}
-          className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 sm:flex-row sm:items-end"
-        >
-          <FormField
-            id="terminal-label"
-            label="Label"
-            placeholder="Front counter iPad"
-            className="sm:w-56"
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-          />
-          <SelectField
-            id="terminal-store"
-            label="Store"
-            className="sm:w-48"
-            placeholder="Select store"
-            options={storeOptions}
-            value={storeId}
-            onChange={(e) => setStoreId(e.target.value)}
-          />
-          <Button type="submit" disabled={create.isPending || !label || !storeId}>
-            Add
-          </Button>
-        </form>
-      ) : null}
 
       {isLoading ? (
         <Skeleton className="h-40 w-full" />

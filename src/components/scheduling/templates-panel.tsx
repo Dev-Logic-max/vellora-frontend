@@ -6,6 +6,7 @@ import { addDays, format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
+import { TimeField } from "@/components/ui/time-picker";
 import {
   Sheet,
   SheetContent,
@@ -112,8 +113,8 @@ export function TemplatesPanel({
             </h3>
             <FormField id="t-name" label="Name" value={name} onChange={(e) => setName(e.target.value)} />
             <div className="grid grid-cols-2 gap-3">
-              <FormField id="t-start" label="Start" type="time" value={start} onChange={(e) => setStart(e.target.value)} />
-              <FormField id="t-end" label="End" type="time" value={end} onChange={(e) => setEnd(e.target.value)} />
+              <TimeField id="t-start" label="Start" value={start} onChange={setStart} />
+              <TimeField id="t-end" label="End" value={end} onChange={setEnd} />
             </div>
             <div className="flex flex-wrap gap-1.5">
               {DAYS.map((d) => (

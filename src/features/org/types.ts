@@ -14,11 +14,24 @@ export interface Company {
   status: CompanyStatus;
   planId: string | null;
   logoUrl: string | null;
+  ownerUserId: string | null;
+  registrationNumber: string | null;
+  companyEmail: string | null;
+  phone: string | null;
+  state: string | null;
+  city: string | null;
+  postalCode: string | null;
   headOfficeAddress: string | null;
+  offices: { label?: string; city?: string; country?: string; address?: string }[];
   createdAt: string;
   updatedAt: string;
   /** Present on the list endpoint (the caller's role in that company). */
   role?: MembershipRole;
+  /** Directory aggregates (present on the list endpoint). */
+  storeCount?: number;
+  employeeCount?: number;
+  ownerName?: string | null;
+  planName?: string | null;
 }
 
 export interface CompanyUsage {
@@ -44,6 +57,8 @@ export interface Store {
   category: string | null;
   status: StoreStatus;
   country: string | null;
+  state: string | null;
+  city: string | null;
   address: string | null;
   postalCode: string | null;
   timezone: string;

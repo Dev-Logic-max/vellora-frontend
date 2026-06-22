@@ -2,37 +2,55 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ChevronRight, Download, Plus, Search, Upload, Users } from "lucide-react";
+import { Check, Copy, Download, Eye, Pencil, Plus, Trash2, Upload, Users } from "lucide-react";
+import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
-import { Combobox } from "@/components/ui/combobox";
-import { DataTableShell } from "@/components/ui/data-table-shell";
+import { AvatarPreview } from "@/components/ui/avatar-preview";
+import { DataTableShell, type DataTableColumnMeta } from "@/components/ui/data-table-shell";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { EmptyState } from "@/components/ui/empty-state";
-import { SelectField } from "@/components/ui/select-field";
+import { RoleTag } from "@/components/ui/role-tag";
 import { StatusPill } from "@/components/ui/status-pill";
-import { EmployeeAvatar } from "@/components/employees/employee-avatar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import type { FilterValues } from "@/components/ui/filter-modal";
 import { EmployeeFormSheet } from "@/components/employees/employee-form-sheet";
 import { ImportEmployeesDialog } from "@/components/employees/import-employees-dialog";
 import { useRouter } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
 import { useStores } from "@/features/org/stores";
 import { useCurrentUser } from "@/features/session/use-current-user";
-import { downloadEmployeesCsv, useEmployees } from "@/features/employees/employees";
+import {
+  downloadEmployeesCsv,
+  useArchiveEmployee,
+  useEmployees,
+} from "@/features/employees/employees";
 import { EMPLOYEE_STATUS_OPTIONS } from "@/features/employees/constants";
-import type { Employee, EmployeeStatus } from "@/features/employees/types";
+import type { Employee, EmployeeDetail, EmployeeStatus } from "@/features/employees/types";
+import type { MembershipRole } from "@/features/session/types";
 
 const PAGE_SIZE = 25;
 
 export function EmployeesList() {
-  const router = useRouter();
   const { data: me } = useCurrentUser();
   const { data: stores } = useStores();
 
   const [search, setSearch] = useState("");
   const [q, setQ] = useState("");
-  const [storeId, setStoreId] = useState<string | undefined>();
-  const [status, setStatus] = useState<EmployeeStatus | "">("");
+  const [filters, setFilters] = useState<FilterValues>({});
   const [page, setPage] = useState(1);
+
+  const storeId = filters.storeId || undefined;
+  const status = (filters.status as EmployeeStatus | undefined) || undefined;
 
   // Debounce the search box.
   useEffect(() => {
@@ -48,7 +66,7 @@ export function EmployeesList() {
     pageSize: PAGE_SIZE,
     q: q || undefined,
     storeId,
-    status: status || undefined,
+    status,
   });
 
   const storeName = useMemo(() => {
@@ -63,16 +81,17 @@ export function EmployeesList() {
   const columns = useMemo<ColumnDef<Employee, unknown>[]>(
     () => [
       {
-        header: "Employee",
+        header: "Name",
         accessorKey: "lastName",
         cell: ({ row }) => {
           const e = row.original;
           return (
             <div className="flex items-center gap-3">
-              <EmployeeAvatar
-                firstName={e.firstName}
-                lastName={e.lastName}
-                avatarUrl={e.avatarUrl}
+              {/* Avatar shows a pointer + opens an image preview on click. */}
+              <AvatarPreview
+                name={`${e.firstName} ${e.lastName}`}
+                src={e.avatarUrl}
+                className="size-9 rounded-full"
               />
               <div className="min-w-0">
                 <p className="truncate font-medium text-foreground">
@@ -87,16 +106,14 @@ export function EmployeesList() {
         },
       },
       {
-        header: "ID",
+        header: "User ID",
         accessorKey: "uniqueCode",
-        cell: ({ row }) => (
-          <span className="font-mono text-xs text-muted-foreground">{row.original.uniqueCode}</span>
-        ),
+        cell: ({ row }) => <CopyIdBadge id={row.original.uniqueCode} />,
       },
       {
-        header: "Role",
-        accessorKey: "role",
-        cell: ({ row }) => row.original.role ?? "—",
+        header: "User role",
+        accessorKey: "membershipRole",
+        cell: ({ row }) => <UserRoleCell role={row.original.membershipRole} />,
       },
       {
         header: "Store",
@@ -108,22 +125,31 @@ export function EmployeesList() {
         cell: ({ row }) => row.original.department ?? "—",
       },
       {
+        header: "Job role",
+        accessorKey: "role",
+        cell: ({ row }) =>
+          row.original.role ? (
+            <span className="text-foreground">{row.original.role}</span>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          ),
+      },
+      {
         header: "Status",
         cell: ({ row }) => <StatusPill status={row.original.status} />,
       },
       {
-        id: "open",
+        id: "actions",
         header: "",
-        cell: () => <ChevronRight className="size-4 text-muted-foreground" />,
+        meta: { isActions: true } satisfies DataTableColumnMeta,
+        cell: ({ row }) => <RowActions employee={row.original} canManage={Boolean(canManage)} />,
       },
     ],
-    [storeName],
+    [storeName, canManage],
   );
 
   const total = data?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const storeOptions =
-    stores?.map((s) => ({ value: s.id, label: s.name, hint: s.code ?? undefined })) ?? [];
+  const storeOptions = stores?.map((s) => ({ value: s.id, label: s.name })) ?? [];
 
   return (
     <div className="space-y-6">
@@ -162,43 +188,6 @@ export function EmployeesList() {
         }
       />
 
-      {/* Filters */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
-          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search name, email, or ID…"
-            className="h-9 w-full rounded-lg border border-border bg-background pl-9 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-          />
-        </div>
-        <Combobox
-          className="sm:w-56"
-          options={storeOptions}
-          value={storeId}
-          onChange={(v) => {
-            setStoreId(v);
-            setPage(1);
-          }}
-          placeholder="All stores"
-        />
-        <SelectField
-          id="status-filter"
-          className="sm:w-44"
-          placeholder="All statuses"
-          options={EMPLOYEE_STATUS_OPTIONS}
-          value={status}
-          onChange={(e) => {
-            setStatus(e.target.value as EmployeeStatus | "");
-            setPage(1);
-          }}
-        />
-        <span className="inline-flex h-9 items-center rounded-lg bg-muted px-3 text-sm font-medium text-muted-foreground tabular-nums">
-          {total} total
-        </span>
-      </div>
-
       {isError ? (
         <p className="text-sm text-destructive">Couldn&apos;t load employees.</p>
       ) : (
@@ -206,7 +195,27 @@ export function EmployeesList() {
           columns={columns}
           data={data?.data ?? []}
           isLoading={isLoading}
-          onRowClick={(e) => router.push(`/employees/${e.id}`)}
+          toolbar={{
+            searchValue: search,
+            onSearchChange: setSearch,
+            searchPlaceholder: "Search name, email, or ID…",
+            filters: [
+              { key: "storeId", label: "Store", type: "select", options: storeOptions },
+              { key: "status", label: "Status", type: "select", options: EMPLOYEE_STATUS_OPTIONS },
+            ],
+            filterValues: filters,
+            onFilterChange: (v) => {
+              setFilters(v);
+              setPage(1);
+            },
+          }}
+          pagination={{
+            page,
+            pageSize: PAGE_SIZE,
+            total,
+            onPageChange: setPage,
+            itemLabel: "employees",
+          }}
           empty={
             <EmptyState
               icon={Users}
@@ -228,33 +237,158 @@ export function EmployeesList() {
           }
         />
       )}
+    </div>
+  );
+}
 
-      {/* Pagination */}
-      {total > PAGE_SIZE ? (
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span className="tabular-nums">
-            Page {page} of {totalPages}
-          </span>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page <= 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page >= totalPages}
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
+/** Company user-role chip. Owner is leadership — shown muted as "Owner" is
+ * implied; per spec we surface every other role with its color, owner excluded. */
+function UserRoleCell({ role }: { role: MembershipRole | null }) {
+  if (!role || role === "owner") return <span className="text-muted-foreground">—</span>;
+  return <RoleTag role={role} />;
+}
+
+/** Plain mono ID — click to copy (shows a copy icon on hover; tick on copy). */
+function CopyIdBadge({ id }: { id: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard?.writeText(id).then(
+      () => {
+        setCopied(true);
+        toast.success(`Copied ${id}`);
+        setTimeout(() => setCopied(false), 1200);
+      },
+      () => toast.error("Couldn't copy"),
+    );
+  };
+  return (
+    <button
+      type="button"
+      onClick={copy}
+      title="Click to copy ID"
+      className="group/id inline-flex cursor-pointer items-center gap-1.5 font-mono text-xs text-muted-foreground transition-colors hover:text-accent-strong"
+    >
+      {id}
+      {copied ? (
+        <Check className="size-3 text-(--success,var(--chart-2))" />
+      ) : (
+        <Copy className="size-3 opacity-0 transition-opacity group-hover/id:opacity-70" />
+      )}
+    </button>
+  );
+}
+
+/** Row action icons: view (→ detail), edit (sheet), deactivate (confirm). */
+function RowActions({ employee, canManage }: { employee: Employee; canManage: boolean }) {
+  const router = useRouter();
+  const archive = useArchiveEmployee();
+  const [editOpen, setEditOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const isArchived = employee.status === "archived";
+
+  return (
+    <div className="flex items-center justify-end gap-1">
+      <ActionIcon
+        label="View"
+        icon={Eye}
+        tone="view"
+        onClick={() => router.push(`/employees/${employee.id}`)}
+      />
+      {canManage ? (
+        <>
+          <ActionIcon label="Edit" icon={Pencil} tone="edit" onClick={() => setEditOpen(true)} />
+          {/* Controlled by the Edit icon above — no trigger element. */}
+          <EmployeeFormSheet
+            employee={employee as EmployeeDetail}
+            open={editOpen}
+            onOpenChange={setEditOpen}
+          />
+          <ActionIcon
+            label={isArchived ? "Deactivated" : "Deactivate"}
+            icon={Trash2}
+            tone="delete"
+            disabled={isArchived}
+            onClick={() => setConfirmOpen(true)}
+          />
+          <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Deactivate this employee?</DialogTitle>
+                <DialogDescription>
+                  {employee.firstName} {employee.lastName} will be archived and lose portal access.
+                  This does not permanently delete their record — you can reactivate them later.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
+                <Button
+                  variant="destructive"
+                  disabled={archive.isPending}
+                  onClick={async () => {
+                    try {
+                      await archive.mutateAsync(employee.id);
+                      toast.success("Employee deactivated");
+                      setConfirmOpen(false);
+                    } catch {
+                      toast.error("Couldn't deactivate");
+                    }
+                  }}
+                >
+                  {archive.isPending ? "Deactivating…" : "Deactivate"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </>
       ) : null}
     </div>
+  );
+}
+
+/** Per-action hover tones: view = light blue, edit = green, delete = red. */
+const ACTION_TONES = {
+  view: "hover:bg-sky-50 hover:text-sky-600",
+  edit: "hover:bg-emerald-50 hover:text-emerald-600",
+  delete: "hover:bg-red-50 hover:text-red-600",
+  accent: "hover:bg-accent-soft hover:text-accent-strong",
+} as const;
+
+function ActionIcon({
+  label,
+  icon: Icon,
+  onClick,
+  tone = "accent",
+  disabled,
+}: {
+  label: string;
+  icon: typeof Eye;
+  onClick?: () => void;
+  tone?: keyof typeof ACTION_TONES;
+  disabled?: boolean;
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick?.();
+            }}
+            aria-label={label}
+            className={cn(
+              "inline-flex size-7 cursor-pointer items-center justify-center rounded-lg border border-transparent text-muted-foreground transition-colors disabled:cursor-not-allowed disabled:opacity-40",
+              ACTION_TONES[tone],
+            )}
+          >
+            <Icon className="size-4" />
+          </button>
+        }
+      />
+      <TooltipContent side="top">{label}</TooltipContent>
+    </Tooltip>
   );
 }

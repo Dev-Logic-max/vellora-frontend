@@ -15,6 +15,7 @@ import {
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { DateField } from "@/components/ui/date-picker";
 import { FormField } from "@/components/ui/form-field";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -60,13 +61,12 @@ export function HolidayCalendar({ canManage }: { canManage: boolean }) {
         </div>
         {canManage ? (
           <div className="flex items-end gap-2">
-            <FormField
+            <DateField
               id="holiday-date"
               label="Date"
-              type="date"
               className="w-40"
               value={newDate}
-              onChange={(e) => setNewDate(e.target.value)}
+              onChange={setNewDate}
             />
             <FormField
               id="holiday-name"

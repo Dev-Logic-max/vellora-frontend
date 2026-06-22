@@ -3,7 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { CalendarOff } from "lucide-react";
 
-import { DataTableShell } from "@/components/ui/data-table-shell";
+import { DataTableShell, type TableToolbarConfig } from "@/components/ui/data-table-shell";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LeavePill } from "@/components/leave/leave-pill";
 import type { LeaveRequest } from "@/features/leave/types";
@@ -39,15 +39,18 @@ const columns: ColumnDef<LeaveRequest, unknown>[] = [
 export function RequestsTable({
   data,
   isLoading,
+  toolbar,
 }: {
   data: LeaveRequest[];
   isLoading: boolean;
+  toolbar?: TableToolbarConfig;
 }) {
   return (
     <DataTableShell
       columns={columns}
       data={data}
       isLoading={isLoading}
+      toolbar={toolbar}
       empty={
         <EmptyState
           icon={CalendarOff}

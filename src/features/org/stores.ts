@@ -29,8 +29,13 @@ export interface StoreInput {
   code?: string;
   category?: string;
   country?: string;
+  state?: string;
+  city?: string;
   address?: string;
+  postalCode?: string;
+  timezone?: string;
   capacity?: number;
+  headStore?: boolean;
 }
 
 export function useCreateStore() {

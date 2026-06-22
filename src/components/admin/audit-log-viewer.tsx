@@ -8,7 +8,6 @@ import { useAuditLog } from "@/features/admin/admin";
 import type { PlatformAuditEntry } from "@/features/admin/types";
 import { DataTableShell } from "@/components/ui/data-table-shell";
 import { EmptyState } from "@/components/ui/empty-state";
-import { FormField } from "@/components/ui/form-field";
 
 export function AuditLogViewer() {
   const { data, isLoading } = useAuditLog();
@@ -40,21 +39,16 @@ export function AuditLogViewer() {
   ];
 
   return (
-    <div className="space-y-3">
-      <FormField
-        id="audit-filter"
-        label=""
-        className="max-w-xs"
-        placeholder="Filter by action…"
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
-      />
-      <DataTableShell
-        columns={columns}
-        data={rows}
-        isLoading={isLoading}
-        empty={<EmptyState icon={ScrollText} title="No audit entries" />}
-      />
-    </div>
+    <DataTableShell
+      columns={columns}
+      data={rows}
+      isLoading={isLoading}
+      toolbar={{
+        searchValue: filter,
+        onSearchChange: setFilter,
+        searchPlaceholder: "Filter by action…",
+      }}
+      empty={<EmptyState icon={ScrollText} title="No audit entries" />}
+    />
   );
 }

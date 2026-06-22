@@ -1,33 +1,44 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Mail, Pencil, Phone } from "lucide-react";
+import {
+  Award,
+  CalendarDays,
+  CalendarOff,
+  Clock,
+  FileText,
+  ClipboardList,
+  Mail,
+  Phone,
+  Settings,
+  UserRound,
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { CountryFlag } from "@/components/ui/country-flag";
+import { EntityAvatar } from "@/components/ui/entity-avatar";
+import { RoleTag } from "@/components/ui/role-tag";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusPill } from "@/components/ui/status-pill";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EmployeeAvatar } from "@/components/employees/employee-avatar";
-import { EmployeeFormSheet } from "@/components/employees/employee-form-sheet";
+import { SegmentedTabs, type SegmentedTab } from "@/components/ui/segmented-tabs";
 import { ContractTab } from "@/components/employees/profile/contract-tab";
 import { CredentialsTab } from "@/components/employees/profile/credentials-tab";
-import { InviteButton } from "@/components/employees/profile/invite-button";
 import { PreferencesTab } from "@/components/employees/profile/preferences-tab";
 import { Link, useRouter } from "@/i18n/navigation";
 import { CONTRACT_TYPE_LABEL } from "@/features/employees/constants";
 import { useEmployee } from "@/features/employees/employees";
 import type { EmployeeDetail, StoreRelation } from "@/features/employees/types";
+import type { MembershipRole } from "@/features/session/types";
 
-const TABS = [
-  { value: "profile", label: "Profile" },
-  { value: "contract", label: "Contract" },
-  { value: "shifts", label: "Shifts" },
-  { value: "leave", label: "Leave" },
-  { value: "attendance", label: "Attendance" },
-  { value: "onboarding", label: "Onboarding" },
-  { value: "documents", label: "Documents" },
-  { value: "credentials", label: "Qualifications" },
-  { value: "preferences", label: "Preferences" },
+const TABS: SegmentedTab[] = [
+  { value: "profile", label: "Profile", icon: UserRound },
+  { value: "contract", label: "Contract", icon: FileText },
+  { value: "shifts", label: "Shifts", icon: CalendarDays },
+  { value: "leave", label: "Leave", icon: CalendarOff },
+  { value: "attendance", label: "Attendance", icon: Clock },
+  { value: "onboarding", label: "Onboarding", icon: ClipboardList },
+  { value: "documents", label: "Documents", icon: FileText },
+  { value: "credentials", label: "Qualifications", icon: Award },
+  { value: "preferences", label: "Preferences", icon: Settings },
 ];
 
 const RELATION_TINT: Record<StoreRelation, string> = {
@@ -85,6 +96,11 @@ export function EmployeeProfile({ id }: { id: string }) {
     return <p className="text-sm text-destructive">Employee not found.</p>;
 
   const fullName = `${employee.firstName} ${employee.lastName}`;
+  // Prefer the employee's own country/nationality; fall back to the locale region.
+  const country =
+    employee.country ??
+    employee.nationality ??
+    (employee.locale?.includes("-") ? (employee.locale.split("-")[1] ?? null) : null);
 
   return (
     <div className="space-y-6">
@@ -92,115 +108,91 @@ export function EmployeeProfile({ id }: { id: string }) {
         ← Employees
       </Link>
 
-      <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-        {/* Identity rail */}
-        <aside className="space-y-5 rounded-xl border border-border bg-surface p-5 shadow-sm">
-          <div className="flex flex-col items-center text-center">
-            <EmployeeAvatar
-              firstName={employee.firstName}
-              lastName={employee.lastName}
-              avatarUrl={employee.avatarUrl}
-              className="size-20 text-xl"
-            />
-            <h1 className="mt-3 font-display text-lg font-semibold text-foreground">{fullName}</h1>
-            <p className="font-mono text-xs text-muted-foreground">{employee.uniqueCode}</p>
-            <div className="mt-2">
+      {/* Full-width identity banner: avatar + name, country flag, role tag. */}
+      <section className="relative overflow-hidden rounded-2xl border border-border bg-surface p-6 shadow-sm">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-linear-to-r from-accent/10 via-accent/5 to-transparent" />
+        <div className="relative flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+          <EntityAvatar
+            name={fullName}
+            src={employee.avatarUrl}
+            className="size-20 rounded-2xl"
+            textClassName="text-2xl"
+          />
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="font-display text-2xl font-semibold text-foreground">{fullName}</h1>
+              {country ? <CountryFlag code={country} /> : null}
               <StatusPill status={employee.status} />
             </div>
-          </div>
+            <p className="mt-1 font-mono text-xs text-muted-foreground">{employee.uniqueCode}</p>
 
-          <div className="space-y-2 text-sm">
-            {employee.email ? (
-              <p className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="size-3.5" />
-                <span className="truncate">{employee.email}</span>
-              </p>
-            ) : null}
-            {employee.phone ? (
-              <p className="flex items-center gap-2 text-muted-foreground">
-                <Phone className="size-3.5" />
-                {employee.phone}
-              </p>
-            ) : null}
-          </div>
-
-          {employee.primaryStore || employee.storeLinks.length ? (
-            <div className="space-y-2">
-              <p className="text-xs tracking-wide text-muted-foreground uppercase">Stores</p>
-              <div className="flex flex-wrap gap-1.5">
-                {employee.primaryStore ? (
-                  <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                    {employee.primaryStore.name} · primary
-                  </span>
-                ) : null}
-                {employee.storeLinks.map((link) => (
-                  <span
-                    key={link.id}
-                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${RELATION_TINT[link.relation]}`}
-                  >
-                    {link.store?.name ?? "Store"} · {link.relation}
-                  </span>
-                ))}
-              </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {employee.membershipRole ? (
+                <RoleTag role={employee.membershipRole as MembershipRole} />
+              ) : null}
+              {employee.role ? (
+                <span className="inline-flex items-center rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                  {employee.role}
+                </span>
+              ) : null}
+              {employee.department ? (
+                <span className="text-xs text-muted-foreground">· {employee.department}</span>
+              ) : null}
             </div>
-          ) : null}
 
-          <div className="space-y-2 border-t border-border pt-4">
-            <EmployeeFormSheet
-              employee={employee}
-              trigger={
-                <Button variant="outline" size="sm" className="w-full">
-                  <Pencil />
-                  Edit profile
-                </Button>
-              }
-            />
-            <InviteButton employeeId={employee.id} email={employee.email} />
-          </div>
-        </aside>
-
-        {/* Tabbed content */}
-        <Tabs value={tab} onValueChange={(v) => setTab(v as string)} className="min-w-0">
-          <div className="overflow-x-auto">
-            <TabsList variant="line" className="w-max">
-              {TABS.map((t) => (
-                <TabsTrigger key={t.value} value={t.value}>
-                  {t.label}
-                </TabsTrigger>
+            <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              {employee.email ? (
+                <span className="flex items-center gap-1.5">
+                  <Mail className="size-3.5" />
+                  <span className="truncate">{employee.email}</span>
+                </span>
+              ) : null}
+              {employee.phone ? (
+                <span className="flex items-center gap-1.5">
+                  <Phone className="size-3.5" />
+                  {employee.phone}
+                </span>
+              ) : null}
+              {employee.primaryStore ? (
+                <span className="inline-flex items-center rounded-full bg-accent-soft px-2 py-0.5 text-xs font-medium text-accent-strong">
+                  {employee.primaryStore.name} · primary
+                </span>
+              ) : null}
+              {employee.storeLinks.map((link) => (
+                <span
+                  key={link.id}
+                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${RELATION_TINT[link.relation]}`}
+                >
+                  {link.store?.name ?? "Store"} · {link.relation}
+                </span>
               ))}
-            </TabsList>
+            </div>
           </div>
+        </div>
+      </section>
 
-          <div className="mt-5">
-            <TabsContent value="profile">
-              <ProfileDetails employee={employee} />
-            </TabsContent>
-            <TabsContent value="contract">
-              <ContractTab employeeId={employee.id} />
-            </TabsContent>
-            <TabsContent value="shifts">
-              <StubTab label="Shifts" />
-            </TabsContent>
-            <TabsContent value="leave">
-              <StubTab label="Leave & holidays" />
-            </TabsContent>
-            <TabsContent value="attendance">
-              <StubTab label="Attendance" />
-            </TabsContent>
-            <TabsContent value="onboarding">
-              <StubTab label="Onboarding" />
-            </TabsContent>
-            <TabsContent value="documents">
-              <StubTab label="Documents" />
-            </TabsContent>
-            <TabsContent value="credentials">
-              <CredentialsTab employeeId={employee.id} />
-            </TabsContent>
-            <TabsContent value="preferences">
-              <PreferencesTab employeeId={employee.id} />
-            </TabsContent>
-          </div>
-        </Tabs>
+      {/* Full-width tabbed content */}
+      <div className="min-w-0">
+        <div className="scrollbar-thin overflow-x-auto pb-1">
+          <SegmentedTabs
+            tabs={TABS}
+            value={tab}
+            onValueChange={setTab}
+            layoutGroup="employee-profile-tabs"
+          />
+        </div>
+
+        <div className="mt-5">
+          {tab === "profile" ? <ProfileDetails employee={employee} /> : null}
+          {tab === "contract" ? <ContractTab employeeId={employee.id} /> : null}
+          {tab === "shifts" ? <StubTab label="Shifts" /> : null}
+          {tab === "leave" ? <StubTab label="Leave & holidays" /> : null}
+          {tab === "attendance" ? <StubTab label="Attendance" /> : null}
+          {tab === "onboarding" ? <StubTab label="Onboarding" /> : null}
+          {tab === "documents" ? <StubTab label="Documents" /> : null}
+          {tab === "credentials" ? <CredentialsTab employeeId={employee.id} /> : null}
+          {tab === "preferences" ? <PreferencesTab employeeId={employee.id} /> : null}
+        </div>
       </div>
     </div>
   );

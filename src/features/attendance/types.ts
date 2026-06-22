@@ -22,7 +22,10 @@ export interface EmployeeRef {
   lastName: string;
   avatarUrl?: string | null;
   uniqueCode?: string | null;
+  /** Free-text job title. */
   role?: string | null;
+  /** Company membership role (the staff "user role"); null without a login. */
+  membershipRole?: string | null;
   primaryStoreId?: string | null;
 }
 

@@ -1,18 +1,26 @@
 "use client";
 
 import { useState } from "react";
+import { LayoutDashboard, ListChecks } from "lucide-react";
 
 import { PageHeader } from "@/components/layout/page-header";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SegmentedTabs, type SegmentedTab } from "@/components/ui/segmented-tabs";
 import { OverviewPanel } from "@/components/onboarding/overview-panel";
 import { TasksPanel } from "@/components/onboarding/tasks-panel";
 import { useCurrentUser } from "@/features/session/use-current-user";
 
+type OnboardingTab = "overview" | "tasks";
+
 const ADMIN_ROLES = ["owner", "hr"];
+
+const TABS: SegmentedTab<OnboardingTab>[] = [
+  { value: "overview", label: "Overview", icon: LayoutDashboard },
+  { value: "tasks", label: "Tasks", icon: ListChecks },
+];
 
 export function OnboardingView() {
   const { data: me } = useCurrentUser();
-  const [tab, setTab] = useState("overview");
+  const [tab, setTab] = useState<OnboardingTab>("overview");
   const canManage = Boolean(me?.role && ADMIN_ROLES.includes(me.role));
 
   return (
@@ -22,20 +30,18 @@ export function OnboardingView() {
         description="Track new-hire checklists and completion across stages."
       />
 
-      <Tabs value={tab} onValueChange={(v) => setTab(v as string)}>
-        <TabsList variant="line" className="w-max">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="tasks">Tasks</TabsTrigger>
-        </TabsList>
+      <SegmentedTabs tabs={TABS} value={tab} onValueChange={setTab} layoutGroup="onboarding-tabs" />
 
-        <TabsContent value="overview" className="pt-2">
+      {tab === "overview" ? (
+        <div className="pt-2">
           <OverviewPanel canManage={canManage} />
-        </TabsContent>
-
-        <TabsContent value="tasks" className="pt-2">
+        </div>
+      ) : null}
+      {tab === "tasks" ? (
+        <div className="pt-2">
           <TasksPanel canManage={canManage} />
-        </TabsContent>
-      </Tabs>
+        </div>
+      ) : null}
     </div>
   );
 }

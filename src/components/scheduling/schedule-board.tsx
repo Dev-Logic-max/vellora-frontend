@@ -10,17 +10,27 @@ import {
   startOfMonth,
   startOfWeek,
 } from "date-fns";
-import { CalendarRange, ChevronLeft, ChevronRight, Plus, Send } from "lucide-react";
+import {
+  CalendarClock,
+  CalendarDays,
+  CalendarRange,
+  ChevronLeft,
+  ChevronRight,
+  Columns3,
+  Plus,
+  Send,
+} from "lucide-react";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
 import { EmptyState } from "@/components/ui/empty-state";
+import { SegmentedTabs, type SegmentedTab } from "@/components/ui/segmented-tabs";
 import { SelectField } from "@/components/ui/select-field";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
 import { CoverageStrip } from "@/components/scheduling/coverage-strip";
 import { MonthGrid } from "@/components/scheduling/month-grid";
+import { RosterCalendar } from "@/components/scheduling/roster-calendar";
 import { ShiftSheet } from "@/components/scheduling/shift-sheet";
 import { TemplatesPanel } from "@/components/scheduling/templates-panel";
 import { TimeGrid } from "@/components/scheduling/time-grid";
@@ -32,10 +42,17 @@ import {
   useUpdateShift,
 } from "@/features/scheduling/scheduling";
 import { SHIFT_STATUS_OPTIONS } from "@/features/scheduling/status";
+import { useCalendarStyle } from "@/features/scheduling/calendar-style";
 import { shiftIso, weekDates, ymd } from "@/lib/schedule-time";
 import type { Shift, ShiftStatus } from "@/features/scheduling/types";
 
 type View = "day" | "week" | "month";
+
+const VIEW_TABS: SegmentedTab<View>[] = [
+  { value: "day", label: "Day", icon: CalendarClock },
+  { value: "week", label: "Week", icon: Columns3 },
+  { value: "month", label: "Month", icon: CalendarDays },
+];
 
 export function ScheduleBoard() {
   const { data: stores } = useStores();
@@ -52,6 +69,7 @@ export function ScheduleBoard() {
 
   const update = useUpdateShift();
   const publish = usePublishShifts();
+  const calendarStyle = useCalendarStyle();
 
   const activeStore = stores?.find((s) => s.id === storeId) ?? stores?.[0];
   const effectiveStoreId = storeId ?? activeStore?.id;
@@ -180,23 +198,7 @@ export function ScheduleBoard() {
       {/* Toolbar */}
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-2">
-          <div className="inline-flex rounded-lg border border-border p-0.5">
-            {(["day", "week", "month"] as View[]).map((v) => (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setView(v)}
-                className={cn(
-                  "rounded-md px-3 py-1 text-sm font-medium capitalize transition-colors",
-                  view === v
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <SegmentedTabs tabs={VIEW_TABS} value={view} onValueChange={setView} layoutGroup="schedule-view" />
           <div className="flex items-center gap-1">
             <Button variant="outline" size="icon-sm" onClick={() => shiftAnchor(-1)}>
               <ChevronLeft />
@@ -248,6 +250,20 @@ export function ScheduleBoard() {
         />
       ) : isLoading ? (
         <Skeleton className="h-[520px] w-full" />
+      ) : calendarStyle === "roster" ? (
+        <RosterCalendar
+          view={view}
+          anchor={anchor}
+          days={days}
+          shifts={shifts ?? []}
+          tz={tz}
+          onShiftClick={openEdit}
+          onEmptyClick={(date, hour) => openCreate(date, hour)}
+          onDayClick={(date) => {
+            setAnchor(new Date(`${date}T00:00:00`));
+            setView("day");
+          }}
+        />
       ) : view === "month" ? (
         <MonthGrid
           month={anchor}
@@ -259,7 +275,7 @@ export function ScheduleBoard() {
           }}
         />
       ) : (
-        <div className="max-h-[640px] overflow-y-auto">
+        <div className="scrollbar-thin max-h-[640px] overflow-y-auto">
           <TimeGrid
             days={days}
             shifts={shifts ?? []}

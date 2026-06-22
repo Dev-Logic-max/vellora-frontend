@@ -16,6 +16,7 @@ import type {
   EmployeeStoreLink,
   Medical,
   Qualification,
+  Supervisor,
 } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3030";
@@ -45,6 +46,14 @@ export function useEmployee(id: string) {
     queryKey: ["employee", id],
     queryFn: () => api.get<EmployeeDetail>(`/api/employees/${id}`),
     enabled: Boolean(id),
+  });
+}
+
+/** Users above Employee in the active company (supervisor picker source). */
+export function useSupervisors() {
+  return useQuery({
+    queryKey: ["employees", "supervisors"],
+    queryFn: () => api.get<Supervisor[]>("/api/employees/supervisors"),
   });
 }
 

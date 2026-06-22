@@ -40,6 +40,7 @@
   --secondary-accent: 79 70 229;
   --tertiary-accent: 79 70 229;
   --surface-3: 237 238 242;
+  --foreground-2: 55 61 72; /* secondary text tier (between foreground & muted) */
 
   /* soft semantic tints for chips */
   --success-soft: 233 247 239;
@@ -156,6 +157,7 @@
   --color-tertiary-accent: rgb(var(--tertiary-accent));
   --color-surface-3: rgb(var(--surface-3));
   --color-faint: rgb(var(--faint));
+  --color-foreground-2: rgb(var(--foreground-2));
 
   /* dark indigo rail */
   --color-rail: rgb(var(--rail-bg));

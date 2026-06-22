@@ -150,3 +150,42 @@ export function readCachedAccent(): string {
   }
 }
 
+// ── UI prefs (density / motion) ─────────────────────────────────────────────
+const PREFS_STORAGE_KEY = "vellora-ui-prefs";
+
+export interface UiPrefs {
+  density?: "comfortable" | "compact";
+  motion?: boolean;
+  tabsIcons?: boolean;
+  /** Dashboard section motif (glance/dots/hexagons/squares). */
+  sectionPattern?: "glance" | "dots" | "hexagons" | "squares";
+}
+
+/** Applies UI prefs to the dashboard scope via data attributes:
+ * `data-density`, `data-motion`, and `data-tabs-icons`. */
+export function applyPrefs(prefs: UiPrefs) {
+  if (typeof document === "undefined") return;
+  document.querySelectorAll<HTMLElement>(SCOPE_SELECTOR).forEach((el) => {
+    el.dataset.density = prefs.density ?? "comfortable";
+    el.dataset.motion = prefs.motion === false ? "off" : "on";
+    el.dataset.tabsIcons = prefs.tabsIcons === false ? "off" : "on";
+  });
+}
+
+export function cachePrefs(prefs: UiPrefs) {
+  try {
+    localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(prefs));
+  } catch {
+    /* ignore */
+  }
+}
+
+export function readCachedPrefs(): UiPrefs {
+  try {
+    const raw = localStorage.getItem(PREFS_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as UiPrefs) : {};
+  } catch {
+    return {};
+  }
+}
+

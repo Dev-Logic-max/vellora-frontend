@@ -24,11 +24,42 @@ export function useCompanyUsage(id: string) {
   });
 }
 
+export interface CompanyOffice {
+  label?: string;
+  city?: string;
+  country?: string;
+  address?: string;
+}
+
+export interface CustomPricing {
+  pricePerEmployee?: number;
+  pricePerDevice?: number;
+  extraStoragePricePerGb?: number;
+  storageLimitGb?: number;
+  storageFrom?: string;
+  storageTo?: string;
+  discountPct?: number;
+  discountFrom?: string;
+  discountTo?: string;
+}
+
 export interface CompanyInput {
   name: string;
   country?: string;
   currency?: string;
   timezone?: string;
+  groupId?: string;
+  ownerUserId?: string;
+  registrationNumber?: string;
+  companyEmail?: string;
+  phone?: string;
+  state?: string;
+  city?: string;
+  postalCode?: string;
+  headOfficeAddress?: string;
+  offices?: CompanyOffice[];
+  planKey?: string;
+  customPricing?: CustomPricing;
 }
 
 export function useCreateCompany() {

@@ -11,7 +11,8 @@ import {
 } from "@/features/recruiting/recruiting";
 import { STAGE_LABELS } from "@/features/recruiting/types";
 import { Button } from "@/components/ui/button";
-import { FormField } from "@/components/ui/form-field";
+import { DateField } from "@/components/ui/date-picker";
+import { TimeField } from "@/components/ui/time-picker";
 import {
   Sheet,
   SheetContent,
@@ -105,13 +106,20 @@ export function CandidateDrawer({
               <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
                 Schedule interview
               </h3>
-              <FormField
-                id="interview-slot"
-                label=""
-                type="datetime-local"
-                value={slot}
-                onChange={(e) => setSlot(e.target.value)}
-              />
+              <div className="grid grid-cols-2 gap-2">
+                <DateField
+                  id="interview-date"
+                  value={slot.slice(0, 10)}
+                  onChange={(d) => setSlot(d ? `${d}T${slot.slice(11, 16) || "09:00"}` : "")}
+                />
+                <TimeField
+                  id="interview-time"
+                  value={slot.slice(11, 16)}
+                  onChange={(t) =>
+                    setSlot(`${slot.slice(0, 10) || new Date().toISOString().slice(0, 10)}T${t}`)
+                  }
+                />
+              </div>
               <Button
                 size="sm"
                 disabled={!slot || schedule.isPending}
