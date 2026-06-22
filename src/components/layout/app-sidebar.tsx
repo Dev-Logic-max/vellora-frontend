@@ -75,7 +75,7 @@ function UserBlock({ user, collapsed }: { user: CurrentUser; collapsed: boolean 
   const name = user.name?.trim() || user.email;
   const block = (
     <div className={cn("flex items-center gap-3 px-4 py-3", collapsed && "justify-center px-0")}>
-      <EntityAvatar name={name} className="size-9" />
+      <EntityAvatar name={name} className="size-9" ring />
       {!collapsed && (
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-foreground">{name}</p>

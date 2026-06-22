@@ -1,20 +1,24 @@
 import { cn } from "@/lib/utils";
 import type { MembershipRole } from "@/features/session/types";
 
-/** Soft, outlined tag colors per membership role (chart-palette led). */
+/**
+ * FIXED role colors — deliberately NOT tied to the theme accent / chart vars, so
+ * a role reads the SAME hue everywhere (tables, dropdowns, any user's login)
+ * regardless of the platform theme. Soft fill + matching text + hairline border.
+ */
 const ROLE_CLASSES: Record<MembershipRole, string> = {
-  owner: "bg-[var(--chart-3)]/12 text-[var(--chart-3)] border-[var(--chart-3)]/25",
-  hr: "bg-accent-soft text-accent-strong border-accent/25",
-  area_manager: "bg-[var(--chart-2)]/12 text-[var(--chart-2)] border-[var(--chart-2)]/25",
-  store_manager: "bg-[var(--chart-4)]/12 text-[var(--chart-4)] border-[var(--chart-4)]/25",
-  employee: "bg-muted text-muted-foreground border-border",
+  owner: "bg-amber-50 text-amber-700 border-amber-300/60",
+  hr: "bg-violet-50 text-violet-700 border-violet-300/60",
+  area_manager: "bg-sky-50 text-sky-700 border-sky-300/60",
+  store_manager: "bg-teal-50 text-teal-700 border-teal-300/60",
+  employee: "bg-slate-100 text-slate-600 border-slate-300/60",
 };
 
 export const ROLE_LABELS: Record<MembershipRole, string> = {
   owner: "Owner",
-  hr: "HR",
-  area_manager: "Area manager",
-  store_manager: "Store manager",
+  hr: "HR - Manager",
+  area_manager: "Area Manager",
+  store_manager: "Store Manager",
   employee: "Employee",
 };
 

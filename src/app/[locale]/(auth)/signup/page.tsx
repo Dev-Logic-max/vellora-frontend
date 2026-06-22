@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { MailCheck } from "lucide-react";
+import { Loader2, MailCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -134,7 +134,13 @@ export default function SignupPage() {
         {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
 
         <Button type="submit" size="lg" className="h-10 w-full" disabled={isSubmitting}>
-          Create account
+          {isSubmitting ? (
+            <>
+              <Loader2 className="size-4 animate-spin" /> Creating account…
+            </>
+          ) : (
+            "Create account"
+          )}
         </Button>
       </form>
 

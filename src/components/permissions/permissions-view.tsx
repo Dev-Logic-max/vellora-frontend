@@ -70,7 +70,7 @@ function PlatformMatrix() {
       </div>
 
       {companyId ? (
-        <PermissionMatrix key={companyId} companyId={companyId} />
+        <PermissionMatrix key={companyId} companyId={companyId} platform />
       ) : (
         <div className="rounded-xl border border-dashed border-border bg-surface-subtle/50 px-4 py-16 text-center">
           <p className="text-sm text-muted-foreground">

@@ -7,15 +7,15 @@ import {
   Columns3,
   Gauge,
   LayoutGrid,
+  LayoutTemplate,
   PanelTop,
-  Save,
   Sparkles,
   Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { BottomActionBar } from "@/components/ui/bottom-action-bar";
+import { GradientHeaderCard } from "@/components/ui/gradient-header-card";
 import { cn } from "@/lib/utils";
 import { applyPrefs, cachePrefs } from "@/features/design/apply";
 import { usePlatformDesign, useUpdateDesign } from "@/features/design/design";
@@ -23,15 +23,26 @@ import { cacheCalendarStyle } from "@/features/scheduling/calendar-style";
 import type { CalendarStyle, Density } from "@/features/design/types";
 
 /** Calendar-style + global UI toggles (density / motion). Changes preview live
- * on the dashboard scope and persist platform-wide on Save. */
+ * on the dashboard scope and persist platform-wide via the bottom action bar. */
 export function LayoutTab() {
   const { data } = usePlatformDesign();
   const update = useUpdateDesign();
 
-  const [calendarStyle, setCalendarStyle] = useState<CalendarStyle>(data?.calendarStyle ?? "grid");
-  const [density, setDensity] = useState<Density>(data?.prefs?.density ?? "comfortable");
-  const [motion, setMotion] = useState<boolean>(data?.prefs?.motion ?? true);
-  const [tabsIcons, setTabsIcons] = useState<boolean>(data?.prefs?.tabsIcons ?? true);
+  const savedCalendar = data?.calendarStyle ?? "grid";
+  const savedDensity = data?.prefs?.density ?? "comfortable";
+  const savedMotion = data?.prefs?.motion ?? true;
+  const savedTabsIcons = data?.prefs?.tabsIcons ?? true;
+
+  const [calendarStyle, setCalendarStyle] = useState<CalendarStyle>(savedCalendar);
+  const [density, setDensity] = useState<Density>(savedDensity);
+  const [motion, setMotion] = useState<boolean>(savedMotion);
+  const [tabsIcons, setTabsIcons] = useState<boolean>(savedTabsIcons);
+
+  const dirty =
+    calendarStyle !== savedCalendar ||
+    density !== savedDensity ||
+    motion !== savedMotion ||
+    tabsIcons !== savedTabsIcons;
 
   // Live preview of prefs on the dashboard scope.
   const previewPrefs = (next: { density?: Density; motion?: boolean; tabsIcons?: boolean }) => {
@@ -55,22 +66,22 @@ export function LayoutTab() {
     }
   };
 
+  const resetToSaved = () => {
+    setCalendarStyle(savedCalendar);
+    setDensity(savedDensity);
+    setMotion(savedMotion);
+    setTabsIcons(savedTabsIcons);
+    applyPrefs({ density: savedDensity, motion: savedMotion, tabsIcons: savedTabsIcons });
+  };
+
   return (
     <div className="space-y-6">
-      <Card className="surface-glass overflow-hidden">
-        <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
-          <div className="space-y-1">
-            <h3 className="font-display text-lg font-semibold text-foreground">Layout &amp; motion</h3>
-            <p className="max-w-xl text-sm text-muted-foreground">
-              Choose the scheduling calendar style and tune global density and motion. Changes
-              preview live; Save applies them platform-wide.
-            </p>
-          </div>
-          <Button onClick={save} disabled={update.isPending}>
-            <Save className="size-4" /> {update.isPending ? "Saving…" : "Save layout"}
-          </Button>
-        </CardContent>
-      </Card>
+      <GradientHeaderCard
+        title="Layout & motion"
+        icon={<LayoutTemplate className="size-5" />}
+        pattern="grid"
+        description="Choose the scheduling calendar style and tune global density, motion, and tab style. Changes preview live; save from the bar that appears at the bottom."
+      />
 
       {/* Calendar style */}
       <section className="space-y-3">
@@ -179,6 +190,16 @@ export function LayoutTab() {
           />
         </div>
       </section>
+
+      <BottomActionBar
+        open={dirty}
+        message="You have unsaved layout changes."
+        onSave={save}
+        onReset={resetToSaved}
+        saveLabel="Save layout"
+        saving={update.isPending}
+        showCancel={false}
+      />
     </div>
   );
 }

@@ -53,9 +53,24 @@ export function SidebarNav({
             // Collapsed: thin divider between groups instead of headings.
             gi > 0 ? <div className="mx-2 mb-1 h-px bg-rail-border" /> : null
           ) : (
-            <p className="px-3 pb-1 text-[10px] font-semibold tracking-[0.08em] text-faint uppercase">
-              {group.title}
-            </p>
+            // Group title + an inline accent-tinted rule filling the rest of the
+            // row (premium, theme-reactive); subtle text shadow lifts the label.
+            <div className="flex items-center gap-2 px-3 pb-1">
+              <span
+                className="shrink-0 text-[10px] font-semibold tracking-[0.08em] text-accent-strong/80 uppercase"
+                style={{ textShadow: "0 1px 0 rgb(255 255 255 / 0.7)" }}
+              >
+                {group.title}
+              </span>
+              {/* Clearly visible accent rule that fades out toward the right. */}
+              <span
+                className="h-px flex-1 rounded-full"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(to right, rgb(var(--accent) / 0.55), rgb(var(--accent) / 0.18) 60%, transparent)",
+                }}
+              />
+            </div>
           )}
 
           {group.items.map((item) =>

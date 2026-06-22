@@ -1,7 +1,7 @@
 "use client";
 
-import { createElement, useState } from "react";
-import { Layers, Plus, Sparkles, type LucideIcon } from "lucide-react";
+import { useState } from "react";
+import { Layers, Plus, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EntityAvatar } from "@/components/ui/entity-avatar";
@@ -41,38 +41,41 @@ function RoleHierarchy() {
       <div className="flex items-center gap-2">
         <Sparkles className="size-4 text-accent-strong" />
         <h2 className="font-display text-base font-semibold text-foreground">Role hierarchy</h2>
+        <span className="text-xs text-muted-foreground">
+          · Fixed role colors — consistent everywhere in the platform.
+        </span>
       </div>
 
-      <div className="space-y-5 rounded-xl border border-border bg-surface p-5 shadow-sm">
+      <div className="space-y-6 rounded-xl border border-border bg-surface p-5 shadow-sm">
+        {/* Platform plane — full names, no icons. */}
         <div>
           <p className="mb-2.5 text-xs font-semibold tracking-wide text-foreground-2 uppercase">
             Platform plane
           </p>
           <div className="grid gap-3 sm:grid-cols-3">
             {PLATFORM_ROLES_META.map((r) => (
-              <RoleCard
-                key={r.key}
-                icon={r.icon}
-                tone={r.tone}
-                dot={r.dot}
-                label={r.label}
-                blurb={r.blurb}
-              />
+              <div key={r.key} className={cn("rounded-xl border p-3.5", r.tone)}>
+                <div className="flex items-center gap-2">
+                  <span className="size-2.5 rounded-full" style={{ backgroundColor: r.dot }} />
+                  <p className="text-sm font-semibold">{r.label}</p>
+                </div>
+                <p className="mt-1.5 text-xs opacity-80">{r.blurb}</p>
+              </div>
             ))}
           </div>
         </div>
 
-        <div className="relative">
+        {/* Company plane — vertical authority rail, full names, no icons. */}
+        <div>
           <p className="mb-2.5 text-xs font-semibold tracking-wide text-foreground-2 uppercase">
             Company plane
           </p>
-          {/* Vertical authority rail through the ordered tenant roles. */}
-          <ol className="space-y-2.5">
+          <ol className="space-y-2">
             {TENANT_ROLES.map((r, i) => (
               <li key={r.key} className="flex items-stretch gap-3">
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center pt-2.5">
                   <span
-                    className="size-3 rounded-full ring-4 ring-background"
+                    className="size-3 rounded-full ring-4 ring-surface"
                     style={{ backgroundColor: r.dot }}
                   />
                   {i < TENANT_ROLES.length - 1 ? (
@@ -81,20 +84,17 @@ function RoleHierarchy() {
                 </div>
                 <div
                   className={cn(
-                    "flex flex-1 items-center gap-3 rounded-lg border px-3.5 py-2.5",
+                    "flex flex-1 items-center gap-3 rounded-xl border px-4 py-2.5",
                     r.tone,
                   )}
                 >
-                  <span className="inline-flex size-8 items-center justify-center rounded-lg bg-background/60">
-                    {createElement(r.icon, { className: "size-4" })}
+                  <span className="flex size-6 items-center justify-center rounded-full bg-surface/70 text-[11px] font-bold tabular-nums">
+                    {r.level}
                   </span>
                   <div className="min-w-0">
                     <p className="text-sm font-semibold">{r.label}</p>
                     <p className="truncate text-xs opacity-80">{r.blurb}</p>
                   </div>
-                  <span className="ml-auto rounded-full bg-background/60 px-2 py-0.5 text-[11px] font-medium tabular-nums">
-                    L{r.level}
-                  </span>
                 </div>
               </li>
             ))}
@@ -102,33 +102,6 @@ function RoleHierarchy() {
         </div>
       </div>
     </section>
-  );
-}
-
-function RoleCard({
-  icon,
-  tone,
-  dot,
-  label,
-  blurb,
-}: {
-  icon: LucideIcon;
-  tone: string;
-  dot: string;
-  label: string;
-  blurb: string;
-}) {
-  return (
-    <div className={cn("rounded-lg border p-3.5", tone)}>
-      <div className="flex items-center gap-2">
-        <span className="size-2 rounded-full" style={{ backgroundColor: dot }} />
-        <span className="inline-flex size-7 items-center justify-center rounded-md bg-background/60">
-          {createElement(icon, { className: "size-4" })}
-        </span>
-        <p className="text-sm font-semibold">{label}</p>
-      </div>
-      <p className="mt-1.5 text-xs opacity-80">{blurb}</p>
-    </div>
   );
 }
 
@@ -203,7 +176,7 @@ function GroupRow({ group, companies }: { group: Group; companies: Company[] }) 
   }));
 
   return (
-    <div className="rounded-xl border border-border bg-surface-subtle/40 p-3.5">
+    <div className="rounded-xl border border-border bg-surface-subtle/40 p-3.5 transition-shadow hover:shadow-accent-sm">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <EntityAvatar name={group.name} src={group.logoUrl} className="size-9 rounded-lg" />
@@ -216,6 +189,9 @@ function GroupRow({ group, companies }: { group: Group; companies: Company[] }) 
             </p>
           </div>
         </div>
+        <span className="rounded-full border border-accent/20 bg-accent-soft px-2 py-0.5 text-[11px] font-medium text-accent-strong tabular-nums">
+          {members?.length ?? 0}
+        </span>
       </div>
 
       {members && members.length > 0 ? (

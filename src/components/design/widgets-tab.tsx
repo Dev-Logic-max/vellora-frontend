@@ -11,19 +11,29 @@ import {
   Users,
 } from "lucide-react";
 
+import {
+  Area,
+  AreaChart,
+  Cell,
+  Pie,
+  PieChart,
+  RadialBar,
+  RadialBarChart,
+  ResponsiveContainer,
+  Tooltip as RTooltip,
+} from "recharts";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CountUp } from "@/components/ui/count-up";
+import { ProgressBar } from "@/components/ui/progress-bar";
 import { StatusPill } from "@/components/ui/status-pill";
+import { ROLE_META, TENANT_ROLES } from "@/features/permissions/roles";
 import { cn } from "@/lib/utils";
 
 type Role = "owner" | "hr" | "area_manager" | "store_manager" | "employee";
-const ROLES: { key: Role; label: string }[] = [
-  { key: "owner", label: "Owner" },
-  { key: "hr", label: "HR" },
-  { key: "area_manager", label: "Area Manager" },
-  { key: "store_manager", label: "Store Manager" },
-  { key: "employee", label: "Employee" },
-];
+// Use the central (fixed-color) role catalogue so chips match everywhere.
+const ROLES = TENANT_ROLES.map((r) => ({ key: r.key as Role, label: r.label }));
 
 /**
  * Widgets gallery — representative dashboard SECTIONS as each role sees them,
@@ -39,21 +49,24 @@ export function WidgetsTab() {
       <Card>
         <CardContent className="flex flex-wrap items-center gap-2 p-4">
           <span className="mr-1 text-sm font-medium text-muted-foreground">Preview as:</span>
-          {ROLES.map((r) => (
-            <button
-              key={r.key}
-              type="button"
-              onClick={() => setRole(r.key)}
-              className={cn(
-                "rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
-                role === r.key
-                  ? "bg-accent-soft text-primary"
-                  : "text-muted-foreground hover:bg-surface-subtle hover:text-foreground",
-              )}
-            >
-              {r.label}
-            </button>
-          ))}
+          {ROLES.map((r) => {
+            const active = role === r.key;
+            return (
+              <button
+                key={r.key}
+                type="button"
+                onClick={() => setRole(r.key)}
+                className={cn(
+                  "rounded-full border px-3 py-1.5 text-sm font-medium transition-all",
+                  active
+                    ? cn(ROLE_META[r.key].tone, "shadow-sm")
+                    : "border-transparent text-muted-foreground hover:bg-surface-subtle hover:text-foreground",
+                )}
+              >
+                {r.label}
+              </button>
+            );
+          })}
         </CardContent>
       </Card>
 
@@ -75,7 +88,250 @@ export function WidgetsTab() {
           <ActivityWidget />
         </div>
       </div>
+
+      {/* ── New & advanced widgets (idea gallery — not yet in the product) ──── */}
+      <div className="flex items-center gap-2 pt-2">
+        <span className="h-4 w-1 rounded-full bg-accent" />
+        <h3 className="font-display text-sm font-semibold text-foreground">
+          Advanced widgets
+        </h3>
+        <span className="text-xs text-muted-foreground">
+          · New section ideas — charts, heatmaps, calendars &amp; more
+        </span>
+      </div>
+      <div className="grid gap-6 lg:grid-cols-3">
+        <TrendChartWidget />
+        <RoleDonutWidget />
+        <GaugeWidget />
+      </div>
+      <div className="grid gap-6 lg:grid-cols-3">
+        <HeatmapWidget />
+        <MiniCalendarWidget />
+        <LeaderboardWidget />
+      </div>
     </div>
+  );
+}
+
+/* ── Trend chart (gradient area) ─────────────────────────────────────────────── */
+function TrendChartWidget() {
+  const data = [42, 55, 48, 63, 60, 72, 80].map((v, i) => ({ d: i, v }));
+  return (
+    <WidgetCard title="Hours trend">
+      <ResponsiveContainer width="100%" height={150}>
+        <AreaChart data={data} margin={{ top: 4, right: 0, bottom: 0, left: 0 }}>
+          <defs>
+            <linearGradient id="wg-trend" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgb(var(--tertiary-accent))" stopOpacity={0.55} />
+              <stop offset="55%" stopColor="rgb(var(--accent))" stopOpacity={0.25} />
+              <stop offset="100%" stopColor="rgb(var(--accent))" stopOpacity={0.02} />
+            </linearGradient>
+            <linearGradient id="wg-trend-line" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="rgb(var(--accent))" />
+              <stop offset="100%" stopColor="rgb(var(--tertiary-accent))" />
+            </linearGradient>
+          </defs>
+          <RTooltip contentStyle={{ borderRadius: 12, fontSize: 12 }} />
+          <Area
+            type="monotone"
+            dataKey="v"
+            stroke="url(#wg-trend-line)"
+            strokeWidth={2.5}
+            fill="url(#wg-trend)"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </WidgetCard>
+  );
+}
+
+/* ── Role donut (with legend + center total) ─────────────────────────────────── */
+function RoleDonutWidget() {
+  const data = [
+    { name: "Employees", value: 64, color: ROLE_META.employee.dot },
+    { name: "Store mgrs", value: 14, color: ROLE_META.store_manager.dot },
+    { name: "Area mgrs", value: 6, color: ROLE_META.area_manager.dot },
+    { name: "HR", value: 4, color: ROLE_META.hr.dot },
+  ];
+  const total = data.reduce((s, d) => s + d.value, 0);
+  return (
+    <WidgetCard title="Team composition">
+      <div className="flex items-center gap-3">
+        <div className="relative h-[140px] w-1/2">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data}
+                dataKey="value"
+                innerRadius={44}
+                outerRadius={64}
+                paddingAngle={3}
+                stroke="rgb(var(--surface))"
+                strokeWidth={2}
+              >
+                {data.map((d) => (
+                  <Cell key={d.name} fill={d.color} />
+                ))}
+              </Pie>
+              <RTooltip contentStyle={{ borderRadius: 12, fontSize: 12 }} />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+            <span className="font-mono text-lg font-semibold text-foreground">
+              <CountUp value={total} />
+            </span>
+            <span className="text-[10px] text-muted-foreground">people</span>
+          </div>
+        </div>
+        <ul className="flex-1 space-y-1.5">
+          {data.map((d) => (
+            <li key={d.name} className="flex items-center justify-between text-xs">
+              <span className="flex items-center gap-1.5">
+                <span className="size-2.5 rounded-full" style={{ backgroundColor: d.color }} />
+                <span className="text-foreground">{d.name}</span>
+              </span>
+              <span className="font-mono tabular-nums text-muted-foreground">{d.value}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </WidgetCard>
+  );
+}
+
+/* ── Radial gauge ────────────────────────────────────────────────────────────── */
+function GaugeWidget() {
+  const value = 86;
+  const data = [{ name: "score", value, fill: "rgb(var(--accent))" }];
+  return (
+    <WidgetCard title="Coverage score">
+      <div className="relative">
+        <ResponsiveContainer width="100%" height={150}>
+          <RadialBarChart
+            innerRadius="70%"
+            outerRadius="100%"
+            data={data}
+            startAngle={210}
+            endAngle={-30}
+          >
+            <RadialBar background dataKey="value" cornerRadius={10} />
+          </RadialBarChart>
+        </ResponsiveContainer>
+        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+          <span className="font-mono text-2xl font-semibold text-foreground">
+            <CountUp value={value} suffix="%" />
+          </span>
+          <span className="text-xs text-muted-foreground">on target</span>
+        </div>
+      </div>
+    </WidgetCard>
+  );
+}
+
+/* ── Attendance heatmap ──────────────────────────────────────────────────────── */
+function HeatmapWidget() {
+  const days = ["M", "T", "W", "T", "F", "S", "S"];
+  // 5 weeks × 7 days of pseudo intensities.
+  const weeks = Array.from({ length: 5 }, (_, w) =>
+    Array.from({ length: 7 }, (_, d) => ((w * 7 + d) * 37) % 100),
+  );
+  return (
+    <WidgetCard title="Attendance heatmap">
+      <div className="space-y-1.5">
+        <div className="grid grid-cols-7 gap-1.5 text-center text-[10px] text-muted-foreground">
+          {days.map((d, i) => (
+            <span key={i}>{d}</span>
+          ))}
+        </div>
+        {weeks.map((week, wi) => (
+          <div key={wi} className="grid grid-cols-7 gap-1.5">
+            {week.map((v, di) => (
+              <span
+                key={di}
+                title={`${v}%`}
+                className="aspect-square rounded-sm"
+                style={{ backgroundColor: `rgb(var(--accent) / ${0.12 + (v / 100) * 0.8})` }}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </WidgetCard>
+  );
+}
+
+/* ── Mini month calendar ─────────────────────────────────────────────────────── */
+function MiniCalendarWidget() {
+  const marked = new Set([3, 8, 9, 15, 16, 22, 27]);
+  const today = 16;
+  return (
+    <WidgetCard title="December">
+      <div className="grid grid-cols-7 gap-1 text-center text-[11px]">
+        {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
+          <span key={i} className="pb-1 font-medium text-muted-foreground">
+            {d}
+          </span>
+        ))}
+        {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+          <span
+            key={day}
+            className={cn(
+              "flex aspect-square items-center justify-center rounded-md tabular-nums",
+              day === today
+                ? "bg-primary font-semibold text-(--accent-foreground,white)"
+                : marked.has(day)
+                  ? "bg-accent-soft font-medium text-accent-strong"
+                  : "text-foreground hover:bg-surface-subtle",
+            )}
+          >
+            {day}
+          </span>
+        ))}
+      </div>
+    </WidgetCard>
+  );
+}
+
+/* ── Leaderboard (rank-colored gradient bars) ────────────────────────────────── */
+function LeaderboardWidget() {
+  // Gold / silver / bronze for the podium, then theme accent for the rest.
+  const rows = [
+    { name: "Sara Khan", hrs: 162, pct: 100, from: "#f59e0b", to: "#fcd34d" },
+    { name: "Omar Ali", hrs: 148, pct: 91, from: "#64748b", to: "#cbd5e1" },
+    { name: "Lina Park", hrs: 134, pct: 83, from: "#b45309", to: "#f59e0b" },
+    {
+      name: "Dan Reed",
+      hrs: 121,
+      pct: 75,
+      from: "rgb(var(--accent))",
+      to: "rgb(var(--tertiary-accent))",
+    },
+  ];
+  const rankCls = ["bg-amber-100 text-amber-700", "bg-slate-200 text-slate-700", "bg-orange-100 text-orange-700"];
+  return (
+    <WidgetCard title="Top hours this month">
+      <ul className="space-y-3">
+        {rows.map((r, i) => (
+          <li key={r.name} className="space-y-1">
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-2">
+                <span
+                  className={cn(
+                    "flex size-5 items-center justify-center rounded-full text-[10px] font-bold",
+                    rankCls[i] ?? "bg-accent-soft text-accent-strong",
+                  )}
+                >
+                  {i + 1}
+                </span>
+                <span className="text-foreground">{r.name}</span>
+              </span>
+              <span className="font-mono text-xs text-muted-foreground">{r.hrs}h</span>
+            </div>
+            <ProgressBar value={r.pct} from={r.from} to={r.to} />
+          </li>
+        ))}
+      </ul>
+    </WidgetCard>
   );
 }
 
@@ -164,10 +420,11 @@ function WeekScheduleWidget() {
 
 /* ── Attendance donut-ish summary ───────────────────────────────────────────── */
 function AttendanceWidget() {
+  // Each meter uses a gradient fill (lighter → fuller hue) instead of a flat color.
   const rows = [
-    { label: "On time", pct: 88, color: "var(--color-success)" },
-    { label: "Late", pct: 8, color: "var(--color-warning)" },
-    { label: "Absent", pct: 4, color: "var(--color-danger)" },
+    { label: "On time", pct: 88, from: "rgb(var(--success) / 0.55)", to: "rgb(var(--success))" },
+    { label: "Late", pct: 8, from: "rgb(var(--warning) / 0.55)", to: "rgb(var(--warning))" },
+    { label: "Absent", pct: 4, from: "rgb(var(--danger) / 0.55)", to: "rgb(var(--danger))" },
   ];
   return (
     <WidgetCard title="Attendance today">
@@ -178,9 +435,7 @@ function AttendanceWidget() {
               <span className="text-muted-foreground">{r.label}</span>
               <span className="font-mono text-foreground">{r.pct}%</span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-surface-subtle">
-              <div className="h-full rounded-full" style={{ width: `${r.pct}%`, backgroundColor: r.color }} />
-            </div>
+            <ProgressBar value={r.pct} from={r.from} to={r.to} />
           </div>
         ))}
       </div>

@@ -27,7 +27,9 @@ function handleAuthError(error: unknown): void {
     const path = window.location.pathname;
     // Avoid redirect loops if we're already on an auth page.
     if (!path.includes("/login") && !path.includes("/signup")) {
-      window.location.assign(`/login?reason=session-expired`);
+      // Remember where the user was so we can return them there after re-login.
+      const next = encodeURIComponent(path + window.location.search);
+      window.location.assign(`/login?reason=session-expired&next=${next}`);
     }
   }
 }

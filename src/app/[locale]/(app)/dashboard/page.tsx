@@ -7,6 +7,7 @@ import { Building2, CalendarDays, Clock, Users } from "lucide-react";
 import { CreateCompanyDialog } from "@/components/dashboard/create-company-dialog";
 import { KpiTile } from "@/components/dashboard/kpi-tile";
 import { OnboardingShowcase } from "@/components/dashboard/onboarding-showcase";
+import { SectionDecor } from "@/components/dashboard/section-decor";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { cardItem, staggerContainer } from "@/lib/motion";
@@ -72,44 +73,80 @@ export default function DashboardPage() {
         </motion.div>
       ) : (
         <>
+          {/* KPI row — 4 tiles in one row; each tile carries its own themed
+              motif (no wrapper panel behind them). */}
           <motion.div variants={cardItem} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <KpiTile
               label="Employees"
               value={dash(employeeCount, empLoading)}
+              count={empLoading ? undefined : { to: employeeCount }}
               icon={Users}
-              decor="bubbles"
+              decor="dots"
             />
             <KpiTile
               label="Stores"
               value={dash(storeCount, storesLoading)}
+              count={storesLoading ? undefined : { to: storeCount }}
               icon={Building2}
               decor="hexagon"
             />
             <KpiTile
               label="Open shifts"
               value={dash(openShifts, shiftsLoading)}
+              count={shiftsLoading ? undefined : { to: openShifts }}
               icon={CalendarDays}
-              decor="dots"
+              decor="bubbles"
             />
             <KpiTile
               label="Clocked in"
               value={dash(clockedIn, logsLoading)}
+              count={logsLoading ? undefined : { to: clockedIn }}
               icon={Clock}
-              decor="bubbles"
+              decor="dots"
             />
           </motion.div>
 
-          <motion.div variants={cardItem}>
-            {hasActivity ? (
-              <EmptyState
-                icon={CalendarDays}
-                title="Activity feed coming soon"
-                description="Live shift, attendance and request activity will stream here. Your metrics above are live."
-              />
-            ) : (
+          {/* Activity area — hexagon honeycomb background (open space → visible).
+              The onboarding guide is its own card; the "coming soon" state is
+              transparent so the motif reads behind it. */}
+          {hasActivity ? (
+            <SectionDecor
+              kind="hexagons"
+              className="rounded-2xl border border-border bg-surface shadow-accent-sm"
+            >
+              <motion.div variants={cardItem}>
+                <EmptyState
+                  icon={CalendarDays}
+                  title="Activity feed coming soon"
+                  description="Live shift, attendance and request activity will stream here. Your metrics above are live."
+                />
+              </motion.div>
+            </SectionDecor>
+          ) : (
+            <motion.div variants={cardItem}>
               <OnboardingShowcase />
-            )}
-          </motion.div>
+            </motion.div>
+          )}
+
+          {/* Quick highlights — two soft bubbles bottom-right. */}
+          <SectionDecor
+            kind="bubbles"
+            className="rounded-2xl border border-border bg-surface p-5 shadow-accent-sm"
+          >
+            <motion.div variants={cardItem}>
+              <h3 className="font-display text-base font-semibold text-foreground">
+                This week at a glance
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {openShifts > 0
+                  ? `${openShifts} open shift${openShifts === 1 ? "" : "s"} still need coverage this week.`
+                  : "All shifts are covered this week — nicely done."}{" "}
+                {clockedIn > 0
+                  ? `${clockedIn} team member${clockedIn === 1 ? " is" : "s are"} clocked in right now.`
+                  : "No one is clocked in at the moment."}
+              </p>
+            </motion.div>
+          </SectionDecor>
         </>
       )}
     </motion.div>

@@ -1,17 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
+  ArrowLeft,
   ArrowRight,
   CalendarDays,
+  Check,
   CheckCircle2,
   ClipboardList,
   Clock,
   MapPin,
   Plus,
+  Sparkles,
   Store,
   Users,
+  X,
 } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
@@ -57,22 +61,23 @@ const STEPS: Step[] = [
   },
 ];
 
-const INTERVAL = 3800;
-
-/** Rotating onboarding showcase shown on an empty dashboard — cycles through
- * Stores → Shifts → Onboarding with smooth transitions (auto-advances; click a
- * dot to jump). Reduced-motion → crossfade only. */
+/** Onboarding GUIDE shown on an empty dashboard — Stores → Shifts → Onboarding.
+ * Manual (Back / Next), never auto-advances or auto-hides; the user dismisses it
+ * with the close button (or after reaching the last step). Reduced-motion safe. */
 export function OnboardingShowcase() {
   const [index, setIndex] = useState(0);
+  const [dismissed, setDismissed] = useState(false);
+  const [dir, setDir] = useState(1);
   const reduce = useReducedMotion();
 
-  useEffect(() => {
-    const t = setInterval(() => setIndex((i) => (i + 1) % STEPS.length), INTERVAL);
-    return () => clearInterval(t);
-  }, []);
+  if (dismissed) return null;
 
   const step = STEPS[index];
-  const dir = 1;
+  const isLast = index === STEPS.length - 1;
+  const go = (next: number) => {
+    setDir(next > index ? 1 : -1);
+    setIndex(next);
+  };
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-border bg-surface p-6 shadow-accent-sm sm:p-8">
@@ -80,13 +85,23 @@ export function OnboardingShowcase() {
       <div className="pointer-events-none absolute -top-16 -right-16 size-56 rounded-full bg-accent/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-20 -left-10 size-48 rounded-full bg-tertiary-accent/10 blur-3xl" />
 
+      {/* Dismiss */}
+      <button
+        type="button"
+        onClick={() => setDismissed(true)}
+        aria-label="Dismiss guide"
+        className="absolute top-3 right-3 z-10 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-surface-subtle hover:text-foreground"
+      >
+        <X className="size-4" />
+      </button>
+
       <div className="relative grid items-center gap-8 lg:grid-cols-2">
         {/* Copy */}
         <div>
-          <p className="text-xs font-semibold tracking-[0.12em] text-accent-strong uppercase">
-            Get started · {step.eyebrow}
+          <p className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-[0.12em] text-accent-strong uppercase">
+            <Sparkles className="size-3.5" /> Setup guide · {step.eyebrow}
           </p>
-          <div className="mt-2 min-h-[7.5rem]">
+          <div className="mt-2 min-h-30">
             <AnimatePresence mode="wait">
               <motion.div
                 key={step.key}
@@ -101,23 +116,54 @@ export function OnboardingShowcase() {
             </AnimatePresence>
           </div>
 
-          <div className="mt-5 flex items-center gap-4">
+          <div className="mt-5 flex flex-wrap items-center gap-3">
             <Link
               href={step.href}
               className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-sm font-medium text-primary-foreground shadow-accent-sm transition-[transform,box-shadow] hover:-translate-y-px hover:shadow-accent-md"
             >
               <Plus className="size-4" />
               {step.cta}
-              <ArrowRight className="size-4" />
             </Link>
-            {/* progress dots */}
+
+            {/* Manual Back / Next (Next becomes Done/close on the last step). */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => go(Math.max(0, index - 1))}
+                disabled={index === 0}
+                aria-label="Previous step"
+                className="inline-flex size-8 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-accent/30 hover:bg-accent-soft hover:text-accent-strong disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <ArrowLeft className="size-4" />
+              </button>
+              {isLast ? (
+                <button
+                  type="button"
+                  onClick={() => setDismissed(true)}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-accent/30 bg-accent-soft px-3 py-1.5 text-sm font-medium text-accent-strong transition-colors hover:bg-accent hover:text-(--accent-foreground,white)"
+                >
+                  <Check className="size-4" /> Done
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => go(Math.min(STEPS.length - 1, index + 1))}
+                  aria-label="Next step"
+                  className="inline-flex size-8 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-accent/30 hover:bg-accent-soft hover:text-accent-strong"
+                >
+                  <ArrowRight className="size-4" />
+                </button>
+              )}
+            </div>
+
+            {/* progress dots (click to jump) */}
             <div className="flex items-center gap-1.5">
               {STEPS.map((s, i) => (
                 <button
                   key={s.key}
                   type="button"
                   aria-label={`Show ${s.title}`}
-                  onClick={() => setIndex(i)}
+                  onClick={() => go(i)}
                   className={cn(
                     "h-1.5 rounded-full transition-all",
                     i === index ? "w-6 bg-primary" : "w-1.5 bg-border hover:bg-muted-foreground/40",
@@ -133,9 +179,9 @@ export function OnboardingShowcase() {
           <AnimatePresence mode="wait" custom={dir}>
             <motion.div
               key={step.key}
-              initial={reduce ? { opacity: 0 } : { opacity: 0, x: 28, scale: 0.97 }}
+              initial={reduce ? { opacity: 0 } : { opacity: 0, x: 28 * dir, scale: 0.97 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, x: -28, scale: 0.97 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, x: -28 * dir, scale: 0.97 }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               className="absolute inset-0"
             >

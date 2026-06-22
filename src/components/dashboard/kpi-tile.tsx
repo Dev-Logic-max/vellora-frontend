@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 
+import { CountUp } from "@/components/ui/count-up";
 import { cn } from "@/lib/utils";
 
 type Decor = "bubbles" | "hexagon" | "dots";
@@ -7,6 +8,9 @@ type Decor = "bubbles" | "hexagon" | "dots";
 interface KpiTileProps {
   label: string;
   value: string;
+  /** When set, the value animates (counts up) to this number on mount, with the
+   * given formatting — `value` is then only the loading/fallback string. */
+  count?: { to: number; prefix?: string; suffix?: string; decimals?: number };
   /** Optional delta chip, e.g. "+12%". */
   delta?: { value: string; direction: "up" | "down" | "neutral" };
   icon?: LucideIcon;
@@ -17,56 +21,58 @@ interface KpiTileProps {
   className?: string;
 }
 
-/** Decorative, low-opacity motif anchored bottom-right (theme-tinted). */
+/** Themed bottom-right motif + a soft accent glow — visible but tasteful, so
+ * each KPI tile carries a bit of the selected theme. */
 function CardDecor({ kind }: { kind: Decor }) {
-  if (kind === "bubbles") {
-    return (
-      <svg
-        aria-hidden
-        className="pointer-events-none absolute -right-3 -bottom-3 size-24 text-accent opacity-[0.07]"
-        viewBox="0 0 100 100"
-        fill="currentColor"
-      >
-        <circle cx="74" cy="74" r="26" />
-        <circle cx="40" cy="84" r="12" />
-        <circle cx="86" cy="40" r="9" />
-      </svg>
-    );
-  }
-  if (kind === "hexagon") {
-    return (
-      <svg
-        aria-hidden
-        className="pointer-events-none absolute -right-4 -bottom-5 size-28 text-accent opacity-[0.06]"
-        viewBox="0 0 100 100"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="4"
-      >
-        <polygon points="50,8 88,29 88,71 50,92 12,71 12,29" />
-        <polygon points="50,26 72,38 72,62 50,74 28,62 28,38" />
-      </svg>
-    );
-  }
-  // dots
   return (
-    <svg
-      aria-hidden
-      className="pointer-events-none absolute right-2 bottom-2 size-20 opacity-[0.12]"
-      viewBox="0 0 60 60"
-    >
-      {[0, 1, 2, 3].map((r) =>
-        [0, 1, 2, 3].map((c) => (
-          <circle
-            key={`${r}-${c}`}
-            cx={12 + c * 14}
-            cy={12 + r * 14}
-            r="2.2"
-            fill={`rgb(var(--chart-${((r + c) % 4) + 1}))`}
-          />
-        )),
+    <>
+      {/* soft accent glow in the bottom-right corner (theme-reactive) */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -right-6 -bottom-8 size-28 rounded-full opacity-25 blur-2xl"
+        style={{ backgroundColor: "rgb(var(--accent))" }}
+      />
+      {kind === "bubbles" ? (
+        <svg
+          aria-hidden
+          className="pointer-events-none absolute right-1 bottom-1 size-20 text-accent opacity-[0.16]"
+          viewBox="0 0 100 100"
+          fill="currentColor"
+        >
+          <circle cx="74" cy="74" r="22" />
+          <circle cx="42" cy="82" r="10" />
+          <circle cx="86" cy="44" r="7" />
+        </svg>
+      ) : kind === "hexagon" ? (
+        <svg
+          aria-hidden
+          className="pointer-events-none absolute -right-2 -bottom-3 size-24 text-accent opacity-[0.14]"
+          viewBox="0 0 100 100"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="4"
+        >
+          <polygon points="50,8 88,29 88,71 50,92 12,71 12,29" />
+          <polygon points="50,26 72,38 72,62 50,74 28,62 28,38" />
+        </svg>
+      ) : (
+        <svg
+          aria-hidden
+          className="pointer-events-none absolute right-2 bottom-2 size-16 text-accent opacity-25"
+          viewBox="0 0 60 60"
+          style={{
+            WebkitMaskImage: "radial-gradient(80% 80% at 100% 100%, black 10%, transparent 75%)",
+            maskImage: "radial-gradient(80% 80% at 100% 100%, black 10%, transparent 75%)",
+          }}
+        >
+          {[0, 1, 2, 3].map((r) =>
+            [0, 1, 2, 3].map((c) => (
+              <circle key={`${r}-${c}`} cx={12 + c * 14} cy={12 + r * 14} r="2.4" fill="currentColor" />
+            )),
+          )}
+        </svg>
       )}
-    </svg>
+    </>
   );
 }
 
@@ -107,6 +113,7 @@ function Sparkline({ data }: { data: number[] }) {
 export function KpiTile({
   label,
   value,
+  count,
   delta,
   icon: Icon,
   sparkline,
@@ -137,7 +144,16 @@ export function KpiTile({
       <div className="relative z-10 mt-3 flex items-end justify-between gap-2">
         <div className="flex items-baseline gap-2">
           <span className="font-mono text-3xl font-semibold tracking-tight tabular-nums text-foreground">
-            {value}
+            {count ? (
+              <CountUp
+                value={count.to}
+                prefix={count.prefix}
+                suffix={count.suffix}
+                decimals={count.decimals}
+              />
+            ) : (
+              value
+            )}
           </span>
           {delta ? (
             <span

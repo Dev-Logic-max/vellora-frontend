@@ -12,7 +12,6 @@ import {
   LayoutDashboard,
   MessagesSquare,
   Palette,
-  Settings,
   ShieldCheck,
   Shuffle,
   Store,
@@ -106,7 +105,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Permissions", href: "/permissions", icon: ShieldCheck, roles: ["owner", "hr"] },
       { label: "Billing", href: "/settings/billing", icon: CreditCard, roles: ["owner"] },
       { label: "Design", href: "/settings/design", icon: Palette, roles: ["owner"] },
-      { label: "Settings", href: "/settings", icon: Settings, roles: ["owner", "hr"] },
+      // Settings lives in the sidebar FOOTER (app-sidebar) — not duplicated here.
       {
         label: "Admin",
         href: "/admin",

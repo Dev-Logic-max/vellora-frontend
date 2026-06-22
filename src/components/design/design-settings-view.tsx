@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Blocks, LayoutGrid, LayoutTemplate, Palette, SwatchBook } from "lucide-react";
 
 import { SegmentedTabs, type SegmentedTab } from "@/components/ui/segmented-tabs";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { usePlatformDesign } from "@/features/design/design";
 import { applyAccent, cacheAccent, readCachedAccent } from "@/features/design/apply";
 import { AccentTab } from "./accent-tab";
@@ -22,14 +24,26 @@ const TABS: SegmentedTab<DesignTab>[] = [
   { value: "widgets", label: "Widgets", icon: Blocks },
 ];
 
+const TAB_KEYS = new Set<DesignTab>(["accent", "layout", "palette", "components", "widgets"]);
+
 /**
  * Design Settings module — tabbed shell. The platform base is white & fixed; the
  * selected accent only tints the dashboard. Applies the effective accent live to
- * `.app-shell` via `data-accent` (with hover-preview), and hosts the tabs.
+ * `.app-shell` via `data-accent` (with hover-preview), and hosts the tabs. The
+ * active tab is reflected in the URL (`?tab=`) so browser back/forward restore it.
  */
 export function DesignSettingsView() {
   const { data } = usePlatformDesign();
-  const [tab, setTab] = useState<DesignTab>("accent");
+  const router = useRouter();
+  const pathname = usePathname();
+  const params = useSearchParams();
+
+  // Tab comes from the URL (default = first tab); changing it pushes a history entry.
+  const urlTab = params.get("tab") as DesignTab | null;
+  const tab: DesignTab = urlTab && TAB_KEYS.has(urlTab) ? urlTab : "accent";
+  const setTab = (next: DesignTab) =>
+    router.push(`${pathname}?tab=${next}`, { scroll: false });
+
   // Committed pick (null → fall back to server/cache) + a transient hover preview.
   const [pick, setPick] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);

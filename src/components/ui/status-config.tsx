@@ -18,8 +18,20 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-/** Coarse tone families that map a status to a soft-fill + outline + icon. */
-export type StatusTone = "success" | "warning" | "danger" | "info" | "accent" | "neutral";
+/** Coarse tone families that map a status to a soft-fill + outline + icon. The
+ * extra `leave`/`suspend`/`purple` tones (fixed hues) keep statuses that used to
+ * collide under "warning" visually distinct (e.g. pending vs on-leave vs
+ * suspended). */
+export type StatusTone =
+  | "success"
+  | "warning"
+  | "danger"
+  | "info"
+  | "accent"
+  | "neutral"
+  | "leave"
+  | "suspend"
+  | "purple";
 
 /** Soft fill + text + a slightly darker border outline (premium lift). */
 export const TONE_CLASSES: Record<StatusTone, string> = {
@@ -29,6 +41,10 @@ export const TONE_CLASSES: Record<StatusTone, string> = {
   info: "bg-info-soft text-info border-info/25",
   accent: "bg-accent-soft text-accent-strong border-accent/25",
   neutral: "bg-muted text-muted-foreground border-border",
+  // Fixed hues (theme-independent) for statuses that would otherwise collide.
+  leave: "bg-sky-50 text-sky-700 border-sky-300/50",
+  suspend: "bg-orange-50 text-orange-700 border-orange-300/50",
+  purple: "bg-violet-50 text-violet-700 border-violet-300/50",
 };
 
 /** Map a status keyword → tone. Centralizes the success/warn/danger meanings so
@@ -57,23 +73,22 @@ export function statusTone(status: string): StatusTone {
     ].includes(s)
   )
     return "success";
+  // Distinct fixed hues for statuses that used to all read as "warning".
+  if (s === "on_leave") return "leave"; // sky
+  if (s === "suspended") return "suspend"; // orange
+  if (["trialing", "interview", "screening"].includes(s)) return "purple";
   if (
     [
       "pending",
       "in_review",
       "requested",
       "flagged",
-      "on_leave",
-      "suspended",
       "late",
       "warning",
       "draft",
       "scheduled",
-      "trialing",
       "processing",
       "past_due",
-      "interview",
-      "screening",
       "planning",
       "planned",
       "awaiting",

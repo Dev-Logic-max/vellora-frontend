@@ -2,30 +2,45 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ChevronRight, Download, Plus, Upload, Users } from "lucide-react";
+import { Check, Copy, Download, Eye, Pencil, Plus, Trash2, Upload, Users } from "lucide-react";
+import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
+import { AvatarPreview } from "@/components/ui/avatar-preview";
 import { DataTableShell, type DataTableColumnMeta } from "@/components/ui/data-table-shell";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { EmptyState } from "@/components/ui/empty-state";
-import { EntityAvatar } from "@/components/ui/entity-avatar";
 import { RoleTag } from "@/components/ui/role-tag";
 import { StatusPill } from "@/components/ui/status-pill";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { FilterValues } from "@/components/ui/filter-modal";
 import { EmployeeFormSheet } from "@/components/employees/employee-form-sheet";
 import { ImportEmployeesDialog } from "@/components/employees/import-employees-dialog";
 import { useRouter } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
 import { useStores } from "@/features/org/stores";
 import { useCurrentUser } from "@/features/session/use-current-user";
-import { downloadEmployeesCsv, useEmployees } from "@/features/employees/employees";
+import {
+  downloadEmployeesCsv,
+  useArchiveEmployee,
+  useEmployees,
+} from "@/features/employees/employees";
 import { EMPLOYEE_STATUS_OPTIONS } from "@/features/employees/constants";
-import type { Employee, EmployeeStatus } from "@/features/employees/types";
+import type { Employee, EmployeeDetail, EmployeeStatus } from "@/features/employees/types";
 import type { MembershipRole } from "@/features/session/types";
 
 const PAGE_SIZE = 25;
 
 export function EmployeesList() {
-  const router = useRouter();
   const { data: me } = useCurrentUser();
   const { data: stores } = useStores();
 
@@ -72,10 +87,11 @@ export function EmployeesList() {
           const e = row.original;
           return (
             <div className="flex items-center gap-3">
-              <EntityAvatar
+              {/* Avatar shows a pointer + opens an image preview on click. */}
+              <AvatarPreview
                 name={`${e.firstName} ${e.lastName}`}
                 src={e.avatarUrl}
-                className="size-9 rounded-lg"
+                className="size-9 rounded-full"
               />
               <div className="min-w-0">
                 <p className="truncate font-medium text-foreground">
@@ -92,9 +108,7 @@ export function EmployeesList() {
       {
         header: "User ID",
         accessorKey: "uniqueCode",
-        cell: ({ row }) => (
-          <span className="font-mono text-xs text-muted-foreground">{row.original.uniqueCode}</span>
-        ),
+        cell: ({ row }) => <CopyIdBadge id={row.original.uniqueCode} />,
       },
       {
         header: "User role",
@@ -125,18 +139,13 @@ export function EmployeesList() {
         cell: ({ row }) => <StatusPill status={row.original.status} />,
       },
       {
-        id: "open",
+        id: "actions",
         header: "",
         meta: { isActions: true } satisfies DataTableColumnMeta,
-        cell: () => (
-          <span className="inline-flex items-center gap-1 rounded-lg bg-accent-soft px-2.5 py-1 text-xs font-medium text-accent-strong transition-colors group-hover:bg-accent group-hover:text-(--accent-foreground,white)">
-            Details
-            <ChevronRight className="size-3.5" />
-          </span>
-        ),
+        cell: ({ row }) => <RowActions employee={row.original} canManage={Boolean(canManage)} />,
       },
     ],
-    [storeName],
+    [storeName, canManage],
   );
 
   const total = data?.total ?? 0;
@@ -186,7 +195,6 @@ export function EmployeesList() {
           columns={columns}
           data={data?.data ?? []}
           isLoading={isLoading}
-          onRowClick={(e) => router.push(`/employees/${e.id}`)}
           toolbar={{
             searchValue: search,
             onSearchChange: setSearch,
@@ -238,4 +246,149 @@ export function EmployeesList() {
 function UserRoleCell({ role }: { role: MembershipRole | null }) {
   if (!role || role === "owner") return <span className="text-muted-foreground">—</span>;
   return <RoleTag role={role} />;
+}
+
+/** Plain mono ID — click to copy (shows a copy icon on hover; tick on copy). */
+function CopyIdBadge({ id }: { id: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard?.writeText(id).then(
+      () => {
+        setCopied(true);
+        toast.success(`Copied ${id}`);
+        setTimeout(() => setCopied(false), 1200);
+      },
+      () => toast.error("Couldn't copy"),
+    );
+  };
+  return (
+    <button
+      type="button"
+      onClick={copy}
+      title="Click to copy ID"
+      className="group/id inline-flex cursor-pointer items-center gap-1.5 font-mono text-xs text-muted-foreground transition-colors hover:text-accent-strong"
+    >
+      {id}
+      {copied ? (
+        <Check className="size-3 text-(--success,var(--chart-2))" />
+      ) : (
+        <Copy className="size-3 opacity-0 transition-opacity group-hover/id:opacity-70" />
+      )}
+    </button>
+  );
+}
+
+/** Row action icons: view (→ detail), edit (sheet), deactivate (confirm). */
+function RowActions({ employee, canManage }: { employee: Employee; canManage: boolean }) {
+  const router = useRouter();
+  const archive = useArchiveEmployee();
+  const [editOpen, setEditOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const isArchived = employee.status === "archived";
+
+  return (
+    <div className="flex items-center justify-end gap-1">
+      <ActionIcon
+        label="View"
+        icon={Eye}
+        tone="view"
+        onClick={() => router.push(`/employees/${employee.id}`)}
+      />
+      {canManage ? (
+        <>
+          <ActionIcon label="Edit" icon={Pencil} tone="edit" onClick={() => setEditOpen(true)} />
+          {/* Controlled by the Edit icon above — no trigger element. */}
+          <EmployeeFormSheet
+            employee={employee as EmployeeDetail}
+            open={editOpen}
+            onOpenChange={setEditOpen}
+          />
+          <ActionIcon
+            label={isArchived ? "Deactivated" : "Deactivate"}
+            icon={Trash2}
+            tone="delete"
+            disabled={isArchived}
+            onClick={() => setConfirmOpen(true)}
+          />
+          <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Deactivate this employee?</DialogTitle>
+                <DialogDescription>
+                  {employee.firstName} {employee.lastName} will be archived and lose portal access.
+                  This does not permanently delete their record — you can reactivate them later.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
+                <Button
+                  variant="destructive"
+                  disabled={archive.isPending}
+                  onClick={async () => {
+                    try {
+                      await archive.mutateAsync(employee.id);
+                      toast.success("Employee deactivated");
+                      setConfirmOpen(false);
+                    } catch {
+                      toast.error("Couldn't deactivate");
+                    }
+                  }}
+                >
+                  {archive.isPending ? "Deactivating…" : "Deactivate"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+/** Per-action hover tones: view = light blue, edit = green, delete = red. */
+const ACTION_TONES = {
+  view: "hover:bg-sky-50 hover:text-sky-600",
+  edit: "hover:bg-emerald-50 hover:text-emerald-600",
+  delete: "hover:bg-red-50 hover:text-red-600",
+  accent: "hover:bg-accent-soft hover:text-accent-strong",
+} as const;
+
+function ActionIcon({
+  label,
+  icon: Icon,
+  onClick,
+  tone = "accent",
+  disabled,
+}: {
+  label: string;
+  icon: typeof Eye;
+  onClick?: () => void;
+  tone?: keyof typeof ACTION_TONES;
+  disabled?: boolean;
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick?.();
+            }}
+            aria-label={label}
+            className={cn(
+              "inline-flex size-7 cursor-pointer items-center justify-center rounded-lg border border-transparent text-muted-foreground transition-colors disabled:cursor-not-allowed disabled:opacity-40",
+              ACTION_TONES[tone],
+            )}
+          >
+            <Icon className="size-4" />
+          </button>
+        }
+      />
+      <TooltipContent side="top">{label}</TooltipContent>
+    </Tooltip>
+  );
 }

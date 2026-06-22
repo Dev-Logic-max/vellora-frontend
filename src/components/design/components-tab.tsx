@@ -44,6 +44,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { ProgressBar } from "@/components/ui/progress-bar";
 import { StatusPill } from "@/components/ui/status-pill";
 import { Switch } from "@/components/ui/switch";
 
@@ -118,13 +119,17 @@ export function ComponentsTab() {
             </div>
             <Switch defaultChecked />
           </div>
-          {/* Slider (native range, accent-tinted) */}
+          {/* Slider (native range with a gradient track) */}
           <div className="space-y-1.5 sm:col-span-2">
             <label className="text-[13px] font-medium text-foreground">Coverage target</label>
             <input
               type="range"
               defaultValue={70}
-              className="accent-primary h-2 w-full cursor-pointer"
+              className="accent-primary h-2 w-full cursor-pointer appearance-none rounded-full"
+              style={{
+                backgroundImage:
+                  "linear-gradient(90deg, rgb(var(--accent)), rgb(var(--tertiary-accent)))",
+              }}
               aria-label="Coverage target"
             />
           </div>
@@ -135,12 +140,16 @@ export function ComponentsTab() {
         <div className="flex flex-wrap items-center gap-2">
           <Badge>Default</Badge>
           <Badge variant="outline">Outline</Badge>
+          {/* Each status now reads in its own hue (pending / on-leave / suspended
+              no longer collide). */}
           <StatusPill status="active" />
           <StatusPill status="pending" />
           <StatusPill status="on_leave" />
           <StatusPill status="suspended" />
+          <StatusPill status="trialing" />
+          <StatusPill status="invited" />
           <StatusPill status="deleted" />
-          <span className="inline-flex items-center gap-1 rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-medium text-primary">
+          <span className="inline-flex items-center gap-1 rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-medium text-accent-strong">
             <User className="size-3" /> Assigned
           </span>
         </div>
@@ -186,9 +195,7 @@ export function ComponentsTab() {
             <span>Onboarding progress</span>
             <span className="font-mono">68%</span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-surface-subtle">
-            <div className="h-full rounded-full bg-primary" style={{ width: "68%" }} />
-          </div>
+          <ProgressBar value={68} />
         </div>
       </Section>
 

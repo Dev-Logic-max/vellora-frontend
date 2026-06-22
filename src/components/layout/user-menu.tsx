@@ -40,7 +40,7 @@ export function UserMenu({ user }: { user: CurrentUser }) {
           />
         }
       >
-        <EntityAvatar name={user.name ?? user.email} />
+        <EntityAvatar name={user.name ?? user.email} ring />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel className="flex flex-col gap-0.5">

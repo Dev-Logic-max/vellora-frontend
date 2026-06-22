@@ -84,12 +84,24 @@ const STEP1_FIELDS = ["firstName", "lastName", "email"] as const;
 export function EmployeeFormSheet({
   employee,
   trigger,
+  open: openProp,
+  onOpenChange,
 }: {
   employee?: EmployeeDetail;
-  trigger: ReactNode;
+  /** Optional trigger element. Omit when driving the sheet via `open` (controlled). */
+  trigger?: ReactNode;
+  /** Optional controlled open state (e.g. driven by a table action icon). */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const isEdit = Boolean(employee);
-  const [open, setOpen] = useState(false);
+  const [openState, setOpenState] = useState(false);
+  // Controlled when `open` is provided; otherwise self-managed.
+  const open = openProp ?? openState;
+  const setOpen = (next: boolean) => {
+    setOpenState(next);
+    onOpenChange?.(next);
+  };
   const [step, setStep] = useState(0);
   const [serverError, setServerError] = useState<string | null>(null);
   const [primaryStoreId, setPrimaryStoreId] = useState<string | undefined>(
@@ -207,7 +219,7 @@ export function EmployeeFormSheet({
         if (!o) resetAll();
       }}
     >
-      <SheetTrigger render={trigger as React.ReactElement} />
+      {trigger ? <SheetTrigger render={trigger as React.ReactElement} /> : null}
       <SheetContent
         showCloseButton={false}
         className="flex w-full flex-col gap-0 p-0 sm:max-w-xl"
