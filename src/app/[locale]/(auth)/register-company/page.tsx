@@ -14,27 +14,29 @@ import { signUp } from "@/lib/auth";
 import { AuthField, PasswordField, SelectField } from "@/components/auth/auth-field";
 import { Stepper } from "@/components/auth/stepper";
 import { Reveal } from "@/components/marketing/reveal";
+import { COUNTRIES, countryName, timezoneForCountry } from "@/lib/geo/countries";
 
-const COUNTRIES = [
-  "United States",
-  "United Kingdom",
-  "Germany",
-  "France",
-  "Spain",
-  "Italy",
-  "Canada",
-  "Australia",
-];
-
+/** A compact set of common timezones for the dropdown — the country selection
+ * pre-selects the right one, but the user can still change it. */
 const TIMEZONES = [
   "UTC",
   "America/New_York",
+  "America/Chicago",
   "America/Los_Angeles",
+  "America/Toronto",
+  "America/Sao_Paulo",
   "Europe/London",
+  "Europe/Paris",
   "Europe/Berlin",
   "Europe/Madrid",
   "Europe/Rome",
   "Asia/Dubai",
+  "Asia/Riyadh",
+  "Asia/Karachi",
+  "Asia/Kolkata",
+  "Asia/Singapore",
+  "Asia/Tokyo",
+  "Australia/Sydney",
 ];
 
 type PlanId = "Starter" | "Growth" | "Business" | "Enterprise";
@@ -215,14 +217,20 @@ export default function RegisterCompanyPage() {
                   id="country"
                   label="Country"
                   error={errors.country?.message}
-                  {...register("country")}
+                  {...register("country", {
+                    onChange: (e) => {
+                      // Country-first: pre-fill the timezone from the chosen country.
+                      const tz = timezoneForCountry(e.target.value);
+                      setValue("timezone", tz, { shouldValidate: true });
+                    },
+                  })}
                 >
                   <option value="" disabled>
                     Select…
                   </option>
                   {COUNTRIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
+                    <option key={c.code} value={c.code}>
+                      {c.name}
                     </option>
                   ))}
                 </SelectField>
@@ -375,7 +383,7 @@ function ReviewStep({ values }: { values: Values }) {
     <div className="divide-y divide-border rounded-xl border border-border px-4">
       <ReviewRow label="Company" value={values.companyName} />
       <ReviewRow label="Workspace" value={`vellora.com/${values.slug}`} />
-      <ReviewRow label="Country" value={values.country} />
+      <ReviewRow label="Country" value={countryName(values.country) ?? values.country} />
       <ReviewRow label="Timezone" value={values.timezone} />
       <ReviewRow label="Admin" value={values.adminName} />
       <ReviewRow label="Email" value={values.adminEmail} />

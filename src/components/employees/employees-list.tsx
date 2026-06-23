@@ -9,31 +9,20 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { AvatarPreview } from "@/components/ui/avatar-preview";
 import { DataTableShell, type DataTableColumnMeta } from "@/components/ui/data-table-shell";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { RoleTag } from "@/components/ui/role-tag";
 import { StatusPill } from "@/components/ui/status-pill";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { FilterValues } from "@/components/ui/filter-modal";
 import { EmployeeFormSheet } from "@/components/employees/employee-form-sheet";
+import { EmployeeDeleteModal } from "@/components/employees/employee-delete-modal";
+import { ExportEmployeesDialog } from "@/components/employees/export-employees-dialog";
 import { ImportEmployeesDialog } from "@/components/employees/import-employees-dialog";
 import { useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { useStores } from "@/features/org/stores";
 import { useCurrentUser } from "@/features/session/use-current-user";
-import {
-  downloadEmployeesCsv,
-  useArchiveEmployee,
-  useEmployees,
-} from "@/features/employees/employees";
+import { useEmployees } from "@/features/employees/employees";
 import { EMPLOYEE_STATUS_OPTIONS } from "@/features/employees/constants";
 import type { Employee, EmployeeDetail, EmployeeStatus } from "@/features/employees/types";
 import type { MembershipRole } from "@/features/session/types";
@@ -160,10 +149,14 @@ export function EmployeesList() {
           <div className="flex items-center gap-2">
             {canImportExport ? (
               <>
-                <Button variant="outline" onClick={() => void downloadEmployeesCsv()}>
-                  <Download />
-                  Export
-                </Button>
+                <ExportEmployeesDialog
+                  trigger={
+                    <Button variant="outline">
+                      <Download />
+                      Export
+                    </Button>
+                  }
+                />
                 <ImportEmployeesDialog
                   trigger={
                     <Button variant="outline">
@@ -278,14 +271,11 @@ function CopyIdBadge({ id }: { id: string }) {
   );
 }
 
-/** Row action icons: view (→ detail), edit (sheet), deactivate (confirm). */
+/** Row action icons: view (→ detail), edit (sheet), remove (rich modal). */
 function RowActions({ employee, canManage }: { employee: Employee; canManage: boolean }) {
   const router = useRouter();
-  const archive = useArchiveEmployee();
   const [editOpen, setEditOpen] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-
-  const isArchived = employee.status === "archived";
+  const [removeOpen, setRemoveOpen] = useState(false);
 
   return (
     <div className="flex items-center justify-end gap-1">
@@ -303,43 +293,22 @@ function RowActions({ employee, canManage }: { employee: Employee; canManage: bo
             employee={employee as EmployeeDetail}
             open={editOpen}
             onOpenChange={setEditOpen}
+            onDelete={() => {
+              setEditOpen(false);
+              setRemoveOpen(true);
+            }}
           />
           <ActionIcon
-            label={isArchived ? "Deactivated" : "Deactivate"}
+            label="Remove"
             icon={Trash2}
             tone="delete"
-            disabled={isArchived}
-            onClick={() => setConfirmOpen(true)}
+            onClick={() => setRemoveOpen(true)}
           />
-          <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Deactivate this employee?</DialogTitle>
-                <DialogDescription>
-                  {employee.firstName} {employee.lastName} will be archived and lose portal access.
-                  This does not permanently delete their record — you can reactivate them later.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
-                <Button
-                  variant="destructive"
-                  disabled={archive.isPending}
-                  onClick={async () => {
-                    try {
-                      await archive.mutateAsync(employee.id);
-                      toast.success("Employee deactivated");
-                      setConfirmOpen(false);
-                    } catch {
-                      toast.error("Couldn't deactivate");
-                    }
-                  }}
-                >
-                  {archive.isPending ? "Deactivating…" : "Deactivate"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <EmployeeDeleteModal
+            employee={employee}
+            open={removeOpen}
+            onOpenChange={setRemoveOpen}
+          />
         </>
       ) : null}
     </div>

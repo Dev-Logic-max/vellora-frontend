@@ -6,6 +6,8 @@ import { api } from "@/lib/api";
 import { getActiveCompanyId } from "@/lib/active-company";
 import { createClient } from "@/lib/supabase/client";
 import type {
+  BankAccount,
+  BankAccountInput,
   Contract,
   Employee,
   EmployeeDetail,
@@ -85,6 +87,15 @@ export function useArchiveEmployee() {
   });
 }
 
+/** Permanently delete an employee (irreversible). */
+export function useDeleteEmployee() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete<{ deleted: true }>(`/api/employees/${id}`),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["employees"] }),
+  });
+}
+
 export function useInviteEmployee(id: string) {
   const qc = useQueryClient();
   return useMutation({
@@ -133,6 +144,33 @@ export async function downloadEmployeesCsv(): Promise<void> {
   a.download = "employees.csv";
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// ── bank accounts ───────────────────────────────────────────────────────────
+export function useBankAccounts(id: string) {
+  return useQuery({
+    queryKey: ["employee", id, "bank-accounts"],
+    queryFn: () => api.get<BankAccount[]>(`/api/employees/${id}/bank-accounts`),
+    enabled: Boolean(id),
+  });
+}
+
+export function useAddBankAccount(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: BankAccountInput) =>
+      api.post<BankAccount>(`/api/employees/${id}/bank-accounts`, input),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["employee", id, "bank-accounts"] }),
+  });
+}
+
+export function useDeleteBankAccount(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (accountId: string) =>
+      api.delete<{ removed: boolean }>(`/api/employees/${id}/bank-accounts/${accountId}`),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["employee", id, "bank-accounts"] }),
+  });
 }
 
 // ── store links ───────────────────────────────────────────────────────────────

@@ -4,8 +4,42 @@ export type EmployeeStatus = "invited" | "active" | "on_leave" | "suspended" | "
 export type ContractType = "full_time" | "part_time" | "temporary" | "contractor" | "intern";
 export type WorkScheduleType = "full_time" | "part_time" | "shift" | "flexible" | "remote";
 export type Gender = "male" | "female" | "other" | "prefer_not_to_say";
+export type MaritalStatus = "single" | "married" | "divorced" | "widowed" | "other";
 export type StoreRelation = "secondary" | "guest" | "peak";
 export type CredentialStatus = "valid" | "expiring" | "expired";
+
+export interface BankAccount {
+  id: string;
+  employeeId: string;
+  label: string | null;
+  country: string | null;
+  bankName: string;
+  bankSwift: string | null;
+  bankBrandColor: string | null;
+  accountHolder: string | null;
+  iban: string | null;
+  accountNumber: string | null;
+  currency: string | null;
+  cardNetwork: string | null;
+  cardLast4: string | null;
+  isPrimary: boolean;
+  createdAt: string;
+}
+
+export interface BankAccountInput {
+  label?: string;
+  country?: string;
+  bankName: string;
+  bankSwift?: string;
+  bankBrandColor?: string;
+  accountHolder?: string;
+  iban?: string;
+  accountNumber?: string;
+  currency?: string;
+  cardNetwork?: string;
+  cardLast4?: string;
+  isPrimary?: boolean;
+}
 
 /** Adjustable benefits a company can offer an employee. */
 export type EmployeeBenefits = Record<string, boolean>;
@@ -36,6 +70,8 @@ export interface Employee {
   nationality: string | null;
   dateOfBirth: string | null;
   gender: Gender | null;
+  maritalStatus: MaritalStatus | null;
+  idCardNumber: string | null;
   iban: string | null;
   country: string | null;
   state: string | null;
@@ -150,6 +186,8 @@ export interface EmployeeInput {
   nationality?: string;
   dateOfBirth?: string;
   gender?: Gender;
+  maritalStatus?: MaritalStatus;
+  idCardNumber?: string;
   iban?: string;
   country?: string;
   state?: string;

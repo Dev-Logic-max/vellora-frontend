@@ -2,10 +2,31 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { Company, CompanyUsage } from "./types";
+import type { Company, CompanySettings, CompanyUsage } from "./types";
 
 export function useCompanies() {
   return useQuery({ queryKey: ["companies"], queryFn: () => api.get<Company[]>("/api/companies") });
+}
+
+/** The caller's active company (RLS-scoped), including its settings. */
+export function useCurrentCompany() {
+  return useQuery({
+    queryKey: ["company", "current"],
+    queryFn: () => api.get<Company>("/api/companies/current"),
+  });
+}
+
+/** Owner-only: update the active company's per-company settings (toggles). */
+export function useUpdateCompanySettings() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (settings: CompanySettings) =>
+      api.patch<Company>("/api/companies/current", { settings }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["company", "current"] });
+      void qc.invalidateQueries({ queryKey: ["device-registration-me"] });
+    },
+  });
 }
 
 export function useCompany(id: string) {

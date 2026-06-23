@@ -7,8 +7,26 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { XIcon } from "lucide-react";
 
-function Sheet({ ...props }: SheetPrimitive.Root.Props) {
-  return <SheetPrimitive.Root data-slot="sheet" {...props} />;
+function Sheet({ onOpenChange, ...props }: SheetPrimitive.Root.Props) {
+  // Ignore outside-press / focus-out dismissals: portaled popovers (date/time
+  // pickers, rich-selects) inside the sheet render at <body> and would otherwise
+  // be treated as an "outside press" and close the sheet. Escape + explicit
+  // close/cancel buttons still work.
+  return (
+    <SheetPrimitive.Root
+      data-slot="sheet"
+      onOpenChange={(open, details) => {
+        if (
+          !open &&
+          (details?.reason === "outside-press" || details?.reason === "focus-out")
+        ) {
+          return;
+        }
+        onOpenChange?.(open, details);
+      }}
+      {...props}
+    />
+  );
 }
 
 function SheetTrigger({ ...props }: SheetPrimitive.Trigger.Props) {

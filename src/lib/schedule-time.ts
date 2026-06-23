@@ -1,4 +1,7 @@
 import { addDays, format, startOfWeek } from "date-fns";
+import { fromZonedTime } from "date-fns-tz";
+
+import { readCachedTimeFormat } from "@/features/design/apply";
 
 /** Visible time window of the grid + pixels per hour. */
 export const GRID_START_HOUR = 0;
@@ -26,13 +29,43 @@ export function zonedParts(iso: string, tz: string): { dateStr: string; minutesO
   };
 }
 
-export function formatTimeInTz(iso: string, tz: string): string {
+/**
+ * Formats a UTC instant for display in a store/user timezone, honoring the
+ * user's 12h/24h preference (override with `hour12`). Times are ALWAYS stored in
+ * UTC; this is the read side.
+ */
+export function formatTimeInTz(iso: string, tz: string, hour12?: boolean): string {
+  const use12 = hour12 ?? readCachedTimeFormat() === "12h";
   return new Intl.DateTimeFormat("en-US", {
     timeZone: tz || "UTC",
-    hour: "numeric",
+    hour: use12 ? "numeric" : "2-digit",
     minute: "2-digit",
-    hour12: true,
+    hour12: use12,
   }).format(new Date(iso));
+}
+
+/**
+ * Converts a wall-clock date + "HH:mm" interpreted in `tz` into a correct UTC
+ * ISO instant (DST-aware via date-fns-tz). This is the WRITE side — use it
+ * whenever the user picks a local time that must persist as UTC, so the value
+ * re-displays correctly from any timezone.
+ */
+export function localToUtcIso(dateStr: string, timeHHmm: string, tz: string): string {
+  // `fromZonedTime` reads the given wall-clock AS being in `tz` and returns the
+  // equivalent UTC Date.
+  return fromZonedTime(`${dateStr}T${timeHHmm}:00`, tz || "UTC").toISOString();
+}
+
+/** Formats a single "HH:mm" (no date/tz) per the 12/24 pref, for the time picker
+ * trigger and inline labels. */
+export function formatHHmm(hhmm: string, hour12?: boolean): string {
+  if (!/^\d{2}:\d{2}$/.test(hhmm)) return hhmm;
+  const use12 = hour12 ?? readCachedTimeFormat() === "12h";
+  if (!use12) return hhmm;
+  const [h, m] = hhmm.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h12}:${m.toString().padStart(2, "0")} ${period}`;
 }
 
 export function durationMinutes(startIso: string, endIso: string): number {

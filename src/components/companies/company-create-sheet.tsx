@@ -15,8 +15,11 @@ import {
 } from "@/components/ui/dialog";
 import { FieldGroup, FullWidth } from "@/components/ui/field-group";
 import { FormField } from "@/components/ui/form-field";
+import { CountrySelect, CurrencySelect } from "@/components/ui/geo-selects";
 import { SelectField } from "@/components/ui/select-field";
 import { Stepper } from "@/components/ui/stepper";
+import { currencyForCountry } from "@/lib/geo/currencies";
+import { timezoneForCountry } from "@/lib/geo/countries";
 import { cn } from "@/lib/utils";
 import { ApiError } from "@/lib/api";
 import { useCreateCompany } from "@/features/org/companies";
@@ -31,8 +34,9 @@ const schema = z.object({
   registrationNumber: z.string().optional(),
   companyEmail: z.string().email("Invalid email").optional().or(z.literal("")),
   phone: z.string().optional(),
-  currency: z.string().min(3, "3-letter code").max(3),
-  country: z.string().min(2, "2-letter code").max(2),
+  currency: z.string().min(3, "Select a currency").max(3),
+  country: z.string().min(2, "Select a country").max(2),
+  timezone: z.string().optional(),
   state: z.string().optional(),
   city: z.string().optional(),
   postalCode: z.string().optional(),
@@ -96,6 +100,7 @@ export function CompanyCreateSheet() {
       name: "",
       currency: "USD",
       country: "US",
+      timezone: "America/New_York",
       planKey: "free",
     },
   });
@@ -128,6 +133,7 @@ export function CompanyCreateSheet() {
         name: values.name,
         country: values.country.toUpperCase(),
         currency: values.currency.toUpperCase(),
+        timezone: values.timezone || undefined,
         groupId: values.groupId || undefined,
         registrationNumber: values.registrationNumber || undefined,
         companyEmail: values.companyEmail || undefined,
@@ -189,7 +195,7 @@ export function CompanyCreateSheet() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex min-h-0 flex-1 flex-col" noValidate>
-          <div className="scrollbar-thin flex-1 space-y-6 overflow-y-auto px-6 py-5">
+          <div className="scrollbar-none flex-1 space-y-6 overflow-y-auto px-6 py-5">
             {step === 0 ? (
               <>
                 <FieldGroup title="Company details">
@@ -227,23 +233,40 @@ export function CompanyCreateSheet() {
                     {...register("companyEmail")}
                   />
                   <FormField id="phone" label="Company phone" {...register("phone")} />
-                  <FormField
-                    id="currency"
-                    label="Currency"
-                    placeholder="USD"
-                    error={errors.currency?.message}
-                    {...register("currency")}
-                  />
+                  <Field label="Currency" error={errors.currency?.message}>
+                    <Controller
+                      control={control}
+                      name="currency"
+                      render={({ field }) => (
+                        <CurrencySelect
+                          value={field.value}
+                          onChange={(v) => field.onChange(v ?? "")}
+                        />
+                      )}
+                    />
+                  </Field>
                 </FieldGroup>
 
                 <FieldGroup title="Location">
-                  <FormField
-                    id="country"
-                    label="Country"
-                    placeholder="US"
-                    error={errors.country?.message}
-                    {...register("country")}
-                  />
+                  <Field label="Country" error={errors.country?.message}>
+                    <Controller
+                      control={control}
+                      name="country"
+                      render={({ field }) => (
+                        <CountrySelect
+                          value={field.value}
+                          onChange={(v) => {
+                            field.onChange(v ?? "");
+                            // Country-first: pre-fill currency + timezone from the country.
+                            if (v) {
+                              setValue("currency", currencyForCountry(v) ?? "USD");
+                              setValue("timezone", timezoneForCountry(v));
+                            }
+                          }}
+                        />
+                      )}
+                    />
+                  </Field>
                   <FormField id="state" label="State / region" {...register("state")} />
                   <FormField id="city" label="City" {...register("city")} />
                   <FormField id="postalCode" label="Postal code" {...register("postalCode")} />
@@ -447,11 +470,20 @@ export function CompanyCreateSheet() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  error,
+  children,
+}: {
+  label: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-1.5">
       <label className="text-[13px] font-medium text-foreground">{label}</label>
       {children}
+      {error ? <p className="text-xs text-destructive">{error}</p> : null}
     </div>
   );
 }

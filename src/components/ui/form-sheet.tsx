@@ -46,7 +46,7 @@ export function FormSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       {trigger ? <SheetTrigger render={trigger as ReactElement} /> : null}
       <SheetContent
-        className={cn("w-full gap-0 p-0 sm:max-w-md", className)}
+        className={cn("w-full gap-0 p-0 sm:max-w-lg", className)}
         showCloseButton={false}
       >
         {/* Header — theme-tinted gradient wash. */}
@@ -59,8 +59,8 @@ export function FormSheet({
           ) : null}
         </div>
 
-        {/* Scrollable body. */}
-        <div className="scrollbar-thin flex-1 overflow-y-auto px-5 py-4">{children}</div>
+        {/* Scrollable body (scrollbar hidden, still scrollable). */}
+        <div className="scrollbar-none flex-1 overflow-y-auto px-5 py-4">{children}</div>
 
         {/* Footer — actions + Cancel. */}
         {footer || !hideCancel ? (

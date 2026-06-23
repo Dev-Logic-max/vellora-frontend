@@ -39,6 +39,41 @@ export function useLogs(filters: LogFilters, enabled = true) {
   });
 }
 
+/** Full detail for one log (employee + breaks) — drives the view sheet. */
+export function useLog(id: string | undefined) {
+  return useQuery({
+    queryKey: [LOGS_KEY, "detail", id],
+    queryFn: () => api.get<AttendanceLog>(`/api/attendance/logs/${id}`),
+    enabled: Boolean(id),
+  });
+}
+
+export function useDeleteLog() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete<{ id: string }>(`/api/attendance/logs/${id}`),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: [LOGS_KEY] }),
+  });
+}
+
+/**
+ * Kiosk QR-scan punch (point 19). Sends the scanned QR token + the device's
+ * stored token (+ fingerprint when required) and performs the action. The
+ * employee is resolved server-side from the auth token.
+ */
+export function useKioskPunch() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: {
+      token: string;
+      action: "clock_in" | "clock_out" | "break_start" | "break_end";
+      deviceToken?: string;
+      fingerprint?: string;
+    }) => api.post<AttendanceLog>("/api/attendance/kiosk/punch", input),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: [LOGS_KEY] }),
+  });
+}
+
 export function useClock() {
   const qc = useQueryClient();
   const invalidate = () => void qc.invalidateQueries({ queryKey: [LOGS_KEY] });
