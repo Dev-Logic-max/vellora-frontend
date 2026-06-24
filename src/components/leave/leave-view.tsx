@@ -99,7 +99,7 @@ export function LeaveView() {
       ) : null}
 
       {tab === "approvals" && canApprove ? <ApprovalsPanel /> : null}
-      {tab === "balances" ? <BalancesPanel year={year} /> : null}
+      {tab === "balances" ? <BalancesPanel year={year} canManage={canManage} /> : null}
       {tab === "policies" && canManage ? <PoliciesPanel canManage={canManage} /> : null}
       {tab === "holidays" ? <HolidayCalendar canManage={canManage} /> : null}
     </div>

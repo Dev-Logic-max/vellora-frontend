@@ -2,14 +2,29 @@
 
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ChevronRight, Store, Users } from "lucide-react";
+import { Eye, Pencil, Store, Trash2, Users } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { DataTableShell, type DataTableColumnMeta } from "@/components/ui/data-table-shell";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { CountryFlag } from "@/components/ui/country-flag";
 import { EntityAvatar } from "@/components/ui/entity-avatar";
 import { RoleTag } from "@/components/ui/role-tag";
 import { StatusPill } from "@/components/ui/status-pill";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useRouter } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
+import { ApiError } from "@/lib/api";
+import { CompanyEditSheet } from "@/components/companies/company-edit-sheet";
+import { useDeactivateCompany } from "@/features/org/companies";
+import { useCurrentUser } from "@/features/session/use-current-user";
 import type { Company } from "@/features/org/types";
 import type { MembershipRole } from "@/features/session/types";
 
@@ -24,8 +39,11 @@ function PlanCell({ plan }: { plan?: string | null }) {
 }
 
 export function CompaniesTable({ companies }: { companies: Company[] }) {
-  const router = useRouter();
+  const { data: me } = useCurrentUser();
   const [search, setSearch] = useState("");
+
+  // Only owners / platform users may deactivate a tenant.
+  const canManage = me?.role === "owner" || Boolean(me?.platformRole);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -99,30 +117,136 @@ export function CompaniesTable({ companies }: { companies: Company[] }) {
         cell: ({ row }) => <StatusPill status={row.original.status} />,
       },
       {
-        id: "open",
+        id: "actions",
         header: "",
         meta: { isActions: true } satisfies DataTableColumnMeta,
-        cell: () => (
-          <span className="inline-flex items-center gap-1 rounded-lg bg-accent-soft px-2.5 py-1 text-xs font-medium text-accent-strong transition-colors group-hover:bg-accent group-hover:text-[var(--accent-foreground,white)]">
-            Details
-            <ChevronRight className="size-3.5" />
-          </span>
-        ),
+        cell: ({ row }) => <RowActions company={row.original} canManage={canManage} />,
       },
     ],
-    [],
+    [canManage],
   );
 
   return (
     <DataTableShell
       columns={columns}
       data={filtered}
-      onRowClick={(c) => router.push(`/companies/${c.id}`)}
       toolbar={{
         searchValue: search,
         onSearchChange: setSearch,
         searchPlaceholder: "Search company, owner, or country…",
       }}
     />
+  );
+}
+
+/** Row action icons: view (→ detail), edit (sheet), deactivate (confirm dialog). */
+function RowActions({ company, canManage }: { company: Company; canManage: boolean }) {
+  const router = useRouter();
+  const [editOpen, setEditOpen] = useState(false);
+  const [removeOpen, setRemoveOpen] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const deactivate = useDeactivateCompany();
+
+  const confirmDelete = async () => {
+    setServerError(null);
+    try {
+      await deactivate.mutateAsync(company.id);
+      setRemoveOpen(false);
+    } catch (error) {
+      setServerError(error instanceof ApiError ? error.message : "Something went wrong.");
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-end gap-1">
+      <ActionIcon
+        label="View"
+        icon={Eye}
+        tone="view"
+        onClick={() => router.push(`/companies/${company.id}`)}
+      />
+      <ActionIcon label="Edit" icon={Pencil} tone="edit" onClick={() => setEditOpen(true)} />
+      {/* Controlled by the Edit icon above — no trigger element. */}
+      <CompanyEditSheet company={company} open={editOpen} onOpenChange={setEditOpen} />
+      {canManage ? (
+        <>
+          <ActionIcon
+            label="Deactivate"
+            icon={Trash2}
+            tone="delete"
+            onClick={() => setRemoveOpen(true)}
+          />
+          <Dialog open={removeOpen} onOpenChange={(o) => !o && setRemoveOpen(false)}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Deactivate {company.name}?</DialogTitle>
+                <DialogDescription>
+                  This suspends the company and revokes access for its members. You can
+                  reactivate it later — tenant data is preserved.
+                </DialogDescription>
+              </DialogHeader>
+              {serverError ? <p className="text-sm text-destructive">{serverError}</p> : null}
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setRemoveOpen(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={confirmDelete}
+                  disabled={deactivate.isPending}
+                >
+                  <Trash2 />
+                  {deactivate.isPending ? "Deactivating…" : "Deactivate"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+/** Per-action hover tones: view = light blue, edit = green, delete = red. */
+const ACTION_TONES = {
+  view: "hover:bg-sky-50 hover:text-sky-600",
+  edit: "hover:bg-emerald-50 hover:text-emerald-600",
+  delete: "hover:bg-red-50 hover:text-red-600",
+  accent: "hover:bg-accent-soft hover:text-accent-strong",
+} as const;
+
+function ActionIcon({
+  label,
+  icon: Icon,
+  onClick,
+  tone = "accent",
+}: {
+  label: string;
+  icon: typeof Eye;
+  onClick?: () => void;
+  tone?: keyof typeof ACTION_TONES;
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick?.();
+            }}
+            aria-label={label}
+            className={cn(
+              "inline-flex size-7 cursor-pointer items-center justify-center rounded-lg border border-transparent text-muted-foreground transition-colors",
+              ACTION_TONES[tone],
+            )}
+          >
+            <Icon className="size-4" />
+          </button>
+        }
+      />
+      <TooltipContent side="top">{label}</TooltipContent>
+    </Tooltip>
   );
 }

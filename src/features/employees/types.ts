@@ -4,8 +4,42 @@ export type EmployeeStatus = "invited" | "active" | "on_leave" | "suspended" | "
 export type ContractType = "full_time" | "part_time" | "temporary" | "contractor" | "intern";
 export type WorkScheduleType = "full_time" | "part_time" | "shift" | "flexible" | "remote";
 export type Gender = "male" | "female" | "other" | "prefer_not_to_say";
+export type MaritalStatus = "single" | "married" | "divorced" | "widowed" | "other";
 export type StoreRelation = "secondary" | "guest" | "peak";
 export type CredentialStatus = "valid" | "expiring" | "expired";
+
+export interface BankAccount {
+  id: string;
+  employeeId: string;
+  label: string | null;
+  country: string | null;
+  bankName: string;
+  bankSwift: string | null;
+  bankBrandColor: string | null;
+  accountHolder: string | null;
+  iban: string | null;
+  accountNumber: string | null;
+  currency: string | null;
+  cardNetwork: string | null;
+  cardLast4: string | null;
+  isPrimary: boolean;
+  createdAt: string;
+}
+
+export interface BankAccountInput {
+  label?: string;
+  country?: string;
+  bankName: string;
+  bankSwift?: string;
+  bankBrandColor?: string;
+  accountHolder?: string;
+  iban?: string;
+  accountNumber?: string;
+  currency?: string;
+  cardNetwork?: string;
+  cardLast4?: string;
+  isPrimary?: boolean;
+}
 
 /** Adjustable benefits a company can offer an employee. */
 export type EmployeeBenefits = Record<string, boolean>;
@@ -36,6 +70,8 @@ export interface Employee {
   nationality: string | null;
   dateOfBirth: string | null;
   gender: Gender | null;
+  maritalStatus: MaritalStatus | null;
+  idCardNumber: string | null;
   iban: string | null;
   country: string | null;
   state: string | null;
@@ -90,9 +126,12 @@ export interface EmployeeFilters {
   q?: string;
 }
 
+export type ContractStatus = "active" | "cancelled";
+
 export interface Contract {
   id: string;
   employeeId: string;
+  title: string | null;
   type: ContractType;
   startDate: string;
   endDate: string | null;
@@ -100,7 +139,31 @@ export interface Contract {
   salary: string | null;
   currency: string;
   docId: string | null;
+  status: ContractStatus;
+  cancelReason: string | null;
+  cancelledAt: string | null;
+  deletedAt: string | null;
   createdAt: string;
+  updatedAt: string;
+}
+
+export type ActivationRequestStatus = "pending" | "approved" | "rejected";
+
+export interface ActivationRequest {
+  id: string;
+  companyId: string;
+  employeeId: string | null;
+  email: string;
+  requestedRole: MembershipRole;
+  status: ActivationRequestStatus;
+  source: string;
+  rejectReason: string | null;
+  cooldownUntil: string | null;
+  decidedAt: string | null;
+  createdAt: string;
+  /** Joined display fields. */
+  employeeName: string | null;
+  uniqueCode: string | null;
 }
 
 export interface Qualification {
@@ -150,6 +213,8 @@ export interface EmployeeInput {
   nationality?: string;
   dateOfBirth?: string;
   gender?: Gender;
+  maritalStatus?: MaritalStatus;
+  idCardNumber?: string;
   iban?: string;
   country?: string;
   state?: string;
@@ -160,6 +225,10 @@ export interface EmployeeInput {
   primaryStoreId?: string;
   uniqueCode?: string;
   secondaryStores?: { storeId: string; relation: StoreRelation }[];
+  /** When set, provision a portal login of this role (raises an activation request). */
+  membershipRole?: MembershipRole;
+  /** Login email for the provisioned account (defaults to `email`). */
+  accountEmail?: string;
 }
 
 /** A user eligible to supervise (role above Employee). */

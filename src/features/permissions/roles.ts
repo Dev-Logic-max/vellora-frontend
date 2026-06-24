@@ -89,6 +89,17 @@ export const ROLE_META: Record<MembershipRole, RoleMeta> = Object.fromEntries(
   TENANT_ROLES.map((r) => [r.key, r]),
 ) as Record<MembershipRole, RoleMeta>;
 
+/**
+ * Roles a user of `actor` may ASSIGN when creating a login — strictly below their
+ * own authority (higher `level` = lower authority). Mirrors the backend ceiling:
+ * a user can't create a same-or-higher role. Owner can assign hr → employee, etc.
+ */
+export function assignableRoles(actor: MembershipRole | null | undefined): MembershipRole[] {
+  if (!actor) return [];
+  const actorLevel = ROLE_META[actor]?.level ?? 99;
+  return TENANT_ROLES.filter((r) => r.level > actorLevel).map((r) => r.key);
+}
+
 /** The roles shown as permission-matrix columns (owner is fixed/full-access). */
 export const MATRIX_ROLES: MembershipRole[] = TENANT_ROLES.map((r) => r.key);
 

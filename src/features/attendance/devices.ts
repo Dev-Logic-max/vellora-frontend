@@ -70,18 +70,40 @@ export function useCreateTerminal() {
 export function useTerminalAction() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, action }: { id: string; action: "authorize" | "block" }) =>
-      api.post<Terminal>(`/api/terminals/${id}/${action}`),
+    mutationFn: ({
+      id,
+      action,
+    }: {
+      id: string;
+      action: "authorize" | "block" | "deactivate" | "reactivate";
+    }) => api.post<Terminal>(`/api/terminals/${id}/${action}`),
     onSuccess: () => void qc.invalidateQueries({ queryKey: [TERMINALS_KEY] }),
   });
 }
 
-/** Polls the rotating QR payload while a terminal panel is open. */
-export function useTerminalQr(terminalId: string | undefined, active: boolean) {
+/** Permanently delete a terminal (owner only) — frees the store for a new one. */
+export function useDeleteTerminal() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete<{ id: string }>(`/api/terminals/${id}`),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: [TERMINALS_KEY] }),
+  });
+}
+
+/**
+ * Polls the rotating QR payload while a terminal panel is open. The backend
+ * controls the TTL (`TERMINAL_QR_TTL_SECONDS`); we refetch a little before it
+ * elapses so the on-screen code never goes stale. `intervalMs` overrides.
+ */
+export function useTerminalQr(
+  terminalId: string | undefined,
+  active: boolean,
+  intervalMs?: number,
+) {
   return useQuery({
     queryKey: [TERMINALS_KEY, terminalId, "qr"],
     queryFn: () => api.get<TerminalQr>(`/api/terminals/${terminalId}/qr`),
     enabled: Boolean(terminalId) && active,
-    refetchInterval: active ? 30_000 : false,
+    refetchInterval: active ? (intervalMs ?? 30_000) : false,
   });
 }

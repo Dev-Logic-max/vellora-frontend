@@ -16,6 +16,31 @@ export interface Plan {
   currency: string;
   entitlementsJson: Record<string, boolean>;
   limitsJson: Record<string, number>;
+  // Card presentation (Pricing module / registration cards).
+  tagline?: string | null;
+  description?: string | null;
+  highlights?: string[];
+  popular?: boolean;
+  isActive?: boolean;
+  sortOrder?: number;
+}
+
+/** Editable plan fields sent to the Pricing-module update/create endpoints. */
+export interface PlanUpsertInput {
+  key?: string;
+  name?: string;
+  tier?: number;
+  priceMonth?: string;
+  priceYear?: string;
+  currency?: string;
+  tagline?: string | null;
+  description?: string | null;
+  highlights?: string[];
+  popular?: boolean;
+  isActive?: boolean;
+  sortOrder?: number;
+  limits?: Record<string, number>;
+  entitlements?: Record<string, boolean>;
 }
 
 export interface Subscription {
