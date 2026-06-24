@@ -216,6 +216,25 @@
   }
 }
 
+/* Globally-available scrollbar-hide (works inside portaled modals/popovers that
+   render outside .app-shell). Used by all modals + the scheduling calendar. */
+.scrollbar-none {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* legacy Edge */
+}
+.scrollbar-none::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* Global accent shadow (the .app-shell-scoped one doesn't reach portaled pickers). */
+.shadow-accent-sm {
+  box-shadow:
+    0 1px 2px rgba(var(--accent) / 0.08),
+    0 1px 3px rgba(var(--accent) / 0.06);
+}
+
 /* Respect users who prefer reduced motion — neutralize transitions/animations. */
 @media (prefers-reduced-motion: reduce) {
   *,

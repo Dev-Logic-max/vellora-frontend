@@ -4,8 +4,9 @@ import { useState } from "react";
 import { DayPicker, type DateRange } from "react-day-picker";
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover";
 import { format } from "date-fns";
-import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 
+import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 
 /** Shared themed DayPicker classNames — selected day uses the accent, today is
@@ -54,7 +55,7 @@ function triggerClass(empty: boolean) {
 }
 
 const popupClass =
-  "z-50 rounded-xl border border-border bg-popover p-3 shadow-lg transition-[transform,opacity] duration-150 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0";
+  "z-50 overflow-hidden rounded-xl border border-border bg-popover shadow-lg transition-[transform,opacity] duration-150 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0";
 
 interface DatePickerProps {
   value?: Date;
@@ -64,11 +65,15 @@ interface DatePickerProps {
   disabled?: boolean;
 }
 
-/** Single-date picker — themed calendar in a popover. */
+/**
+ * Single-date picker. The trigger shows `MM/DD/YYYY` (or the picked date) on the
+ * LEFT and a chevron on the RIGHT; fixed height so opening never shifts layout.
+ * The popover hosts the themed {@link Calendar} (header + year-grid + footer).
+ */
 export function DatePicker({
   value,
   onChange,
-  placeholder = "Pick a date",
+  placeholder = "MM/DD/YYYY",
   className,
   disabled,
 }: DatePickerProps) {
@@ -79,26 +84,25 @@ export function DatePicker({
         disabled={disabled}
         className={cn(triggerClass(!value), className)}
       >
-        <CalendarDays className="size-4 text-muted-foreground" />
-        <span className="flex-1 text-left">
-          {value ? format(value, "EEE, MMM d, yyyy") : placeholder}
+        <CalendarDays className="size-4 shrink-0 text-muted-foreground" />
+        <span className={cn("flex-1 text-left tabular-nums", value && "text-foreground")}>
+          {value ? format(value, "MM/dd/yyyy") : placeholder}
         </span>
+        <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
         <PopoverPrimitive.Positioner sideOffset={6} align="start" className="z-50">
           <PopoverPrimitive.Popup className={popupClass}>
-            <DayPicker
-              mode="single"
-              required={false}
+            <Calendar
               selected={value}
               onSelect={(d) => {
                 onChange(d);
                 setOpen(false);
               }}
-              showOutsideDays
-              weekStartsOn={1}
-              components={{ Chevron: CalendarChevron }}
-              classNames={dayPickerClassNames}
+              onClear={() => {
+                onChange(undefined);
+                setOpen(false);
+              }}
             />
           </PopoverPrimitive.Popup>
         </PopoverPrimitive.Positioner>

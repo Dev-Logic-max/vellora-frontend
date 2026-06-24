@@ -7,8 +7,25 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { XIcon } from "lucide-react";
 
-function Dialog({ ...props }: DialogPrimitive.Root.Props) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />;
+function Dialog({ onOpenChange, ...props }: DialogPrimitive.Root.Props) {
+  // Ignore outside-press / focus-out dismissals so clicking a portaled popover
+  // (selects, pickers) inside the dialog doesn't close it. Escape + explicit
+  // close/cancel still work.
+  return (
+    <DialogPrimitive.Root
+      data-slot="dialog"
+      onOpenChange={(open, details) => {
+        if (
+          !open &&
+          (details?.reason === "outside-press" || details?.reason === "focus-out")
+        ) {
+          return;
+        }
+        onOpenChange?.(open, details);
+      }}
+      {...props}
+    />
+  );
 }
 
 function DialogTrigger({ ...props }: DialogPrimitive.Trigger.Props) {

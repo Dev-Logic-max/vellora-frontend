@@ -4,6 +4,7 @@ import { Store as StoreIcon } from "lucide-react";
 
 import { KpiTile } from "@/components/dashboard/kpi-tile";
 import { PageHeader } from "@/components/layout/page-header";
+import { PlanLimitBanner } from "@/components/billing/plan-limit-banner";
 import { CapacityBar } from "@/components/stores/capacity-bar";
 import { StoreCreateSheet } from "@/components/stores/store-create-sheet";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -26,6 +27,8 @@ export default function StoresPage() {
         description="Locations under your active company."
         actions={<StoreCreateSheet />}
       />
+
+      <PlanLimitBanner metric="stores" label="stores" />
 
       {data && data.length > 0 && (
         <div className="grid gap-4 sm:grid-cols-3">

@@ -6,6 +6,10 @@ import { api } from "@/lib/api";
 import { getActiveCompanyId } from "@/lib/active-company";
 import { createClient } from "@/lib/supabase/client";
 import type {
+  ActivationRequest,
+  ActivationRequestStatus,
+  BankAccount,
+  BankAccountInput,
   Contract,
   Employee,
   EmployeeDetail,
@@ -85,6 +89,15 @@ export function useArchiveEmployee() {
   });
 }
 
+/** Permanently delete an employee (irreversible). */
+export function useDeleteEmployee() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete<{ deleted: true }>(`/api/employees/${id}`),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["employees"] }),
+  });
+}
+
 export function useInviteEmployee(id: string) {
   const qc = useQueryClient();
   return useMutation({
@@ -135,6 +148,33 @@ export async function downloadEmployeesCsv(): Promise<void> {
   URL.revokeObjectURL(url);
 }
 
+// ── bank accounts ───────────────────────────────────────────────────────────
+export function useBankAccounts(id: string) {
+  return useQuery({
+    queryKey: ["employee", id, "bank-accounts"],
+    queryFn: () => api.get<BankAccount[]>(`/api/employees/${id}/bank-accounts`),
+    enabled: Boolean(id),
+  });
+}
+
+export function useAddBankAccount(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: BankAccountInput) =>
+      api.post<BankAccount>(`/api/employees/${id}/bank-accounts`, input),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["employee", id, "bank-accounts"] }),
+  });
+}
+
+export function useDeleteBankAccount(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (accountId: string) =>
+      api.delete<{ removed: boolean }>(`/api/employees/${id}/bank-accounts/${accountId}`),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["employee", id, "bank-accounts"] }),
+  });
+}
+
 // ── store links ───────────────────────────────────────────────────────────────
 export function useEmployeeStoreLinks(id: string) {
   return useQuery({
@@ -158,6 +198,36 @@ export function useAddContract(id: string) {
   return useMutation({
     mutationFn: (input: Partial<Contract>) =>
       api.post<Contract>(`/api/employees/${id}/contracts`, input),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["employee", id, "contracts"] }),
+  });
+}
+
+/** Extend an active contract — move (or clear) its end date. */
+export function useExtendContract(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ contractId, endDate }: { contractId: string; endDate: string | null }) =>
+      api.patch<Contract>(`/api/employees/${id}/contracts/${contractId}/extend`, { endDate }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["employee", id, "contracts"] }),
+  });
+}
+
+/** Cancel a contract (kept until permanently deleted). */
+export function useCancelContract(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ contractId, reason }: { contractId: string; reason?: string }) =>
+      api.post<Contract>(`/api/employees/${id}/contracts/${contractId}/cancel`, { reason }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["employee", id, "contracts"] }),
+  });
+}
+
+/** Permanently delete a cancelled contract. */
+export function useDeleteContract(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (contractId: string) =>
+      api.delete<{ deleted: true }>(`/api/employees/${id}/contracts/${contractId}`),
     onSuccess: () => void qc.invalidateQueries({ queryKey: ["employee", id, "contracts"] }),
   });
 }
@@ -213,5 +283,40 @@ export function useUpdatePreferences(id: string) {
     mutationFn: (input: Partial<Omit<EmployeePreferences, "employeeId">>) =>
       api.put<EmployeePreferences>(`/api/employees/${id}/preferences`, input),
     onSuccess: () => void qc.invalidateQueries({ queryKey: ["employee", id, "preferences"] }),
+  });
+}
+
+// ── activation requests (HR/admin approval queue) ─────────────────────────────
+export function useActivationRequests(status?: ActivationRequestStatus, enabled = true) {
+  return useQuery({
+    queryKey: ["activation-requests", status ?? "all"],
+    queryFn: () =>
+      api.get<ActivationRequest[]>(
+        `/api/employees/activation-requests${status ? `?status=${status}` : ""}`,
+      ),
+    enabled,
+  });
+}
+
+export function useApproveActivation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (requestId: string) =>
+      api.post<ActivationRequest>(`/api/employees/activation-requests/${requestId}/approve`),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["activation-requests"] });
+      void qc.invalidateQueries({ queryKey: ["employees"] });
+    },
+  });
+}
+
+export function useRejectActivation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ requestId, reason }: { requestId: string; reason?: string }) =>
+      api.post<ActivationRequest>(`/api/employees/activation-requests/${requestId}/reject`, {
+        reason,
+      }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["activation-requests"] }),
   });
 }

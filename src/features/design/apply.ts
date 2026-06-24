@@ -53,7 +53,6 @@ export const PALETTE_GROUPS: TokenGroup[] = [
       { var: "--chart-1", label: "Chart lead" },
       { var: "--chart-3", label: "Chart alt" },
       { var: "--chart-4", label: "Chart 3rd" },
-      { var: "--chart-2", label: "Chart blue" },
     ],
   },
   {
@@ -127,12 +126,22 @@ export function accentRamp(swatch: string): string[] {
   return [0.1, 0.25, 0.45, 0.7, 0.9, 1].map((a) => `rgb(${swatch} / ${a})`);
 }
 
-/** Applies the accent preset to the live dashboard scope via `data-accent`. */
+/** Applies the accent preset to the live dashboard scope via `data-accent`, and
+ * mirrors the resolved accent vars onto :root so PORTALED popups (date/time
+ * pickers, rich-selects, dialogs that mount at <body>) inherit the active theme
+ * instead of the default indigo. */
 export function applyAccent(accent: string) {
   if (typeof document === "undefined") return;
   document.querySelectorAll<HTMLElement>(SCOPE_SELECTOR).forEach((el) => {
     el.dataset.accent = accent;
   });
+  // Mirror onto :root for portaled content (read live from the just-set scope).
+  const root = document.documentElement;
+  root.dataset.accent = accent;
+  for (const v of ["--accent", "--accent-strong", "--accent-soft", "--primary", "--ring"]) {
+    const resolved = readLiveToken(v);
+    if (resolved && resolved !== "0 0 0") root.style.setProperty(v, resolved);
+  }
 }
 
 export function cacheAccent(accent: string) {
@@ -159,6 +168,32 @@ export interface UiPrefs {
   tabsIcons?: boolean;
   /** Dashboard section motif (glance/dots/hexagons/squares). */
   sectionPattern?: "glance" | "dots" | "hexagons" | "squares";
+  /** Clock display: 12-hour (AM/PM) or 24-hour. Times are stored in UTC; this
+   * only affects display. */
+  timeFormat?: "12h" | "24h";
+}
+
+const TIME_FORMAT_KEY = "vellora-time-format";
+
+/** Reads the cached time-format pref (sync, for formatters). Defaults to 12h. */
+export function readCachedTimeFormat(): "12h" | "24h" {
+  if (typeof window === "undefined") return "12h";
+  try {
+    return localStorage.getItem(TIME_FORMAT_KEY) === "24h" ? "24h" : "12h";
+  } catch {
+    return "12h";
+  }
+}
+
+/** Persists + applies the time-format pref (also sets a data attr for CSS if needed). */
+export function applyTimeFormat(fmt: "12h" | "24h") {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(TIME_FORMAT_KEY, fmt);
+  } catch {
+    /* ignore */
+  }
+  document.documentElement.dataset.timeFormat = fmt;
 }
 
 /** Applies UI prefs to the dashboard scope via data attributes:

@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Clock, PencilLine } from "lucide-react";
+import { Clock, Eye, PencilLine, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -40,12 +40,16 @@ export function LogsTable({
   isLoading,
   tz,
   onCorrect,
+  onView,
+  onDelete,
   toolbar,
 }: {
   logs: AttendanceLog[];
   isLoading?: boolean;
   tz: string;
   onCorrect: (log: AttendanceLog) => void;
+  onView: (log: AttendanceLog) => void;
+  onDelete: (log: AttendanceLog) => void;
   toolbar?: TableToolbarConfig;
 }) {
   const columns = useMemo<ColumnDef<AttendanceLog, unknown>[]>(
@@ -100,13 +104,6 @@ export function LogsTable({
         cell: ({ row }) => <span className="tabular-nums">{workedLabel(row.original)}</span>,
       },
       {
-        header: "Breaks",
-        cell: ({ row }) => {
-          const n = (row.original.breaks ?? []).length;
-          return <span className="text-muted-foreground tabular-nums">{n || "—"}</span>;
-        },
-      },
-      {
         header: "Method",
         cell: ({ row }) => <span className="capitalize">{row.original.method}</span>,
       },
@@ -119,21 +116,46 @@ export function LogsTable({
         header: "",
         meta: { isActions: true } satisfies DataTableColumnMeta,
         cell: ({ row }) => (
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onCorrect(row.original);
-            }}
-            aria-label="Request correction"
-          >
-            <PencilLine />
-          </Button>
+          <div className="flex items-center justify-end gap-1">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onView(row.original);
+              }}
+              aria-label="View detail"
+            >
+              <Eye />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onCorrect(row.original);
+              }}
+              aria-label="Request correction"
+            >
+              <PencilLine />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="text-muted-foreground hover:text-danger"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(row.original);
+              }}
+              aria-label="Delete log"
+            >
+              <Trash2 />
+            </Button>
+          </div>
         ),
       },
     ],
-    [tz, onCorrect],
+    [tz, onCorrect, onView, onDelete],
   );
 
   return (

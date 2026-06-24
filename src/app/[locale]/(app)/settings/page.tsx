@@ -1,6 +1,13 @@
 "use client";
 
-import { CreditCard, Palette, ShieldCheck, type LucideIcon } from "lucide-react";
+import {
+  CreditCard,
+  Palette,
+  ShieldCheck,
+  SlidersHorizontal,
+  Smartphone,
+  type LucideIcon,
+} from "lucide-react";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { Link } from "@/i18n/navigation";
@@ -14,6 +21,12 @@ interface SettingLink {
 
 const LINKS: SettingLink[] = [
   {
+    href: "/settings/device",
+    label: "Device",
+    description: "Register the device you clock in from.",
+    icon: Smartphone,
+  },
+  {
     href: "/permissions",
     label: "Permissions",
     description: "Control which roles can access each module.",
@@ -24,6 +37,12 @@ const LINKS: SettingLink[] = [
     label: "Design",
     description: "Theme, layout, and component preferences.",
     icon: Palette,
+  },
+  {
+    href: "/settings/preferences",
+    label: "Preferences",
+    description: "Time format and personal display options.",
+    icon: SlidersHorizontal,
   },
   {
     href: "/settings/billing",

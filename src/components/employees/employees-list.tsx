@@ -2,38 +2,28 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Check, Copy, Download, Eye, Pencil, Plus, Trash2, Upload, Users } from "lucide-react";
+import { Check, Copy, Download, Eye, Pencil, Plus, Trash2, Upload, UserCheck, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/page-header";
+import { PlanLimitBanner } from "@/components/billing/plan-limit-banner";
 import { Button } from "@/components/ui/button";
 import { AvatarPreview } from "@/components/ui/avatar-preview";
 import { DataTableShell, type DataTableColumnMeta } from "@/components/ui/data-table-shell";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { RoleTag } from "@/components/ui/role-tag";
 import { StatusPill } from "@/components/ui/status-pill";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { FilterValues } from "@/components/ui/filter-modal";
 import { EmployeeFormSheet } from "@/components/employees/employee-form-sheet";
+import { EmployeeDeleteModal } from "@/components/employees/employee-delete-modal";
+import { ExportEmployeesDialog } from "@/components/employees/export-employees-dialog";
 import { ImportEmployeesDialog } from "@/components/employees/import-employees-dialog";
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { useStores } from "@/features/org/stores";
 import { useCurrentUser } from "@/features/session/use-current-user";
-import {
-  downloadEmployeesCsv,
-  useArchiveEmployee,
-  useEmployees,
-} from "@/features/employees/employees";
+import { useActivationRequests, useEmployees } from "@/features/employees/employees";
 import { EMPLOYEE_STATUS_OPTIONS } from "@/features/employees/constants";
 import type { Employee, EmployeeDetail, EmployeeStatus } from "@/features/employees/types";
 import type { MembershipRole } from "@/features/session/types";
@@ -77,6 +67,10 @@ export function EmployeesList() {
   const canManage =
     me?.role && ["owner", "hr", "area_manager", "store_manager"].includes(me.role);
   const canImportExport = me?.role === "owner" || me?.role === "hr";
+  // Owner/HR approve user activations — surface a pending-count badge.
+  const canActivate = me?.role === "owner" || me?.role === "hr";
+  const { data: pending } = useActivationRequests("pending", canActivate);
+  const pendingCount = pending?.length ?? 0;
 
   const columns = useMemo<ColumnDef<Employee, unknown>[]>(
     () => [
@@ -158,12 +152,30 @@ export function EmployeesList() {
         description="Your people directory across every store."
         actions={
           <div className="flex items-center gap-2">
+            {canActivate ? (
+              <Link
+                href="/employees/activation"
+                className="relative inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-accent-soft"
+              >
+                <UserCheck className="size-4" />
+                Activations
+                {pendingCount > 0 ? (
+                  <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 py-0.5 text-[11px] font-semibold text-primary-foreground tabular-nums">
+                    {pendingCount}
+                  </span>
+                ) : null}
+              </Link>
+            ) : null}
             {canImportExport ? (
               <>
-                <Button variant="outline" onClick={() => void downloadEmployeesCsv()}>
-                  <Download />
-                  Export
-                </Button>
+                <ExportEmployeesDialog
+                  trigger={
+                    <Button variant="outline">
+                      <Download />
+                      Export
+                    </Button>
+                  }
+                />
                 <ImportEmployeesDialog
                   trigger={
                     <Button variant="outline">
@@ -187,6 +199,8 @@ export function EmployeesList() {
           </div>
         }
       />
+
+      {canManage ? <PlanLimitBanner metric="employees" label="employees" /> : null}
 
       {isError ? (
         <p className="text-sm text-destructive">Couldn&apos;t load employees.</p>
@@ -278,14 +292,11 @@ function CopyIdBadge({ id }: { id: string }) {
   );
 }
 
-/** Row action icons: view (→ detail), edit (sheet), deactivate (confirm). */
+/** Row action icons: view (→ detail), edit (sheet), remove (rich modal). */
 function RowActions({ employee, canManage }: { employee: Employee; canManage: boolean }) {
   const router = useRouter();
-  const archive = useArchiveEmployee();
   const [editOpen, setEditOpen] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-
-  const isArchived = employee.status === "archived";
+  const [removeOpen, setRemoveOpen] = useState(false);
 
   return (
     <div className="flex items-center justify-end gap-1">
@@ -303,43 +314,22 @@ function RowActions({ employee, canManage }: { employee: Employee; canManage: bo
             employee={employee as EmployeeDetail}
             open={editOpen}
             onOpenChange={setEditOpen}
+            onDelete={() => {
+              setEditOpen(false);
+              setRemoveOpen(true);
+            }}
           />
           <ActionIcon
-            label={isArchived ? "Deactivated" : "Deactivate"}
+            label="Remove"
             icon={Trash2}
             tone="delete"
-            disabled={isArchived}
-            onClick={() => setConfirmOpen(true)}
+            onClick={() => setRemoveOpen(true)}
           />
-          <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Deactivate this employee?</DialogTitle>
-                <DialogDescription>
-                  {employee.firstName} {employee.lastName} will be archived and lose portal access.
-                  This does not permanently delete their record — you can reactivate them later.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
-                <Button
-                  variant="destructive"
-                  disabled={archive.isPending}
-                  onClick={async () => {
-                    try {
-                      await archive.mutateAsync(employee.id);
-                      toast.success("Employee deactivated");
-                      setConfirmOpen(false);
-                    } catch {
-                      toast.error("Couldn't deactivate");
-                    }
-                  }}
-                >
-                  {archive.isPending ? "Deactivating…" : "Deactivate"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <EmployeeDeleteModal
+            employee={employee}
+            open={removeOpen}
+            onOpenChange={setRemoveOpen}
+          />
         </>
       ) : null}
     </div>
