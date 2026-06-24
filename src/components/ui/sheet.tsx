@@ -54,19 +54,42 @@ function SheetOverlay({ className, ...props }: SheetPrimitive.Backdrop.Props) {
   );
 }
 
+/** Standalone overlay that closes the sheet on a real backdrop click — used when
+ * `closeOnBackdrop` is set. The backdrop is never the portaled-picker target, so
+ * this is unambiguous (unlike base-ui's outside-press, which we still suppress). */
+function ClosableOverlay({ className }: { className?: string }) {
+  return (
+    <SheetPrimitive.Close
+      render={
+        <div
+          data-slot="sheet-overlay"
+          className={cn(
+            "fixed inset-0 z-50 bg-black/10 transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-xs",
+            className,
+          )}
+        />
+      }
+    />
+  );
+}
+
 function SheetContent({
   className,
   children,
   side = "right",
   showCloseButton = true,
+  closeOnBackdrop = false,
   ...props
 }: SheetPrimitive.Popup.Props & {
   side?: "top" | "right" | "bottom" | "left";
   showCloseButton?: boolean;
+  /** Close the sheet when the backdrop is clicked (a Close trigger, so it does
+   * not run reset-on-cancel logic — used by forms that must keep their data). */
+  closeOnBackdrop?: boolean;
 }) {
   return (
     <SheetPortal>
-      <SheetOverlay />
+      {closeOnBackdrop ? <ClosableOverlay /> : <SheetOverlay />}
       <SheetPrimitive.Popup
         data-slot="sheet-content"
         data-side={side}

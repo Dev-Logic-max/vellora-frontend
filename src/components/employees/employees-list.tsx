@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Check, Copy, Download, Eye, Pencil, Plus, Trash2, Upload, Users } from "lucide-react";
+import { Check, Copy, Download, Eye, Pencil, Plus, Trash2, Upload, UserCheck, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/page-header";
+import { PlanLimitBanner } from "@/components/billing/plan-limit-banner";
 import { Button } from "@/components/ui/button";
 import { AvatarPreview } from "@/components/ui/avatar-preview";
 import { DataTableShell, type DataTableColumnMeta } from "@/components/ui/data-table-shell";
@@ -18,11 +19,11 @@ import { EmployeeFormSheet } from "@/components/employees/employee-form-sheet";
 import { EmployeeDeleteModal } from "@/components/employees/employee-delete-modal";
 import { ExportEmployeesDialog } from "@/components/employees/export-employees-dialog";
 import { ImportEmployeesDialog } from "@/components/employees/import-employees-dialog";
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { useStores } from "@/features/org/stores";
 import { useCurrentUser } from "@/features/session/use-current-user";
-import { useEmployees } from "@/features/employees/employees";
+import { useActivationRequests, useEmployees } from "@/features/employees/employees";
 import { EMPLOYEE_STATUS_OPTIONS } from "@/features/employees/constants";
 import type { Employee, EmployeeDetail, EmployeeStatus } from "@/features/employees/types";
 import type { MembershipRole } from "@/features/session/types";
@@ -66,6 +67,10 @@ export function EmployeesList() {
   const canManage =
     me?.role && ["owner", "hr", "area_manager", "store_manager"].includes(me.role);
   const canImportExport = me?.role === "owner" || me?.role === "hr";
+  // Owner/HR approve user activations — surface a pending-count badge.
+  const canActivate = me?.role === "owner" || me?.role === "hr";
+  const { data: pending } = useActivationRequests("pending", canActivate);
+  const pendingCount = pending?.length ?? 0;
 
   const columns = useMemo<ColumnDef<Employee, unknown>[]>(
     () => [
@@ -147,6 +152,20 @@ export function EmployeesList() {
         description="Your people directory across every store."
         actions={
           <div className="flex items-center gap-2">
+            {canActivate ? (
+              <Link
+                href="/employees/activation"
+                className="relative inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-accent-soft"
+              >
+                <UserCheck className="size-4" />
+                Activations
+                {pendingCount > 0 ? (
+                  <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 py-0.5 text-[11px] font-semibold text-primary-foreground tabular-nums">
+                    {pendingCount}
+                  </span>
+                ) : null}
+              </Link>
+            ) : null}
             {canImportExport ? (
               <>
                 <ExportEmployeesDialog
@@ -180,6 +199,8 @@ export function EmployeesList() {
           </div>
         }
       />
+
+      {canManage ? <PlanLimitBanner metric="employees" label="employees" /> : null}
 
       {isError ? (
         <p className="text-sm text-destructive">Couldn&apos;t load employees.</p>

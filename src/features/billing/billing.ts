@@ -8,12 +8,15 @@ import type {
   EffectiveAccess,
   Invoice,
   Plan,
+  PlanUpsertInput,
   Subscription,
   UsageMeter,
 } from "./types";
 
 const SUB_KEY = "billing-subscription";
 const PLANS_KEY = "billing-plans";
+const PUBLIC_PLANS_KEY = "public-plans";
+const ADMIN_PLANS_KEY = "admin-plans";
 const USAGE_KEY = "billing-usage";
 const INVOICES_KEY = "billing-invoices";
 const ENTITLEMENTS_KEY = "billing-entitlements";
@@ -23,6 +26,49 @@ export function usePlans() {
     queryKey: [PLANS_KEY],
     queryFn: () => api.get<Plan[]>("/api/billing/plans"),
     staleTime: 5 * 60_000,
+  });
+}
+
+/** Public plan catalogue (active plans) — registration + company-create cards.
+ * Unauthenticated-safe (no token required). */
+export function usePublicPlans() {
+  return useQuery({
+    queryKey: [PUBLIC_PLANS_KEY],
+    queryFn: () => api.get<Plan[]>("/api/plans"),
+    staleTime: 5 * 60_000,
+  });
+}
+
+/** All plans incl. inactive (Pricing module, super-admin). */
+export function useAdminPlans() {
+  return useQuery({
+    queryKey: [ADMIN_PLANS_KEY],
+    queryFn: () => api.get<Plan[]>("/api/admin/plans"),
+    staleTime: 60_000,
+  });
+}
+
+export function useUpdatePlan() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: PlanUpsertInput }) =>
+      api.put<Plan>(`/api/admin/plans/${id}`, input),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: [ADMIN_PLANS_KEY] });
+      void qc.invalidateQueries({ queryKey: [PUBLIC_PLANS_KEY] });
+      void qc.invalidateQueries({ queryKey: [PLANS_KEY] });
+    },
+  });
+}
+
+export function useCreatePlan() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: PlanUpsertInput) => api.post<Plan>("/api/admin/plans", input),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: [ADMIN_PLANS_KEY] });
+      void qc.invalidateQueries({ queryKey: [PUBLIC_PLANS_KEY] });
+    },
   });
 }
 

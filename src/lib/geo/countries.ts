@@ -67,9 +67,22 @@ export const COUNTRIES: CountryDef[] = [
 ];
 
 const BY_CODE = new Map(COUNTRIES.map((c) => [c.code, c]));
+const BY_NAME = new Map(COUNTRIES.map((c) => [c.name.toLowerCase(), c]));
 
 export function countryName(code: string | null | undefined): string | undefined {
   return code ? BY_CODE.get(code.toUpperCase())?.name : undefined;
+}
+
+/**
+ * Resolve a stored country/nationality value (either an alpha-2 code OR a full
+ * name like "United States") to its ISO alpha-2 code, for flag rendering. Returns
+ * undefined when it can't be matched.
+ */
+export function countryCode(value: string | null | undefined): string | undefined {
+  if (!value) return undefined;
+  const v = value.trim();
+  if (/^[A-Za-z]{2}$/.test(v) && BY_CODE.has(v.toUpperCase())) return v.toUpperCase();
+  return BY_NAME.get(v.toLowerCase())?.code;
 }
 
 /**

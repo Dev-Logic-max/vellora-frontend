@@ -5,21 +5,28 @@ import { useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   Award,
+  Briefcase,
+  Building,
   CalendarDays,
   CalendarOff,
   Clock,
   FileText,
   ClipboardList,
+  IdCard,
+  Mail,
   MessageSquare,
   Pencil,
+  Phone,
   Settings,
+  Store,
   Trash2,
   UserRound,
 } from "lucide-react";
 
-import { CountryFlag } from "@/components/ui/country-flag";
+import { Flag } from "@/components/ui/flag";
 import { EntityAvatar } from "@/components/ui/entity-avatar";
 import { RoleTag } from "@/components/ui/role-tag";
+import { countryCode, countryName } from "@/lib/geo/countries";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusPill } from "@/components/ui/status-pill";
 import { SegmentedTabs, type SegmentedTab } from "@/components/ui/segmented-tabs";
@@ -119,31 +126,108 @@ function AttendanceEmpty() {
   );
 }
 
-function Detail({ label, value }: { label: string; value: React.ReactNode }) {
+function Detail({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: React.ReactNode;
+  icon: typeof UserRound;
+}) {
   return (
-    <div>
-      <dt className="text-xs tracking-wide text-muted-foreground uppercase">{label}</dt>
-      <dd className="mt-0.5 text-sm text-foreground">{value || "—"}</dd>
+    <div className="flex items-start gap-3 rounded-xl border border-border bg-surface px-4 py-3 transition-colors hover:border-primary/30">
+      <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-primary">
+        <Icon className="size-4" />
+      </span>
+      <div className="min-w-0">
+        <dt className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+          {label}
+        </dt>
+        <dd className="mt-0.5 truncate text-sm font-medium text-foreground">{value || "—"}</dd>
+      </div>
     </div>
   );
 }
 
+/** A small titled section block (accent rule header) wrapping a detail grid. */
 function ProfileDetails({ employee }: { employee: EmployeeDetail }) {
   return (
-    <dl className="grid grid-cols-2 gap-5 rounded-xl border border-border bg-surface p-5 sm:grid-cols-3">
-      <Detail label="Employee ID" value={<span className="font-mono">{employee.uniqueCode}</span>} />
-      <Detail label="Role" value={employee.role} />
-      <Detail label="Department" value={employee.department} />
-      <Detail label="Primary store" value={employee.primaryStore?.name} />
-      <Detail label="Hire date" value={employee.hireDate} />
-      <Detail
-        label="Contract"
-        value={employee.contractType ? CONTRACT_TYPE_LABEL[employee.contractType] : null}
+    <div className="space-y-4">
+      <SectionHeader title="Overview" icon={UserRound} />
+      <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <Detail
+          icon={IdCard}
+          label="Employee ID"
+          value={<span className="font-mono">{employee.uniqueCode}</span>}
+        />
+        <Detail icon={Briefcase} label="Job role" value={employee.role} />
+        <Detail icon={Building} label="Department" value={employee.department} />
+        <Detail icon={Store} label="Primary store" value={employee.primaryStore?.name} />
+        <Detail icon={CalendarDays} label="Hire date" value={employee.hireDate} />
+        <Detail
+          icon={FileText}
+          label="Contract"
+          value={employee.contractType ? CONTRACT_TYPE_LABEL[employee.contractType] : null}
+        />
+        <Detail icon={Mail} label="Email" value={employee.email} />
+        <Detail icon={Phone} label="Phone" value={employee.phone} />
+        <Detail icon={Clock} label="Timezone" value={employee.timezone} />
+      </dl>
+    </div>
+  );
+}
+
+/** Accent-ruled section header used across the profile tab. */
+function SectionHeader({ title, icon: Icon }: { title: string; icon: typeof UserRound }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span className="flex size-7 items-center justify-center rounded-lg bg-accent-soft text-primary">
+        <Icon className="size-4" />
+      </span>
+      <h3 className="font-display text-sm font-semibold text-foreground">{title}</h3>
+      <span
+        className="h-px flex-1 rounded-full"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, rgb(var(--accent) / 0.45), rgb(var(--accent) / 0.12) 60%, transparent)",
+        }}
       />
-      <Detail label="Locale" value={employee.locale} />
-      <Detail label="Timezone" value={employee.timezone} />
-      <Detail label="Email" value={employee.email} />
-    </dl>
+    </div>
+  );
+}
+
+/** Designed empty state for the Leave tab — mirrors the attendance legend style. */
+function LeaveEmpty() {
+  const TYPES = [
+    { label: "Annual", from: "from-emerald-500", to: "to-teal-500" },
+    { label: "Sick", from: "from-rose-500", to: "to-red-500" },
+    { label: "Unpaid", from: "from-slate-400", to: "to-slate-500" },
+    { label: "Parental", from: "from-violet-500", to: "to-fuchsia-500" },
+  ];
+  return (
+    <div className="rounded-2xl border border-border bg-surface px-6 py-12 text-center">
+      <div className="mx-auto flex max-w-md flex-col items-center gap-4">
+        <span className="flex size-14 items-center justify-center rounded-2xl bg-accent-soft text-primary">
+          <CalendarOff className="size-7" />
+        </span>
+        <h3 className="font-display text-lg font-semibold text-foreground">No leave yet</h3>
+        <p className="text-sm text-muted-foreground">
+          This employee&apos;s leave requests, balances and holidays will appear here once they
+          book time off.
+        </p>
+        <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
+          {TYPES.map((s) => (
+            <span
+              key={s.label}
+              className={`inline-flex items-center gap-1.5 rounded-full bg-linear-to-r ${s.from} ${s.to} px-3 py-1 text-xs font-medium text-white shadow-sm`}
+            >
+              {s.label}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -167,10 +251,12 @@ export function EmployeeProfile({ id }: { id: string }) {
 
   const fullName = `${employee.firstName} ${employee.lastName}`;
   // Prefer the employee's own country/nationality; fall back to the locale region.
-  const country =
+  // Resolve to an ISO alpha-2 so we can render the real flag SVG (not initials).
+  const rawCountry =
     employee.country ??
     employee.nationality ??
     (employee.locale?.includes("-") ? (employee.locale.split("-")[1] ?? null) : null);
+  const cc = countryCode(rawCountry);
 
   return (
     <div className="space-y-6">
@@ -207,10 +293,13 @@ export function EmployeeProfile({ id }: { id: string }) {
         ) : null}
       </div>
 
-      {/* Identity hero: avatar TOP-LEFT (rounded-full), name + status right, role
-          tag under the name. Soft theme glow bottom-right. */}
+      {/* Identity hero: avatar TOP-LEFT (rounded-full), name + status right,
+          PLATFORM role tag under the name + real country flag. Theme-colored glow
+          bottom-right (mirrors the dashboard's accent glow). */}
       <section className="relative overflow-hidden rounded-2xl border border-border bg-surface p-6 shadow-sm">
-        <div className="pointer-events-none absolute -right-10 -bottom-10 size-48 rounded-full bg-accent/10 blur-3xl" />
+        {/* Layered accent glow, bottom-right — same treatment as the dashboard. */}
+        <div className="pointer-events-none absolute -right-16 -bottom-20 size-64 rounded-full bg-accent/25 blur-[80px]" />
+        <div className="pointer-events-none absolute right-6 -bottom-10 size-40 rounded-full bg-primary/20 blur-3xl" />
         <div className="relative flex items-start justify-between gap-4">
           <div className="flex items-start gap-4">
             <EntityAvatar
@@ -222,15 +311,27 @@ export function EmployeeProfile({ id }: { id: string }) {
             <div className="min-w-0">
               <div className="flex items-center gap-2.5">
                 <h1 className="font-display text-2xl font-semibold text-foreground">{fullName}</h1>
-                {country ? <CountryFlag code={country} /> : null}
+                {cc ? (
+                  <span
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/80 py-0.5 pr-2 pl-1 shadow-sm"
+                    title={countryName(cc) ?? cc}
+                  >
+                    <Flag code={cc} className="h-3.5 w-5 rounded-[3px]" />
+                    <span className="text-xs font-medium text-muted-foreground">{cc}</span>
+                  </span>
+                ) : null}
               </div>
-              <div className="mt-2">
+              {/* The PLATFORM (membership) role — not the free-text job title. */}
+              <div className="mt-2 flex items-center gap-2">
                 {employee.membershipRole ? (
                   <RoleTag role={employee.membershipRole as MembershipRole} />
-                ) : employee.role ? (
+                ) : (
                   <span className="inline-flex items-center rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                    {employee.role}
+                    No portal login
                   </span>
+                )}
+                {employee.role ? (
+                  <span className="text-xs text-muted-foreground">· {employee.role}</span>
                 ) : null}
               </div>
             </div>
@@ -259,7 +360,7 @@ export function EmployeeProfile({ id }: { id: string }) {
           ) : null}
           {tab === "contract" ? <ContractTab employeeId={employee.id} /> : null}
           {tab === "shifts" ? <StubTab label="Shifts" /> : null}
-          {tab === "leave" ? <StubTab label="Leave & holidays" /> : null}
+          {tab === "leave" ? <LeaveEmpty /> : null}
           {tab === "attendance" ? <AttendanceEmpty /> : null}
           {tab === "onboarding" ? <OnboardingEmpty canManage={canManage} /> : null}
           {tab === "documents" ? <StubTab label="Documents" /> : null}

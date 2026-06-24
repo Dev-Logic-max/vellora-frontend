@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Shuffle,
   Store,
+  Tags,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -110,6 +111,13 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "Admin",
         href: "/admin",
         icon: ShieldCheck,
+        roles: ALL_ROLES,
+        platformOnly: true,
+      },
+      {
+        label: "Pricing",
+        href: "/admin/pricing",
+        icon: Tags,
         roles: ALL_ROLES,
         platformOnly: true,
       },

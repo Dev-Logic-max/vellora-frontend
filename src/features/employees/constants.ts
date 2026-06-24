@@ -1,3 +1,15 @@
+import {
+  Bus,
+  CarFront,
+  Dumbbell,
+  HeartPulse,
+  Home,
+  ShieldPlus,
+  Smile,
+  UtensilsCrossed,
+  type LucideIcon,
+} from "lucide-react";
+
 import type {
   ContractType,
   EmployeeStatus,
@@ -67,3 +79,15 @@ export const BENEFIT_OPTIONS: { key: string; label: string }[] = [
   { key: "remote_stipend", label: "Remote stipend" },
   { key: "paid_parking", label: "Paid parking" },
 ];
+
+/** Icon per benefit key (rendered in the benefits grid). */
+export const BENEFIT_ICONS: Record<string, LucideIcon> = {
+  first_aid: ShieldPlus,
+  medical: HeartPulse,
+  dental: Smile,
+  meal_allowance: UtensilsCrossed,
+  transport: Bus,
+  gym: Dumbbell,
+  remote_stipend: Home,
+  paid_parking: CarFront,
+};

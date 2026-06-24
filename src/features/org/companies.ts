@@ -71,6 +71,7 @@ export interface CompanyInput {
   timezone?: string;
   groupId?: string;
   ownerUserId?: string;
+  category?: string;
   registrationNumber?: string;
   companyEmail?: string;
   phone?: string;

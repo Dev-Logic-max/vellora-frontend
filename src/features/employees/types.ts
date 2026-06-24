@@ -126,9 +126,12 @@ export interface EmployeeFilters {
   q?: string;
 }
 
+export type ContractStatus = "active" | "cancelled";
+
 export interface Contract {
   id: string;
   employeeId: string;
+  title: string | null;
   type: ContractType;
   startDate: string;
   endDate: string | null;
@@ -136,7 +139,31 @@ export interface Contract {
   salary: string | null;
   currency: string;
   docId: string | null;
+  status: ContractStatus;
+  cancelReason: string | null;
+  cancelledAt: string | null;
+  deletedAt: string | null;
   createdAt: string;
+  updatedAt: string;
+}
+
+export type ActivationRequestStatus = "pending" | "approved" | "rejected";
+
+export interface ActivationRequest {
+  id: string;
+  companyId: string;
+  employeeId: string | null;
+  email: string;
+  requestedRole: MembershipRole;
+  status: ActivationRequestStatus;
+  source: string;
+  rejectReason: string | null;
+  cooldownUntil: string | null;
+  decidedAt: string | null;
+  createdAt: string;
+  /** Joined display fields. */
+  employeeName: string | null;
+  uniqueCode: string | null;
 }
 
 export interface Qualification {
@@ -198,6 +225,10 @@ export interface EmployeeInput {
   primaryStoreId?: string;
   uniqueCode?: string;
   secondaryStores?: { storeId: string; relation: StoreRelation }[];
+  /** When set, provision a portal login of this role (raises an activation request). */
+  membershipRole?: MembershipRole;
+  /** Login email for the provisioned account (defaults to `email`). */
+  accountEmail?: string;
 }
 
 /** A user eligible to supervise (role above Employee). */

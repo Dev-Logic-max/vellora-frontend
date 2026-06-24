@@ -21,6 +21,7 @@ export interface Company {
   planId: string | null;
   logoUrl: string | null;
   ownerUserId: string | null;
+  category: string | null;
   registrationNumber: string | null;
   companyEmail: string | null;
   phone: string | null;
