@@ -10,7 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useCurrentUser } from "@/features/session/use-current-user";
-import { readCachedAccent, readCachedPrefs } from "@/features/design/apply";
+import {
+  applyAccent,
+  applyTimeFormat,
+  readCachedAccent,
+  readCachedPrefs,
+  readCachedTimeFormat,
+} from "@/features/design/apply";
 import { AppSidebar } from "./app-sidebar";
 import { CommandPalette } from "./command-palette";
 import { MobileNav } from "./mobile-nav";
@@ -28,6 +34,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [accent] = useState(() => readCachedAccent());
   // UI prefs (density / motion) — cached for a flash-free first paint.
   const [prefs] = useState(() => readCachedPrefs());
+
+  // Mirror the accent onto :root (so portaled popups are themed) + apply the
+  // time-format pref — on mount, not just when changed in the Design module.
+  useEffect(() => {
+    applyAccent(readCachedAccent());
+    applyTimeFormat(readCachedTimeFormat());
+  }, []);
 
   // Cmd/Ctrl-K toggles the super-search palette.
   useEffect(() => {

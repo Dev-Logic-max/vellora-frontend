@@ -275,7 +275,7 @@ export function ScheduleBoard() {
           }}
         />
       ) : (
-        <div className="scrollbar-thin max-h-[640px] overflow-y-auto">
+        <div className="scrollbar-none max-h-[640px] overflow-y-auto">
           <TimeGrid
             days={days}
             shifts={shifts ?? []}

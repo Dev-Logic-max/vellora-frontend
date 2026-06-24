@@ -33,6 +33,9 @@ export const ATTENDANCE_STATUS_STYLES: Record<string, string> = {
   active: "bg-success-soft text-success",
   pending: "bg-warning-soft text-warning",
   reset: "bg-muted text-muted-foreground",
+  inactive: "bg-warning-soft text-warning",
+  disabled: "bg-warning-soft text-warning",
+  revoked: "bg-muted text-muted-foreground",
   blocked: "bg-danger-soft text-danger",
 };
 
@@ -68,6 +71,7 @@ export const DEVICE_STATUS_OPTIONS: { value: DeviceStatus; label: string }[] = [
 export const TERMINAL_STATUS_LABELS: Record<TerminalStatus, string> = {
   pending: "Pending",
   active: "Active",
+  inactive: "Inactive",
   blocked: "Blocked",
 };
 

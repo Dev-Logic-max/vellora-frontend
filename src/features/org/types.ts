@@ -4,6 +4,12 @@ export type CompanyStatus = "pending" | "active" | "inactive" | "suspended" | "d
 export type StoreStatus = "pending" | "active" | "inactive" | "suspended" | "archived";
 export type BillingMode = "consolidated" | "per_company";
 
+/** Per-company feature toggles (mirrors backend CompanySettings). */
+export interface CompanySettings {
+  /** Require a device fingerprint match (secondary to registration) to clock in. */
+  requireDeviceFingerprint?: boolean;
+}
+
 export interface Company {
   id: string;
   groupId: string | null;
@@ -15,6 +21,7 @@ export interface Company {
   planId: string | null;
   logoUrl: string | null;
   ownerUserId: string | null;
+  category: string | null;
   registrationNumber: string | null;
   companyEmail: string | null;
   phone: string | null;
@@ -23,6 +30,7 @@ export interface Company {
   postalCode: string | null;
   headOfficeAddress: string | null;
   offices: { label?: string; city?: string; country?: string; address?: string }[];
+  settings?: CompanySettings;
   createdAt: string;
   updatedAt: string;
   /** Present on the list endpoint (the caller's role in that company). */

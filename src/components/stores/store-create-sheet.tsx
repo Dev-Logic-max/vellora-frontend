@@ -148,7 +148,7 @@ export function StoreCreateSheet() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex min-h-0 flex-1 flex-col" noValidate>
-          <div className="scrollbar-thin flex-1 space-y-6 overflow-y-auto px-6 py-5">
+          <div className="scrollbar-none flex-1 space-y-6 overflow-y-auto px-6 py-5">
             {step === 0 ? (
               <>
                 <FieldGroup title="Store details">

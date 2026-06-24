@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Award, HeartPulse, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { DateField } from "@/components/ui/date-picker";
@@ -84,19 +84,35 @@ function QualificationsCard({ employeeId }: { employeeId: string }) {
       ) : isLoading ? (
         <Skeleton className="h-20 w-full" />
       ) : data && data.length > 0 ? (
-        <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
+        <div className="grid gap-3 sm:grid-cols-2">
           {data.map((q) => (
-            <div key={q.id} className="flex items-center justify-between px-4 py-3 text-sm">
-              <div>
-                <p className="font-medium text-foreground">{q.name}</p>
-                <p className="text-xs text-muted-foreground">{q.issuer ?? "—"}</p>
+            <div
+              key={q.id}
+              className="flex items-start gap-3 rounded-xl border border-border bg-surface p-3.5"
+            >
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-primary">
+                <Award className="size-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium text-foreground">{q.name}</p>
+                <p className="truncate text-xs text-muted-foreground">{q.issuer ?? "No issuer"}</p>
+                <div className="mt-1.5 flex items-center gap-2">
+                  <ExpiryChip expires={q.expires} />
+                  {q.issued ? (
+                    <span className="text-[11px] text-muted-foreground tabular-nums">
+                      Issued {q.issued}
+                    </span>
+                  ) : null}
+                </div>
               </div>
-              <ExpiryChip expires={q.expires} />
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">No qualifications recorded.</p>
+        <EmptyCard
+          icon={Award}
+          text="No qualifications recorded. Track certifications and licences with expiry alerts."
+        />
       )}
     </section>
   );
@@ -162,21 +178,46 @@ function MedicalsCard({ employeeId }: { employeeId: string }) {
       ) : isLoading ? (
         <Skeleton className="h-20 w-full" />
       ) : data && data.length > 0 ? (
-        <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
+        <div className="grid gap-3 sm:grid-cols-2">
           {data.map((m) => (
-            <div key={m.id} className="flex items-center justify-between px-4 py-3 text-sm">
-              <div>
-                <p className="font-medium text-foreground">{m.type}</p>
-                <p className="text-xs text-muted-foreground tabular-nums">{m.date ?? "—"}</p>
+            <div
+              key={m.id}
+              className="flex items-start gap-3 rounded-xl border border-border bg-surface p-3.5"
+            >
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-(--chart-2)/12 text-(--chart-2)">
+                <HeartPulse className="size-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium text-foreground">{m.type}</p>
+                <p className="truncate text-xs text-muted-foreground tabular-nums">
+                  {m.date ? `Checked ${m.date}` : "No date"}
+                </p>
+                <div className="mt-1.5">
+                  <ExpiryChip expires={m.expires} />
+                </div>
               </div>
-              <ExpiryChip expires={m.expires} />
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">No medicals recorded.</p>
+        <EmptyCard
+          icon={HeartPulse}
+          text="No medicals recorded. Log health checks with renewal reminders."
+        />
       )}
     </section>
+  );
+}
+
+/** Designed empty placeholder for credential cards. */
+function EmptyCard({ icon: Icon, text }: { icon: typeof Award; text: string }) {
+  return (
+    <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-surface-subtle/40 px-6 py-8 text-center">
+      <span className="flex size-10 items-center justify-center rounded-full bg-accent-soft text-primary">
+        <Icon className="size-5" />
+      </span>
+      <p className="max-w-xs text-sm text-muted-foreground">{text}</p>
+    </div>
   );
 }
 

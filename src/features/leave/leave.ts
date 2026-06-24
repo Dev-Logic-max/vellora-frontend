@@ -106,6 +106,20 @@ export function useLeaveBalances(filters: { employeeId?: string; year?: number }
   });
 }
 
+/** Set an employee's entitled days for a leave type + year (manage-balance modal). */
+export function useSetLeaveBalance() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: {
+      employeeId: string;
+      typeId: string;
+      year: number;
+      entitled: number;
+    }) => api.post<LeaveBalance>("/api/leave/balances", input),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: [BALANCES_KEY] }),
+  });
+}
+
 // ── policies (types) ──────────────────────────────────────────────────────────
 export function useLeaveTypes() {
   return useQuery({

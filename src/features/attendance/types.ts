@@ -13,7 +13,7 @@ export type AnomalySeverity = "low" | "medium" | "high";
 export type AnomalyStatus = "open" | "in_review" | "resolved" | "dismissed";
 export type CorrectionStatus = "requested" | "approved" | "rejected";
 
-export type TerminalStatus = "pending" | "active" | "blocked";
+export type TerminalStatus = "pending" | "active" | "inactive" | "blocked";
 export type DeviceStatus = "pending" | "registered" | "reset" | "blocked";
 
 export interface EmployeeRef {
@@ -109,6 +109,8 @@ export interface Terminal {
   qrSecret: string | null;
   qrRotatedAt: string | null;
   lastSeen: string | null;
+  deactivatedBy: string | null;
+  deactivatedAt: string | null;
   createdAt: string;
 }
 
@@ -119,6 +121,61 @@ export interface TerminalQr {
   rotatedAt: string;
   expiresAt: string;
   ttlSeconds: number;
+}
+
+// ── Device registration (point 21) ──────────────────────────────────────────
+export type DeviceRegistrationStatus = "active" | "disabled" | "revoked";
+export type DeviceRegistrationAction =
+  | "registered"
+  | "revoked"
+  | "disabled"
+  | "enabled"
+  | "re_registered";
+
+export interface PublicRegistration {
+  id: string;
+  label: string | null;
+  platform: string | null;
+  status: DeviceRegistrationStatus;
+  registeredAt: string;
+  lastSeenAt: string | null;
+}
+
+/** The signed-in employee's own device status (drives the My-Profile UI). */
+export interface MyDeviceStatus {
+  isEmployee: boolean;
+  employeeId?: string;
+  registered: boolean;
+  requireFingerprint: boolean;
+  registration: PublicRegistration | null;
+  /** Returned once, right after registering, so the device can persist it. */
+  deviceToken?: string;
+}
+
+/** A registration row in the HR/admin management table. */
+export interface DeviceRegistration {
+  id: string;
+  companyId: string;
+  employeeId: string;
+  label: string | null;
+  platform: string | null;
+  status: DeviceRegistrationStatus;
+  registeredAt: string;
+  lastSeenAt: string | null;
+  revokedBy: string | null;
+  revokedAt: string | null;
+  employee?: EmployeeRef | null;
+}
+
+export interface DeviceRegistrationLog {
+  id: string;
+  employeeId: string;
+  registrationId: string | null;
+  action: DeviceRegistrationAction;
+  actorUserId: string | null;
+  deviceLabel: string | null;
+  note: string | null;
+  createdAt: string;
 }
 
 export interface LogFilters {

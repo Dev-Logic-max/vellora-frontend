@@ -1,7 +1,20 @@
+import {
+  Bus,
+  CarFront,
+  Dumbbell,
+  HeartPulse,
+  Home,
+  ShieldPlus,
+  Smile,
+  UtensilsCrossed,
+  type LucideIcon,
+} from "lucide-react";
+
 import type {
   ContractType,
   EmployeeStatus,
   Gender,
+  MaritalStatus,
   StoreRelation,
   WorkScheduleType,
 } from "./types";
@@ -47,6 +60,14 @@ export const GENDER_OPTIONS: { value: Gender; label: string }[] = [
   { value: "prefer_not_to_say", label: "Prefer not to say" },
 ];
 
+export const MARITAL_STATUS_OPTIONS: { value: MaritalStatus; label: string }[] = [
+  { value: "single", label: "Single" },
+  { value: "married", label: "Married" },
+  { value: "divorced", label: "Divorced" },
+  { value: "widowed", label: "Widowed" },
+  { value: "other", label: "Other" },
+];
+
 /** Benefits a company can toggle on for an employee (the key is persisted). */
 export const BENEFIT_OPTIONS: { key: string; label: string }[] = [
   { key: "first_aid", label: "First-aid certified" },
@@ -58,3 +79,15 @@ export const BENEFIT_OPTIONS: { key: string; label: string }[] = [
   { key: "remote_stipend", label: "Remote stipend" },
   { key: "paid_parking", label: "Paid parking" },
 ];
+
+/** Icon per benefit key (rendered in the benefits grid). */
+export const BENEFIT_ICONS: Record<string, LucideIcon> = {
+  first_aid: ShieldPlus,
+  medical: HeartPulse,
+  dental: Smile,
+  meal_allowance: UtensilsCrossed,
+  transport: Bus,
+  gym: Dumbbell,
+  remote_stipend: Home,
+  paid_parking: CarFront,
+};
