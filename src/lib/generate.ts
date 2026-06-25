@@ -46,6 +46,11 @@ export function isValidUniqueId(code: string): boolean {
   return /^[A-Z0-9]{3}-[A-Z0-9]{3,4}$/.test(code);
 }
 
+/** Store code: a plain 6-digit numeric code (e.g. `482915`). */
+export function generateStoreCode(): string {
+  return pick("0123456789", 6);
+}
+
 const PW_UPPER = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 const PW_LOWER = "abcdefghijkmnpqrstuvwxyz";
 const PW_NUM = "23456789";

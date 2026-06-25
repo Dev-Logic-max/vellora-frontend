@@ -77,7 +77,7 @@ export function TransferSheet({ trigger }: { trigger: ReactNode }) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger render={trigger as React.ReactElement} />
-      <SheetContent className="w-full sm:max-w-md">
+      <SheetContent className="w-full sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>New transfer</SheetTitle>
           <SheetDescription>Move an employee between stores.</SheetDescription>

@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { AvatarPreview } from "@/components/ui/avatar-preview";
 import { DataTableShell, type DataTableColumnMeta } from "@/components/ui/data-table-shell";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Flag } from "@/components/ui/flag";
+import { ListToolbar } from "@/components/ui/list-toolbar";
 import { RoleTag } from "@/components/ui/role-tag";
 import { StatusPill } from "@/components/ui/status-pill";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -20,6 +22,7 @@ import { EmployeeDeleteModal } from "@/components/employees/employee-delete-moda
 import { ExportEmployeesDialog } from "@/components/employees/export-employees-dialog";
 import { ImportEmployeesDialog } from "@/components/employees/import-employees-dialog";
 import { Link, useRouter } from "@/i18n/navigation";
+import { countryCode } from "@/lib/geo/countries";
 import { cn } from "@/lib/utils";
 import { useStores } from "@/features/org/stores";
 import { useCurrentUser } from "@/features/session/use-current-user";
@@ -79,6 +82,11 @@ export function EmployeesList() {
         accessorKey: "lastName",
         cell: ({ row }) => {
           const e = row.original;
+          const cc = countryCode(
+            e.country ??
+              e.nationality ??
+              (e.locale?.includes("-") ? (e.locale.split("-")[1] ?? null) : null),
+          );
           return (
             <div className="flex items-center gap-3">
               {/* Avatar shows a pointer + opens an image preview on click. */}
@@ -88,8 +96,11 @@ export function EmployeesList() {
                 className="size-9 rounded-full"
               />
               <div className="min-w-0">
-                <p className="truncate font-medium text-foreground">
-                  {e.firstName} {e.lastName}
+                <p className="flex items-center gap-1.5 truncate font-medium text-foreground">
+                  <span className="truncate">
+                    {e.firstName} {e.lastName}
+                  </span>
+                  {cc ? <Flag code={cc} className="h-3 w-4.5 shrink-0 rounded-xs" /> : null}
                 </p>
                 {e.email ? (
                   <p className="truncate text-xs text-muted-foreground">{e.email}</p>
@@ -205,25 +216,27 @@ export function EmployeesList() {
       {isError ? (
         <p className="text-sm text-destructive">Couldn&apos;t load employees.</p>
       ) : (
-        <DataTableShell
-          columns={columns}
-          data={data?.data ?? []}
-          isLoading={isLoading}
-          toolbar={{
-            searchValue: search,
-            onSearchChange: setSearch,
-            searchPlaceholder: "Search name, email, or ID…",
-            filters: [
+        <div className="space-y-4">
+          <ListToolbar
+            searchValue={search}
+            onSearchChange={setSearch}
+            searchPlaceholder="Search name, email, or ID…"
+            showFilter
+            filters={[
               { key: "storeId", label: "Store", type: "select", options: storeOptions },
               { key: "status", label: "Status", type: "select", options: EMPLOYEE_STATUS_OPTIONS },
-            ],
-            filterValues: filters,
-            onFilterChange: (v) => {
+            ]}
+            filterValues={filters}
+            onFilterChange={(v) => {
               setFilters(v);
               setPage(1);
-            },
-          }}
-          pagination={{
+            }}
+          />
+          <DataTableShell
+            columns={columns}
+            data={data?.data ?? []}
+            isLoading={isLoading}
+            pagination={{
             page,
             pageSize: PAGE_SIZE,
             total,
@@ -249,7 +262,8 @@ export function EmployeesList() {
               }
             />
           }
-        />
+          />
+        </div>
       )}
     </div>
   );

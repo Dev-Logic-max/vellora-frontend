@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import type { Company, CompanySettings, CompanyUsage } from "./types";
+// CompanySettings is also referenced in CompanyInput below.
 
 export function useCompanies() {
   return useQuery({ queryKey: ["companies"], queryFn: () => api.get<Company[]>("/api/companies") });
@@ -82,6 +83,9 @@ export interface CompanyInput {
   offices?: CompanyOffice[];
   planKey?: string;
   customPricing?: CustomPricing;
+  logoUrl?: string | null;
+  bannerUrl?: string | null;
+  settings?: CompanySettings;
 }
 
 export function useCreateCompany() {

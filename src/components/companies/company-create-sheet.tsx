@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, ArrowRight, Check, Plus } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Plus, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { DateField } from "@/components/ui/date-picker";
@@ -422,35 +422,37 @@ export function CompanyCreateSheet() {
             {serverError ? <p className="text-sm text-destructive">{serverError}</p> : null}
           </div>
 
-          {/* Footer — Cancel/Back (left) + Next/Create (right). */}
-          <div className="flex items-center justify-end gap-2 border-t border-border bg-surface-subtle/60 px-6 py-3">
-            {step === 0 ? (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setOpen(false);
-                  resetAll();
-                }}
-              >
-                Cancel
-              </Button>
-            ) : (
-              <Button type="button" variant="outline" onClick={() => setStep((s) => s - 1)}>
-                <ArrowLeft />
-                Back
-              </Button>
-            )}
-            {step < STEPS.length - 1 ? (
-              <Button type="button" onClick={goNext}>
-                Next
-                <ArrowRight />
-              </Button>
-            ) : (
-              <Button type="button" onClick={handleSave} disabled={isSubmitting}>
-                {isSubmitting ? "Creating…" : "Create company"}
-              </Button>
-            )}
+          {/* Footer — Close (far left, always) + Back/Next/Create (right). */}
+          <div className="flex items-center justify-between gap-2 border-t border-border bg-surface-subtle/60 px-6 py-3">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setOpen(false);
+                resetAll();
+              }}
+            >
+              <X />
+              Close
+            </Button>
+            <div className="flex items-center gap-2">
+              {step > 0 ? (
+                <Button type="button" variant="outline" onClick={() => setStep((s) => s - 1)}>
+                  <ArrowLeft />
+                  Back
+                </Button>
+              ) : null}
+              {step < STEPS.length - 1 ? (
+                <Button type="button" onClick={goNext}>
+                  Next
+                  <ArrowRight />
+                </Button>
+              ) : (
+                <Button type="button" onClick={handleSave} disabled={isSubmitting}>
+                  {isSubmitting ? "Creating…" : "Create company"}
+                </Button>
+              )}
+            </div>
           </div>
         </form>
       </DialogContent>

@@ -59,7 +59,7 @@ export function DocumentsView() {
                   </Button>
                 }
               />
-              <SheetContent className="w-full sm:max-w-md">
+              <SheetContent className="w-full sm:max-w-lg">
                 <SheetHeader>
                   <SheetTitle>Upload documents</SheetTitle>
                   <SheetDescription>

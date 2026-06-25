@@ -12,14 +12,10 @@ import {
 } from "@/features/admin/admin";
 import { setImpersonation } from "@/features/admin/impersonation";
 import { Button } from "@/components/ui/button";
+import { FieldGroup } from "@/components/ui/field-group";
+import { FormSheet } from "@/components/ui/form-sheet";
+import { PlanTag } from "@/components/ui/plan-tag";
 import { SelectField } from "@/components/ui/select-field";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusPill } from "@/components/ui/status-pill";
 
@@ -29,6 +25,11 @@ const STATUSES = [
   { value: "inactive", label: "Inactive" },
 ];
 
+/**
+ * Tenant configuration sheet (platform). A standardized `lg` right-sheet:
+ * gradient header, grouped sections (plan assignment, lifecycle status,
+ * impersonation), and a footer Close. Cross-tenant — gated by the PlatformGuard.
+ */
 export function TenantDrawer({ id, onClose }: { id: string | null; onClose: () => void }) {
   const { data: tenant, isLoading } = useTenant(id);
   const { data: plans } = useAdminPlans();
@@ -38,33 +39,32 @@ export function TenantDrawer({ id, onClose }: { id: string | null; onClose: () =
   const [planId, setPlanId] = useState("");
 
   return (
-    <Sheet open={Boolean(id)} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-md">
-        <SheetHeader>
-          <SheetTitle>{tenant?.name ?? "Tenant"}</SheetTitle>
-          <SheetDescription>{tenant?.slug ?? "—"}</SheetDescription>
-        </SheetHeader>
-
-        {isLoading || !tenant ? (
-          <div className="space-y-3 px-4">
-            <Skeleton className="h-16 w-full" />
-            <Skeleton className="h-16 w-full" />
+    <FormSheet
+      open={Boolean(id)}
+      onOpenChange={(open) => !open && onClose()}
+      title={tenant?.name ?? "Tenant"}
+      subtitle="Platform configuration"
+    >
+      {isLoading || !tenant ? (
+        <div className="space-y-3">
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-16 w-full" />
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {/* Snapshot */}
+          <div className="flex items-center justify-between rounded-xl border border-border bg-surface-subtle/40 px-4 py-3">
+            <StatusPill status={tenant.status} />
+            <span className="text-sm text-muted-foreground">
+              {tenant.employees} employees · {tenant.stores ?? 0} stores
+            </span>
           </div>
-        ) : (
-          <div className="space-y-6 px-4 pb-8">
-            <div className="flex items-center justify-between">
-              <StatusPill status={tenant.status} />
-              <span className="text-sm text-muted-foreground">
-                {tenant.employees} employees
-              </span>
-            </div>
 
-            <section className="space-y-2">
-              <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                Plan
-              </h3>
-              <p className="text-sm text-foreground">
-                Current: {tenant.subscription?.plan?.name ?? "Free"}
+          {/* Plan assignment */}
+          <FieldGroup title="Plan">
+            <div className="col-span-full space-y-2">
+              <p className="text-sm text-foreground-2">
+                Current: <PlanTag plan={tenant.subscription?.plan?.name} />
               </p>
               <div className="flex gap-2">
                 <SelectField
@@ -84,33 +84,32 @@ export function TenantDrawer({ id, onClose }: { id: string | null; onClose: () =
                   Assign
                 </Button>
               </div>
-            </section>
+            </div>
+          </FieldGroup>
 
-            <section className="space-y-2">
-              <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                Status
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {STATUSES.map((s) => (
-                  <Button
-                    key={s.value}
-                    size="sm"
-                    variant={tenant.status === s.value ? "default" : "outline"}
-                    disabled={setStatus.isPending}
-                    onClick={() => setStatus.mutate({ id: tenant.id, status: s.value })}
-                  >
-                    {s.label}
-                  </Button>
-                ))}
-              </div>
-            </section>
+          {/* Lifecycle status */}
+          <FieldGroup title="Lifecycle status">
+            <div className="col-span-full flex flex-wrap gap-2">
+              {STATUSES.map((s) => (
+                <Button
+                  key={s.value}
+                  size="sm"
+                  variant={tenant.status === s.value ? "default" : "outline"}
+                  disabled={setStatus.isPending}
+                  onClick={() => setStatus.mutate({ id: tenant.id, status: s.value })}
+                >
+                  {s.label}
+                </Button>
+              ))}
+            </div>
+          </FieldGroup>
 
-            <section className="space-y-2">
-              <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                Impersonate
-              </h3>
+          {/* Impersonation */}
+          <FieldGroup title="Impersonation">
+            <div className="col-span-full space-y-2">
               <p className="text-xs text-muted-foreground">
-                Start an audited impersonation session. A banner shows while active.
+                Start an audited impersonation session to view this tenant&apos;s workspace. A banner
+                shows while active.
               </p>
               <Button
                 variant="outline"
@@ -128,10 +127,10 @@ export function TenantDrawer({ id, onClose }: { id: string | null; onClose: () =
                 <UserCog className="size-4" />
                 Impersonate
               </Button>
-            </section>
-          </div>
-        )}
-      </SheetContent>
-    </Sheet>
+            </div>
+          </FieldGroup>
+        </div>
+      )}
+    </FormSheet>
   );
 }

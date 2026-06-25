@@ -42,7 +42,7 @@ function JobEditor() {
           </Button>
         }
       />
-      <SheetContent className="w-full overflow-y-auto sm:max-w-md">
+      <SheetContent className="w-full overflow-y-auto sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>New position</SheetTitle>
         </SheetHeader>
