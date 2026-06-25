@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { Store, StoreActivity } from "./types";
+import type { Store, StoreActivity, StoreAnalytics, StoreSettings } from "./types";
 
 export function useStores() {
   return useQuery({ queryKey: ["stores"], queryFn: () => api.get<Store[]>("/api/stores") });
@@ -36,6 +36,17 @@ export interface StoreInput {
   timezone?: string;
   capacity?: number;
   headStore?: boolean;
+  logoUrl?: string;
+  bannerUrl?: string;
+  settings?: StoreSettings;
+}
+
+export function useStoreAnalytics(id: string) {
+  return useQuery({
+    queryKey: ["store", id, "analytics"],
+    queryFn: () => api.get<StoreAnalytics>(`/api/stores/${id}/analytics`),
+    enabled: Boolean(id),
+  });
 }
 
 export function useCreateStore() {

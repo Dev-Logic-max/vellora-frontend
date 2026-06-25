@@ -38,7 +38,7 @@ export function CandidateDrawer({
 
   return (
     <Sheet open={Boolean(candidateId)} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-md">
+      <SheetContent className="w-full overflow-y-auto sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>{candidate?.name ?? "Candidate"}</SheetTitle>
           <SheetDescription>{candidate?.email}</SheetDescription>

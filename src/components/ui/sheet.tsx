@@ -60,6 +60,9 @@ function SheetOverlay({ className, ...props }: SheetPrimitive.Backdrop.Props) {
 function ClosableOverlay({ className }: { className?: string }) {
   return (
     <SheetPrimitive.Close
+      // The backdrop is a <div>, not a native button — tell base-ui so it doesn't
+      // warn about lost button semantics (this overlay is purely a click target).
+      nativeButton={false}
       render={
         <div
           data-slot="sheet-overlay"

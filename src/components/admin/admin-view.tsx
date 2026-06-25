@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, Flag, Network, ScrollText, ShieldAlert } from "lucide-react";
+import { Building2, Flag, Inbox, Network, ScrollText, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 
 import { PageHeader } from "@/components/layout/page-header";
@@ -9,18 +9,19 @@ import { SegmentedTabs, type SegmentedTab } from "@/components/ui/segmented-tabs
 import { useCurrentUser } from "@/features/session/use-current-user";
 import { AuditLogViewer } from "./audit-log-viewer";
 import { FeatureFlagsPanel } from "./feature-flags-panel";
+import { RequestsTab } from "./requests-tab";
 import { RolesGroupsTab } from "./roles-groups-tab";
-import { TenantDrawer } from "./tenant-drawer";
-import { TenantsTable } from "./tenants-table";
+import { TenantsPanel } from "./tenants-panel";
 
 /**
  * Platform console (P9-F). Visible only to platform operators; everyone else
  * sees a block. The backend PlatformGuard is the real gate.
  */
-type AdminTab = "tenants" | "roles" | "flags" | "audit";
+type AdminTab = "tenants" | "requests" | "roles" | "flags" | "audit";
 
 const ADMIN_TABS: SegmentedTab<AdminTab>[] = [
   { value: "tenants", label: "Tenants", icon: Building2 },
+  { value: "requests", label: "Requests", icon: Inbox },
   { value: "roles", label: "Roles & groups", icon: Network },
   { value: "flags", label: "Feature flags", icon: Flag },
   { value: "audit", label: "Audit log", icon: ScrollText },
@@ -30,7 +31,6 @@ export function AdminView() {
   const { data: user, isLoading } = useCurrentUser();
   const isPlatform = Boolean(user?.platformRole);
   const [tab, setTab] = useState<AdminTab>("tenants");
-  const [openTenant, setOpenTenant] = useState<string | null>(null);
 
   if (!isLoading && !isPlatform) {
     return (
@@ -52,12 +52,8 @@ export function AdminView() {
       <SegmentedTabs tabs={ADMIN_TABS} value={tab} onValueChange={setTab} layoutGroup="admin-tabs" />
 
       <div className="pt-1">
-        {tab === "tenants" ? (
-          <>
-            <TenantsTable onOpen={setOpenTenant} />
-            <TenantDrawer id={openTenant} onClose={() => setOpenTenant(null)} />
-          </>
-        ) : null}
+        {tab === "tenants" ? <TenantsPanel /> : null}
+        {tab === "requests" ? <RequestsTab /> : null}
         {tab === "roles" ? <RolesGroupsTab /> : null}
         {tab === "flags" ? <FeatureFlagsPanel /> : null}
         {tab === "audit" ? <AuditLogViewer /> : null}

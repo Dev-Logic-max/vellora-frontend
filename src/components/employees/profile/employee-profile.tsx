@@ -26,7 +26,7 @@ import {
 import { Flag } from "@/components/ui/flag";
 import { EntityAvatar } from "@/components/ui/entity-avatar";
 import { RoleTag } from "@/components/ui/role-tag";
-import { countryCode, countryName } from "@/lib/geo/countries";
+import { countryCode } from "@/lib/geo/countries";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusPill } from "@/components/ui/status-pill";
 import { SegmentedTabs, type SegmentedTab } from "@/components/ui/segmented-tabs";
@@ -312,13 +312,10 @@ export function EmployeeProfile({ id }: { id: string }) {
               <div className="flex items-center gap-2.5">
                 <h1 className="font-display text-2xl font-semibold text-foreground">{fullName}</h1>
                 {cc ? (
-                  <span
-                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/80 py-0.5 pr-2 pl-1 shadow-sm"
-                    title={countryName(cc) ?? cc}
-                  >
-                    <Flag code={cc} className="h-3.5 w-5 rounded-[3px]" />
-                    <span className="text-xs font-medium text-muted-foreground">{cc}</span>
-                  </span>
+                  <Flag
+                    code={cc}
+                    className="h-4 w-6 rounded-[3px] shadow-sm"
+                  />
                 ) : null}
               </div>
               {/* The PLATFORM (membership) role — not the free-text job title. */}

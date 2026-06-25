@@ -97,7 +97,7 @@ export function LeaveRequestSheet({
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger render={trigger as React.ReactElement} />
-      <SheetContent className="w-full sm:max-w-md">
+      <SheetContent className="w-full sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>Request leave</SheetTitle>
           <SheetDescription>Pick a date range and leave type.</SheetDescription>

@@ -4,8 +4,13 @@ export interface TenantSummary {
   name: string;
   slug: string | null;
   status: string;
+  country: string | null;
   createdAt: string;
   employees: number;
+  stores: number;
+  ownerName: string | null;
+  ownerAvatarUrl: string | null;
+  employeeAvatars: { name: string; avatarUrl: string | null }[];
   subscription?: { status: string; plan?: { name: string } | null } | null;
 }
 

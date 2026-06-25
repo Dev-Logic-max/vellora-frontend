@@ -289,7 +289,7 @@ export function EmployeeFormSheet({
       <SheetContent
         showCloseButton={false}
         closeOnBackdrop
-        className="flex w-full flex-col gap-0 p-0 data-[side=right]:sm:max-w-3xl"
+        className="flex w-full flex-col gap-0 p-0 data-[side=right]:sm:max-w-lg"
       >
         {/* Header — title + small subtext + step rail (heading UNDER the number).
             Medium close (✕) top-right. */}

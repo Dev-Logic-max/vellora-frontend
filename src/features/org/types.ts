@@ -20,6 +20,7 @@ export interface Company {
   status: CompanyStatus;
   planId: string | null;
   logoUrl: string | null;
+  bannerUrl: string | null;
   ownerUserId: string | null;
   category: string | null;
   registrationNumber: string | null;
@@ -39,7 +40,10 @@ export interface Company {
   storeCount?: number;
   employeeCount?: number;
   ownerName?: string | null;
+  ownerAvatarUrl?: string | null;
   planName?: string | null;
+  /** Sample of employee avatars for the overlapping stack (up to 4). */
+  employeeAvatars?: { name: string; avatarUrl: string | null }[];
 }
 
 export interface CompanyUsage {
@@ -57,6 +61,20 @@ export interface Group {
   updatedAt: string;
 }
 
+/** Per-store operational toggles (mirrors backend store settings). */
+export interface StoreSettings {
+  /** Link this store to a (future) POS system. */
+  posEnabled?: boolean;
+  /** Expose a public storefront profile. */
+  publicProfile?: boolean;
+  /** Notify managers when traffic hits peak thresholds. */
+  peakAlerts?: boolean;
+  /** Reporting currency override (defaults to the company currency). */
+  currency?: string;
+  /** Monthly revenue target used by analytics. */
+  monthlyTarget?: number;
+}
+
 export interface Store {
   id: string;
   companyId: string;
@@ -72,10 +90,38 @@ export interface Store {
   timezone: string;
   capacity: number;
   headStore: boolean;
+  logoUrl: string | null;
+  bannerUrl: string | null;
+  settings: StoreSettings;
   openingHours: Record<string, unknown>;
   managerUserId: string | null;
   createdAt: string;
   updatedAt: string;
+  /** Directory aggregates (present on the list endpoint). */
+  employeeCount?: number;
+  employeeAvatars?: { name: string; avatarUrl: string | null }[];
+}
+
+/** Mock store analytics (revenue/profit/visitors/peak hours — POS placeholder). */
+export interface StoreAnalytics {
+  storeId: string;
+  currency: string;
+  period: string;
+  revenueMtd: number;
+  profitMtd: number;
+  marginPct: number;
+  laborCost: number;
+  visitorsMtd: number;
+  target: number;
+  revenueChangePct: number;
+  profitChangePct: number;
+  visitorsChangePct: number;
+  shiftsThisWeek: number;
+  hoursScheduled: number;
+  avgBasket: number;
+  trend: { month: number; revenue: number; profit: number; visitors: number }[];
+  hourly: { hour: number; traffic: number }[];
+  peakHours: number[];
 }
 
 export interface StoreActivity {

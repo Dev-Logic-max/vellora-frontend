@@ -32,7 +32,7 @@ export function EmployeeDrawer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full sm:max-w-md">
+      <SheetContent className="w-full sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>{name}</SheetTitle>
           <SheetDescription>Onboarding checklist</SheetDescription>

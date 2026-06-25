@@ -67,7 +67,7 @@ export function CorrectionSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full sm:max-w-md">
+      <SheetContent className="w-full sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>Request correction</SheetTitle>
           <SheetDescription>

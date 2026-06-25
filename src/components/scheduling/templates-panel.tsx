@@ -60,7 +60,7 @@ export function TemplatesPanel({
   return (
     <Sheet>
       <SheetTrigger render={trigger as React.ReactElement} />
-      <SheetContent className="w-full overflow-y-auto sm:max-w-md">
+      <SheetContent className="w-full overflow-y-auto sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>Templates</SheetTitle>
           <SheetDescription>Fill the current week from a saved pattern.</SheetDescription>

@@ -1,24 +1,60 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { Store as StoreIcon } from "lucide-react";
 
 import { KpiTile } from "@/components/dashboard/kpi-tile";
 import { PageHeader } from "@/components/layout/page-header";
 import { PlanLimitBanner } from "@/components/billing/plan-limit-banner";
-import { CapacityBar } from "@/components/stores/capacity-bar";
+import { StoreCard } from "@/components/stores/store-card";
 import { StoreCreateSheet } from "@/components/stores/store-create-sheet";
+import { StoresTable } from "@/components/stores/stores-table";
 import { EmptyState } from "@/components/ui/empty-state";
-import { EntityAvatar } from "@/components/ui/entity-avatar";
+import { ListToolbar, type ListView } from "@/components/ui/list-toolbar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { StatusPill } from "@/components/ui/status-pill";
-import { Link } from "@/i18n/navigation";
+import type { FilterValues } from "@/components/ui/filter-modal";
 import { useStores } from "@/features/org/stores";
+
+const VIEW_KEY = "vellora:stores-view";
+/** Show the filter control only once there are enough stores to warrant it. */
+const FILTER_THRESHOLD = 8;
+
+function initialView(): ListView {
+  if (typeof window === "undefined") return "cards";
+  return window.localStorage.getItem(VIEW_KEY) === "table" ? "table" : "cards";
+}
 
 export default function StoresPage() {
   const { data, isLoading, isError } = useStores();
+  const [view, setView] = useState<ListView>(initialView);
+  const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState<FilterValues>({});
+
+  const changeView = (v: ListView) => {
+    setView(v);
+    window.localStorage.setItem(VIEW_KEY, v);
+  };
 
   const active = data?.filter((s) => s.status === "active").length ?? 0;
   const totalCapacity = data?.reduce((sum, s) => sum + s.capacity, 0) ?? 0;
+  const totalStaff = data?.reduce((sum, s) => sum + (s.employeeCount ?? 0), 0) ?? 0;
+  const util = totalCapacity > 0 ? Math.round((totalStaff / totalCapacity) * 100) : 0;
+
+  const filtered = useMemo(() => {
+    const list = data ?? [];
+    const q = search.trim().toLowerCase();
+    return list.filter((s) => {
+      if (filters.status && s.status !== filters.status) return false;
+      if (!q) return true;
+      return (
+        s.name.toLowerCase().includes(q) ||
+        (s.code ?? "").toLowerCase().includes(q) ||
+        (s.city ?? "").toLowerCase().includes(q)
+      );
+    });
+  }, [data, search, filters]);
+
+  const total = data?.length ?? 0;
 
   return (
     <div className="space-y-6">
@@ -31,15 +67,17 @@ export default function StoresPage() {
       <PlanLimitBanner metric="stores" label="stores" />
 
       {data && data.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <KpiTile label="Active stores" value={String(active)} icon={StoreIcon} />
+          <KpiTile label="Team members" value={String(totalStaff)} />
           <KpiTile label="Total capacity" value={String(totalCapacity)} />
-          <KpiTile label="Avg utilization" value="0%" />
+          <KpiTile label="Avg utilization" value={`${util}%`} />
         </div>
       )}
 
       {isLoading && <Skeleton className="h-48 w-full" />}
       {isError && <p className="text-sm text-destructive">Couldn&apos;t load stores.</p>}
+
       {data && data.length === 0 && (
         <EmptyState
           icon={StoreIcon}
@@ -48,46 +86,50 @@ export default function StoresPage() {
           action={<StoreCreateSheet />}
         />
       )}
+
       {data && data.length > 0 && (
-        <div className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border bg-surface-subtle text-left text-xs tracking-wide text-foreground-2 uppercase">
-                <th className="px-4 py-3 font-semibold">Store</th>
-                <th className="px-4 py-3 font-semibold">Code</th>
-                <th className="px-4 py-3 font-semibold">Capacity</th>
-                <th className="px-4 py-3 font-semibold">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((store) => (
-                <tr
-                  key={store.id}
-                  className="border-b border-border transition-colors last:border-0 hover:bg-surface-subtle"
-                >
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/stores/${store.id}`}
-                      className="flex items-center gap-3 font-medium text-foreground hover:text-primary"
-                    >
-                      <EntityAvatar name={store.name} className="size-8 rounded-lg" />
-                      {store.name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                    {store.code ?? "—"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <CapacityBar used={0} max={store.capacity} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatusPill status={store.status} />
-                  </td>
-                </tr>
+        <>
+          <ListToolbar
+            searchValue={search}
+            onSearchChange={setSearch}
+            searchPlaceholder="Search stores by name, code, or city…"
+            view={view}
+            onViewChange={changeView}
+            showFilter={total > FILTER_THRESHOLD}
+            filters={[
+              {
+                key: "status",
+                label: "Status",
+                type: "select",
+                options: [
+                  { value: "active", label: "Active" },
+                  { value: "pending", label: "Pending" },
+                  { value: "inactive", label: "Inactive" },
+                  { value: "suspended", label: "Suspended" },
+                  { value: "archived", label: "Archived" },
+                ],
+              },
+            ]}
+            filterValues={filters}
+            onFilterChange={setFilters}
+          />
+
+          {filtered.length === 0 ? (
+            <EmptyState
+              icon={StoreIcon}
+              title="No matches"
+              description="No stores match your search or filters."
+            />
+          ) : view === "cards" ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((s) => (
+                <StoreCard key={s.id} store={s} />
               ))}
-            </tbody>
-          </table>
-        </div>
+            </div>
+          ) : (
+            <StoresTable stores={filtered} />
+          )}
+        </>
       )}
     </div>
   );
